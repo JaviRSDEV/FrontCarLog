@@ -1,0 +1,115 @@
+<div class="login-layout d-flex flex-column min-vh-100">
+
+  <img class="fondo-difuminado" src="assets/fondoPrincipal.jpg" alt="Fondo taller">
+
+  <div class="content-wrapper container-fluid text-center d-flex flex-column justify-content-center align-items-center flex-grow-1 py-5">
+
+    <img id="logo" src="assets/logo.png" alt="Logo CarLog">
+
+    <h1 class="titulo display-1 text-primary fw-bold">
+      <span id="car">CAR</span><span id="log">LOG</span>
+    </h1>
+
+    <h4 id="subtitulo" class="text-info fw-bold">Tu taller digital</h4>
+
+    <p class="info mt-3 fw-semibold text-center">
+      Registra tus vehículos y sus mantenimientos y olvídate de papeles.<br>
+      Lleva el control total en tu ordenador y evita imprevistos.
+    </p>
+
+    <div class="container mt-4">
+      <div class="row g-4 justify-content-center">
+
+        <div class="col-md-5">
+          <div class="h-100 text-white card rounded-5 p-4 d-flex flex-row align-items-center shadow" id="caja">
+            <img src="../../assets/coche_caja.webp" class="me-3 rounded" width="60">
+            <span class="text-start">Registra tu vehículo de manera fácil y sencilla</span>
+          </div>
+        </div>
+
+        <div class="col-md-5">
+          <div class="h-100 text-white card rounded-5 p-4 d-flex flex-row align-items-center shadow" id="caja">
+            <img src="../../assets/piezas_caja.jpg" class="me-3 rounded" width="60">
+            <span class="text-start">Registra las piezas que desees para tener un seguimiento</span>
+          </div>
+        </div>
+
+        <div class="col-md-8">
+          <div class="text-white card rounded-5 p-4 d-flex flex-row align-items-center shadow justify-content-center" id="caja">
+            <img src="../../assets/alerta_caja.webp" class="me-3 rounded" width="60">
+            <span>Automatiza alertas a tu preferencia</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div id="btn-container" class="mt-5">
+      <button id="login" class="btn btn-primary me-2 px-4" (click)="openLogin()">Iniciar sesión</button>
+      <button id="register" class="btn btn-secondary px-4" (click)="openRegister()">Regístrate</button>
+    </div>
+
+  </div>
+  <footer id="pie_pagina" class="py-2 border-top mt-auto">
+    <div class="container">
+      <div class="row text-center text-md-start">
+        <div class="col-md-8 col-12 mb-3 mb-md-0">
+          <h5 class="text-uppercase fw-bold text-white">Sobre nosotros</h5>
+          <p class="small text-white">Texto de ejemplo</p>
+        </div>
+        <div class="col-md-4 col-12 text-center text-md-end">
+          <h5 class="text-uppercase fw-bold text-white">Nuestras redes</h5>
+          <div class="d-flex justify-content-center justify-content-md-end gap-3">
+            <a href="#" class="text-white fs-3"><i class="bi bi-instagram"></i></a>
+            <a href="#" class="text-white fs-3"><i class="bi bi-twitter-x"></i></a>
+            <a href="#" class="text-white fs-3"><i class="bi bi-whatsapp"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+@if(showLogin){
+  <div class="modal fade show modal-animado" tabindex="-1" style="display: block;">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 shadow-lg">
+        <div class="modal-header border-0 pb-0">
+          <h4 class="modal-title text-primary fw-bold">Iniciar sesión</h4>
+          <button type="button" class="btn-close" (click)="closeLogin()"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted mb-4">Introduce tus credenciales para acceder</p>
+          <input type="email" class="form-control form-control-lg mb-3" placeholder="Correo electrónico">
+          <input type="password" class="form-control form-control-lg mb-4" placeholder="Contraseña">
+          <button class="btn btn-primary w-100 btn-lg rounded-pill" style="background-color: #004E7C;">Acceder</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showRegister) {
+  <div class="modal fade show modal-animado" tabindex="-1" style="display: block;">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 shadow-lg">
+        <div class="modal-header border-0 pb-0">
+          <h4 class="modal-title text-primary fw-bold">Crear Cuenta</h4>
+          <button type="button" class="btn-close" (click)="closeRegister()"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted mb-4">Únete a CarLog y empieza a gestionar tus vehículos.</p>
+          <input type="text" class="form-control form-control-lg mb-3" placeholder="DNI">
+          <input type="text" class="form-control form-control-lg mb-3" placeholder="Nombre completo">
+          <input type="email" class="form-control form-control-lg mb-3" placeholder="Correo electrónico">
+          <input type="text" class="form-control form-control-lg mb-3" placeholder="Teléfono">
+          <input type="password" class="form-control form-control-lg mb-4" placeholder="Contraseña">
+          <button class="btn btn-info w-100 btn-lg text-white rounded-pill" style="background-color: #00AEEF;">Comenzar ahora</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showLogin || showRegister) {
+  <div class="modal-backdrop fade show backdrop-animado" (click)="closeLogin(); closeRegister()"></div>
+}
+</div>
