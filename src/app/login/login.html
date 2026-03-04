@@ -21,34 +21,36 @@
       <div class="row g-4 justify-content-center">
 
         <div class="col-md-5">
-          <div class="h-100 text-white card rounded-5 p-4 d-flex flex-row align-items-center shadow" id="caja">
-            <img src="../../assets/coche_caja.webp" class="me-3 rounded" width="60">
+          <div class="h-100 text-white card rounded-5 p-4 d-flex flex-row align-items-center shadow caja">
+            <img src="../../assets/coche_caja.webp" class="me-5 rounded imagen_tarjeta" width="100">
             <span class="text-start">Registra tu vehículo de manera fácil y sencilla</span>
           </div>
         </div>
 
         <div class="col-md-5">
-          <div class="h-100 text-white card rounded-5 p-4 d-flex flex-row align-items-center shadow" id="caja">
-            <img src="../../assets/piezas_caja.jpg" class="me-3 rounded" width="60">
+          <div class="h-100 text-white card rounded-5 p-4 d-flex flex-row align-items-center shadow caja">
+            <img src="../../assets/piezas_caja.jpg" class="me-5 rounded imagen_tarjeta" width="100">
             <span class="text-start">Registra las piezas que desees para tener un seguimiento</span>
           </div>
         </div>
 
         <div class="col-md-8">
-          <div class="text-white card rounded-5 p-4 d-flex flex-row align-items-center shadow justify-content-center" id="caja">
-            <img src="../../assets/alerta_caja.webp" class="me-3 rounded" width="60">
+          <div class="text-white card rounded-5 p-4 d-flex flex-row align-items-center shadow justify-content-center caja">
+            <img src="../../assets/alerta_caja.webp" class="me-5 rounded imagen_tarjeta" width="100">
             <span>Automatiza alertas a tu preferencia</span>
           </div>
         </div>
 
       </div>
     </div>
+
     <div id="btn-container" class="mt-5">
-      <button id="login" class="btn btn-primary me-2 px-4" (click)="openLogin()">Iniciar sesión</button>
-      <button id="register" class="btn btn-secondary px-4" (click)="openRegister()">Regístrate</button>
+      <button id="login" class="btn btn-primary me-2 px-4 boton" (click)="openLogin()">Iniciar sesión</button>
+      <button id="register" class="btn btn-secondary px-4 boton" (click)="openRegister()">Regístrate</button>
     </div>
 
   </div>
+
   <footer id="pie_pagina" class="py-2 border-top mt-auto">
     <div class="container">
       <div class="row text-center text-md-start">
@@ -71,16 +73,48 @@
 @if(showLogin){
   <div class="modal fade show modal-animado" tabindex="-1" style="display: block;">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content rounded-4 shadow-lg">
-        <div class="modal-header border-0 pb-0">
-          <h4 class="modal-title text-primary fw-bold">Iniciar sesión</h4>
-          <button type="button" class="btn-close" (click)="closeLogin()"></button>
-        </div>
-        <div class="modal-body">
-          <p class="text-muted mb-4">Introduce tus credenciales para acceder</p>
-          <input type="email" class="form-control form-control-lg mb-3" placeholder="Correo electrónico">
-          <input type="password" class="form-control form-control-lg mb-4" placeholder="Contraseña">
-          <button class="btn btn-primary w-100 btn-lg rounded-pill" style="background-color: #004E7C;">Acceder</button>
+      <div class="modal-content rounded-5 shadow-lg p-4 border-0">
+        <div class="modal-body text-center">
+
+          <h2 class="display-5 fw-bold mb-1">
+            <span style="color: #004E7C;">CAR</span><span style="color: #00AEEF;">LOG</span>
+          </h2>
+          <h4 class="fw-bold mb-4" style="color: #333;">Iniciar <span style="color: #00AEEF;">Sesión</span></h4>
+
+          <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
+
+            <div class="text-start mb-3">
+              <label class="fw-bold mb-1" style="color: #0066FF;">Correo electrónico</label>
+              <input type="email" class="form-control form-control-lg rounded-4" formControlName="email">
+              @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched){
+                @if(loginForm.get('email')?.hasError('required')){
+                  <small class="text-danger fw-semibold">El correo es obligatorio</small>
+                }
+                @if(loginForm.get('email')?.hasError('email')){
+                  <small class="text-danger fw-semibold">El correo no es válido</small>
+                }
+              }
+            </div>
+
+            <div class="text-start mb-4">
+              <label class="fw-bold mb-1" style="color: #0066FF;">Contraseña</label>
+              <input type="password" class="form-control form-control-lg rounded-4" formControlName="password">
+              @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched){
+                @if(loginForm.get('password')?.hasError('required')){
+                  <small class="text-danger fw-semibold">La contraseña es obligatoria</small>
+                }
+                @if(loginForm.get('password')?.hasError('minlength')){
+                  <small class="text-danger fw-semibold">Debe tener al menos 6 caracteres</small>
+                }
+              }
+            </div>
+
+            <p class="mb-4 text-muted small">¿No tienes cuenta? <a href="#" (click)="closeLogin(); openRegister(); $event.preventDefault()" class="fw-bold text-decoration-underline" style="color: #00AEEF;">Regístrate.</a></p>
+
+            <button type="submit" class="btn w-100 btn-lg rounded-pill text-white mb-3 fw-bold shadow-sm" style="background-color: #00D4FF;" [disabled]="loginForm.invalid">Acceder</button>
+            <button type="button" class="btn w-100 btn-lg rounded-pill text-white fw-bold shadow-sm" style="background-color: #0066FF;" (click)="closeLogin()">Volver</button>
+          </form>
+
         </div>
       </div>
     </div>
@@ -112,4 +146,5 @@
 @if (showLogin || showRegister) {
   <div class="modal-backdrop fade show backdrop-animado" (click)="closeLogin(); closeRegister()"></div>
 }
+
 </div>
