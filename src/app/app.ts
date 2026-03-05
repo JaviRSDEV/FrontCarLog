@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Login } from './login/login'
+import { Login } from './pages/login/login'
 
 @Component({
   selector: 'app-root',

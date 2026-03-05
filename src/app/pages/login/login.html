@@ -131,12 +131,77 @@
         </div>
         <div class="modal-body">
           <p class="text-muted mb-4">Únete a CarLog y empieza a gestionar tus vehículos.</p>
-          <input type="text" class="form-control form-control-lg mb-3" placeholder="DNI">
-          <input type="text" class="form-control form-control-lg mb-3" placeholder="Nombre completo">
-          <input type="email" class="form-control form-control-lg mb-3" placeholder="Correo electrónico">
-          <input type="text" class="form-control form-control-lg mb-3" placeholder="Teléfono">
-          <input type="password" class="form-control form-control-lg mb-4" placeholder="Contraseña">
-          <button class="btn btn-info w-100 btn-lg text-white rounded-pill" style="background-color: #00AEEF;">Comenzar ahora</button>
+
+          <form [formGroup]="registerForm" (ngSubmit)="onRegisterSubmit()">
+
+            <div class="text-start mb-3">
+              <input type="text" class="form-control form-control-lg rounded-4" formControlName="dni" placeholder="DNI (Ej: 12345678A)">
+              @if (registerForm.get('dni')?.invalid && registerForm.get('dni')?.touched) {
+                @if (registerForm.get('dni')?.hasError('required')) {
+                  <small class="text-danger fw-semibold">El DNI es obligatorio</small>
+                }
+                @if (registerForm.get('dni')?.hasError('pattern')) {
+                  <small class="text-danger fw-semibold">Debe tener 8 números y 1 letra</small>
+                }
+              }
+            </div>
+
+            <div class="text-start mb-3">
+              <input type="text" class="form-control form-control-lg rounded-4" formControlName="name" placeholder="Nombre completo">
+              @if (registerForm.get('name')?.invalid && registerForm.get('name')?.touched) {
+                <small class="text-danger fw-semibold">El nombre es obligatorio</small>
+              }
+            </div>
+
+            <div class="text-start mb-3">
+              <input type="email" class="form-control form-control-lg rounded-4" formControlName="email" placeholder="Correo electrónico">
+              @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+                @if (registerForm.get('email')?.hasError('required')) {
+                  <small class="text-danger fw-semibold">El correo es obligatorio</small>
+                }
+                @if (registerForm.get('email')?.hasError('email')) {
+                  <small class="text-danger fw-semibold">El formato no es válido</small>
+                }
+              }
+            </div>
+
+            <div class="text-start mb-3">
+              <input type="text" class="form-control form-control-lg rounded-4" formControlName="phone" placeholder="Teléfono">
+              @if (registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched) {
+                <small class="text-danger fw-semibold">El teléfono es obligatorio</small>
+              }
+            </div>
+
+            <div class="text-start mb-3">
+              <input type="password" class="form-control form-control-lg rounded-4" formControlName="password" placeholder="Contraseña">
+              @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
+                @if (registerForm.get('password')?.hasError('required')) {
+                  <small class="text-danger fw-semibold">La contraseña es obligatoria</small>
+                }
+                @if (registerForm.get('password')?.hasError('minlength')) {
+                  <small class="text-danger fw-semibold">Debe tener al menos 6 caracteres</small>
+                }
+              }
+            </div>
+
+            <div class="text-start mb-4">
+              <select id="role" formControlName="role" class="form-control form-control-lg rounded-4 text-muted">
+                <option value="" disabled selected>Selecciona tu rol...</option>
+                <option value="MANAGER">Dueño de taller</option>
+                <option value="MECHANIC">Mecánico de taller</option>
+                <option value="CLIENT">Cliente</option>
+                <option value="DIY">Mecánico por cuenta propia</option>
+              </select>
+              @if (registerForm.get('role')?.invalid && registerForm.get('role')?.touched) {
+                <small class="text-danger fw-semibold">Debes seleccionar un tipo de cuenta</small>
+              }
+            </div>
+
+            <button type="submit" class="btn btn-info w-100 btn-lg text-white rounded-pill shadow-sm" style="background-color: #00AEEF;" [disabled]="registerForm.invalid">
+              Comenzar ahora
+            </button>
+
+          </form>
         </div>
       </div>
     </div>
