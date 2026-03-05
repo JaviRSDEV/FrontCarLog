@@ -65,7 +65,7 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-image: url('../../assets/fondoPrincipal.jpg');
+  background-image: url('../../../assets/fondoPrincipal.jpg');
   background-size: cover;
   background-position: center;
   filter: blur(8px); /* Bajamos un poco el blur para que se aprecie mejor */

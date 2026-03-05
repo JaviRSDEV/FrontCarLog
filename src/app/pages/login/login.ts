@@ -6,7 +6,7 @@ import { Auth } from '../../services/auth';
   standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './login.html',
-  styleUrl: './login.css',
+  styleUrls: ['./login.css'],
 })
 export class Login {
   showLogin = false;
