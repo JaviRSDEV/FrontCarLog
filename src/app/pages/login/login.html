@@ -69,7 +69,7 @@
       </div>
     </div>
   </footer>
-
+<!--Modal de login-->
 @if(showLogin){
   <div class="modal fade show modal-animado" tabindex="-1" style="display: block;">
     <div class="modal-dialog modal-dialog-centered">
@@ -120,17 +120,20 @@
     </div>
   </div>
 }
-
+<!--Modal de registro-->
 @if (showRegister) {
   <div class="modal fade show modal-animado" tabindex="-1" style="display: block;">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content rounded-4 shadow-lg">
         <div class="modal-header border-0 pb-0">
-          <h4 class="modal-title text-primary fw-bold">Crear Cuenta</h4>
           <button type="button" class="btn-close" (click)="closeRegister()"></button>
         </div>
-        <div class="modal-body">
-          <p class="text-muted mb-4">Únete a CarLog y empieza a gestionar tus vehículos.</p>
+        <div class="modal-body text-center">
+
+          <h2 class="display-5 fw-bold mb-1">
+            <span style="color: #004E7C;">CAR</span><span style="color: #00AEEF;">LOG</span>
+          </h2>
+          <h4 class="fw-bold mb-4" style="color: #333;">Reg<span style="color: #00AEEF;">istrate</span></h4>
 
           <form [formGroup]="registerForm" (ngSubmit)="onRegisterSubmit()">
 
@@ -197,9 +200,8 @@
               }
             </div>
 
-            <button type="submit" class="btn btn-info w-100 btn-lg text-white rounded-pill shadow-sm" style="background-color: #00AEEF;" [disabled]="registerForm.invalid">
-              Comenzar ahora
-            </button>
+            <button type="submit" class="btn w-100 btn-lg rounded-pill text-white mb-3 fw-bold shadow-sm" style="background-color: #00D4FF;" [disabled]="registerForm.invalid">Comenzar ahora</button>
+            <button type="button" class="btn w-100 btn-lg rounded-pill text-white fw-bold shadow-sm" style="background-color: #0066FF;" (click)="closeRegister()">Volver</button>
 
           </form>
         </div>
