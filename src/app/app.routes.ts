@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { Login } from './pages/login/login';
 import { DashboardLayout } from './pages/dashboard-layout/dashboard-layout'
+import { VehicleListComponent } from './components/shared/vehicle-list-component/vehicle-list-component';
 
 export const routes: Routes = [
 
@@ -12,9 +13,10 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardLayout,
-    children: [
-
-    ]
+    children: [{
+      path: 'vehiculos',
+      component: VehicleListComponent
+    }]
   },
   {
     path: '**',

@@ -1,17 +1,33 @@
 <div class="layout-wrapper">
 
   <nav class="sidebar">
-    <button [routerLink]="['/dashboard']" class="btn w-100 d-flex justify-content-center align-items-center mb-3">
-      <i class="bi bi-house-door-fill text-black"></i>
+    <button class="btn w-100 d-flex justify-content-center align-items-center mb-3">
+      <i
+          [routerLink]="['/dashboard']"
+          routerLinkActive ="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="bi bi-house-door-fill"></i>
     </button>
     <button class="btn w-100 d-flex justify-content-center align-items-center mb-3">
-      <i class="bi bi-search text-black"></i>
+      <i
+          [routerLink]="['/buscar']"
+          routerLinkActive ="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="bi bi-search"></i>
     </button>
     <button class="btn w-100 d-flex justify-content-center align-items-center mb-3">
-      <i class="bi bi-car-front-fill text-black"></i>
+      <i
+          [routerLink]="['/dashboard/vehiculos']"
+          routerLinkActive ="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="bi bi-car-front-fill"></i>
     </button>
-    <button class="btn w-100 d-flex justify-content-center align-items-center mb-3">
-      <i class="bi bi-tools text-black"></i>
+    <button
+          [routerLink]="['/buscar']"
+          routerLinkActive ="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="btn w-100 d-flex justify-content-center align-items-center mb-3">
+      <i class="bi bi-tools"></i>
     </button>
   </nav>
 </div>
