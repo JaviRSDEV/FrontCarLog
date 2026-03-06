@@ -1,3 +1,17 @@
-nav{
+.layout-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
   background-color: #00AEEF;
+  width: 80px;
+  padding: 20px 10px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid black;
+}
+
+.sidebar .btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
 }

@@ -1,0 +1,21 @@
+.cabecera {
+  border-bottom: 1px solid black;
+}
+
+.logo {
+  width: 80px;
+}
+
+.titulo {
+  display: flex;
+  text-shadow: 3px 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.car { color: #004E7C; }
+.log { color: #00AEEF; }
+
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
