@@ -6,9 +6,11 @@
 
     <app-header></app-header>
 
-    <main class="flex-grow-1 p-4 bg-light">
-      <router-outlet></router-outlet>
-    </main>
+    <div class="main-wrapper d-flex flex-column flex-grow-1">
+      <main class="flex-grow-1 p-4">
+        <router-outlet></router-outlet>
+      </main>
+    </div>
 
     <app-footer></app-footer>
 

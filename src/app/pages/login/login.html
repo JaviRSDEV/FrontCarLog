@@ -203,6 +203,12 @@
                 <small class="text-danger fw-semibold">Debes seleccionar un tipo de cuenta</small>
               }
             </div>
+            <div class="form-check text-start mb-4">
+              <input class="form-check-input border-secondary" type="checkbox" id="rememberMeReg" formControlName="rememberMe">
+              <label class="form-check-label text-muted fw-semibold" for="rememberMeReg">
+                Mantener la sesión iniciada
+              </label>
+            </div>
 
             <button type="submit" class="btn w-100 btn-lg rounded-pill text-white mb-3 fw-bold shadow-sm" style="background-color: #00D4FF;" [disabled]="registerForm.invalid">Comenzar ahora</button>
             <button type="button" class="btn w-100 btn-lg rounded-pill text-white fw-bold shadow-sm" style="background-color: #0066FF;" (click)="closeRegister()">Volver</button>

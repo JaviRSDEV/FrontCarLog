@@ -29,7 +29,8 @@ export class Login {
       email: ['', [Validators.required, Validators.email]],
       phone: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      role: ['', Validators.required]
+      role: ['', Validators.required],
+      rememberMe: [false]
     });
   }
 
@@ -82,13 +83,28 @@ export class Login {
       this.authService.register(this.registerForm.value).subscribe({
         next: (backendResponse) => {
           console.log("Usuario registrado con exito", backendResponse);
-          this.closeRegister()
+
+          const token =  backendResponse.token;
+          const rememberMe = this.registerForm.get('rememberMe')?.value;
+
+          if(rememberMe){
+            const expirationDate = new Date();
+            expirationDate.setDate(expirationDate.getDate() + 7);
+            document.cookie = `auth_token=${token}; expires=${expirationDate.toUTCString()}; path=/; SameSite=Strict; Secure`;
+            console.log("Auto-login: Token en cookie");
+          }else{
+            sessionStorage.setItem('auth_token', token);
+            console.log("Auto-login: Token en SessionStorage");
+          }
+
+          this.closeRegister();
+          this.router.navigate(['/dashboard']);
         },
-        error: (errorBackend) => {
-          console.error('Error al registrar usuario', errorBackend)
+          error: (errorBackend) => {
+            console.error('Error al registrar usuario', errorBackend)
         }
       });
-    } else {
+    }else {
       console.log("El formulario de registro contiene errores");
       this.registerForm.markAllAsTouched();
     }

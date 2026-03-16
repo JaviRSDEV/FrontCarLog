@@ -1,3 +1,24 @@
-layout-wrapper{
-  background-image: url(../../../assets/fondoUser.jpg);
+.main-wrapper {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.main-wrapper::before {
+  content: "";
+
+  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../../../assets/fondoUser.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  right: -20px;
+  bottom: -20px;
+
+  filter: blur(10px);
+  z-index: -1;
 }
