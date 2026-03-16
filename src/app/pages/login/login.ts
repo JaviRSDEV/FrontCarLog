@@ -86,6 +86,7 @@ export class Login {
 
           const token =  backendResponse.token;
           const rememberMe = this.registerForm.get('rememberMe')?.value;
+          sessionStorage.setItem('role', this.registerForm.get('role')?.value);
 
           if(rememberMe){
             const expirationDate = new Date();
@@ -98,7 +99,16 @@ export class Login {
           }
 
           this.closeRegister();
-          this.router.navigate(['/dashboard']);
+
+          const rolElegido = this.registerForm.get('role')?.value;
+
+          if(rolElegido === 'MANAGER'){
+            console.log("Dueño de taller, redirigiendo a la creación del taller...");
+            this.router.navigate(['/dashboard/alta-taller']);
+          }else{
+            console.log("Redirigiendo al dashboard...")
+            this.router.navigate(['/dashboard']);
+          }
         },
           error: (errorBackend) => {
             console.error('Error al registrar usuario', errorBackend)

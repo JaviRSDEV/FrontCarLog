@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { Login } from './pages/login/login';
 import { DashboardLayout } from './pages/dashboard-layout/dashboard-layout'
 import { VehicleListComponent } from './components/shared/vehicle-list-component/vehicle-list-component';
+import { AltaTaller } from './components/shared/alta-taller/alta-taller';
 
 export const routes: Routes = [
 
@@ -16,6 +17,10 @@ export const routes: Routes = [
     children: [{
       path: 'vehiculos',
       component: VehicleListComponent
+    },
+    {
+      path: 'alta-taller',
+      component: AltaTaller
     }]
   },
   {
