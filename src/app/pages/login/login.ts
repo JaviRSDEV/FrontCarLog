@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Auth } from '../../services/auth';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -15,10 +16,11 @@ export class Login {
   loginForm: FormGroup;
   registerForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private authService: Auth){
+  constructor(private fb: FormBuilder, private authService: Auth, private router: Router){
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      rememberMe: [false]
     });
 
     this.registerForm = this.fb.group({
@@ -48,6 +50,23 @@ export class Login {
       this.authService.login(this.loginForm.value).subscribe({
         next: (backendResponse) => {
           console.log("Funciona", backendResponse);
+
+          const token = backendResponse.token;
+          const rememberMe = this.loginForm.get('rememberMe')?.value
+
+          if(rememberMe){
+            const expirationDate = new Date();
+            expirationDate.setDate(expirationDate.getDate() + 7);
+
+            document.cookie = `auth_token=${token}; expires=${expirationDate.toUTCString()}; path=/; SameSite=Strict; Secure`;
+            console.log("Token almacenado en una Cookie (Recordar sesión)");
+          }else{
+            sessionStorage.setItem('auth_token', token);
+            console.log("Token almacenado en la session storage (Sesión temporal)");
+          }
+
+          this.closeLogin();
+          this.router.navigate(['/dashboard'])
         },
         error: (backendError) => {
           console.error("Error al iniciar sesión:", backendError)

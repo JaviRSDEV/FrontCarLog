@@ -108,13 +108,17 @@
                 }
               }
             </div>
-
+            <div class="form-check text-start mb-4">
+              <input class="form-check-input border-secondary" type="checkbox" id="rememberMe" formControlName="rememberMe">
+              <label class="form-check-label text-muted fw-semibold" for="rememberMe">
+                Mantener la sesión iniciada
+              </label>
+            </div>
             <p class="mb-4 text-muted small">¿No tienes cuenta? <a href="#" (click)="closeLogin(); openRegister(); $event.preventDefault()" class="fw-bold text-decoration-underline" style="color: #00AEEF;">Regístrate.</a></p>
 
             <button type="submit" class="btn w-100 btn-lg rounded-pill text-white mb-3 fw-bold shadow-sm" style="background-color: #00D4FF;" [disabled]="loginForm.invalid">Acceder</button>
             <button type="button" class="btn w-100 btn-lg rounded-pill text-white fw-bold shadow-sm" style="background-color: #0066FF;" (click)="closeLogin()">Volver</button>
           </form>
-
         </div>
       </div>
     </div>
