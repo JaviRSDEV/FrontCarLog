@@ -4,10 +4,13 @@ import { inject } from '@angular/core';
 export const tallerGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
 
-  const role = sessionStorage.getItem('user_role') || 'MANAGER';
-  const tieneTaller = false;
+  const userJson = sessionStorage.getItem('user');
+  const user = userJson ? JSON.parse(userJson) : null;
 
-  if(role == 'MANAGER' && !tieneTaller){
+  const isManager = user?.role === 'MANAGER';
+  const tieneTaller = !!user?.workshop;
+
+  if(isManager && !tieneTaller){
     router.navigate(['dashboard/alta-taller']);
     return false;
   }

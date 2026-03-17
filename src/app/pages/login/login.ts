@@ -50,7 +50,8 @@ export class Login {
     if(this.loginForm.valid){
       this.authService.login(this.loginForm.value).subscribe({
         next: (backendResponse) => {
-          console.log("Funciona", backendResponse);
+
+          sessionStorage.setItem('user', JSON.stringify(backendResponse));
 
           const token = backendResponse.token;
           const rememberMe = this.loginForm.get('rememberMe')?.value
@@ -82,7 +83,8 @@ export class Login {
     if(this.registerForm.valid){
       this.authService.register(this.registerForm.value).subscribe({
         next: (backendResponse) => {
-          console.log("Usuario registrado con exito", backendResponse);
+
+          sessionStorage.setItem('user', JSON.stringify(backendResponse));
 
           const token =  backendResponse.token;
           const rememberMe = this.registerForm.get('rememberMe')?.value;
@@ -100,7 +102,6 @@ export class Login {
 
 
           this.closeRegister();
-
 
           console.log(rolElegido);
           if(rolElegido === 'MANAGER'){

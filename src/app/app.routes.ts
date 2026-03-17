@@ -14,6 +14,7 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardLayout,
+    canActivate: [tallerGuard],
     children: [{
       path: 'vehiculos',
       component: VehicleListComponent,

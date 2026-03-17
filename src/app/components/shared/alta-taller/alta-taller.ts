@@ -27,8 +27,12 @@ export class AltaTaller {
       console.log("Datos introducidos:", this.tallerForm.value);
 
       this.tallerService.crearTaller(this.tallerForm.value).subscribe({
-        next: (response) => {
-          console.log("¡Taller guardado con éxito!", response);
+        next: (newWorkshop) => {
+          const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+
+          user.workshop = newWorkshop;
+
+          sessionStorage.setItem('user', JSON.stringify(user));
 
           this.router.navigate(['/dashboard']);
         },

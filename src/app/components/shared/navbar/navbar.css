@@ -24,6 +24,6 @@ i {
   transition: color 0.3s ease;
 }
 
-i.active {
+.btn.active i{
   color: white;
 }
