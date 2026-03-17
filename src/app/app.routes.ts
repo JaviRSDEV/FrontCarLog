@@ -3,7 +3,7 @@ import { Login } from './pages/login/login';
 import { DashboardLayout } from './pages/dashboard-layout/dashboard-layout'
 import { VehicleListComponent } from './components/shared/vehicle-list-component/vehicle-list-component';
 import { AltaTaller } from './components/shared/alta-taller/alta-taller';
-
+import { tallerGuard } from './core/guards/taller-guard';
 export const routes: Routes = [
 
   {
@@ -16,11 +16,12 @@ export const routes: Routes = [
     component: DashboardLayout,
     children: [{
       path: 'vehiculos',
-      component: VehicleListComponent
+      component: VehicleListComponent,
+      canActivate: [tallerGuard]
     },
     {
       path: 'alta-taller',
-      component: AltaTaller
+      component: AltaTaller,
     }]
   },
   {

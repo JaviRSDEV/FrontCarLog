@@ -87,7 +87,7 @@ export class Login {
           const token =  backendResponse.token;
           const rememberMe = this.registerForm.get('rememberMe')?.value;
           sessionStorage.setItem('role', this.registerForm.get('role')?.value);
-
+          const rolElegido = this.registerForm.get('role')?.value;
           if(rememberMe){
             const expirationDate = new Date();
             expirationDate.setDate(expirationDate.getDate() + 7);
@@ -98,10 +98,11 @@ export class Login {
             console.log("Auto-login: Token en SessionStorage");
           }
 
+
           this.closeRegister();
 
-          const rolElegido = this.registerForm.get('role')?.value;
 
+          console.log(rolElegido);
           if(rolElegido === 'MANAGER'){
             console.log("Dueño de taller, redirigiendo a la creación del taller...");
             this.router.navigate(['/dashboard/alta-taller']);
