@@ -3,10 +3,10 @@ import { Login } from './pages/login/login';
 import { DashboardLayout } from './pages/dashboard-layout/dashboard-layout'
 import { VehicleListComponent } from './components/shared/vehicle-list-component/vehicle-list-component';
 import { AltaTaller } from './components/shared/alta-taller/alta-taller';
-import { tallerGuard } from './core/guards/taller-guard';
-import { authguardGuard } from './core/guards/auth-guard';
-import { altaTallerGuard } from './core/guards/alta-taller-guard';
-import { loginGuard } from './core/guards/login-guard';
+import { tallerGuard } from './core/guards/taller-guard/taller-guard';
+import { authguardGuard } from './core/guards/auth-guard/auth-guard';
+import { altaTallerGuard } from './core/guards/alta-taller-guard/alta-taller-guard';
+import { loginGuard } from './core/guards/login-guard/login-guard';
 export const routes: Routes = [
 
   {

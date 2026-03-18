@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { CanActivateFn } from '@angular/router';
 
-import { tallerGuard } from './taller-guard';
+import { tallerGuard } from './taller-guard/taller-guard';
 
 describe('tallerGuard', () => {
   const executeGuard: CanActivateFn = (...guardParameters) =>
