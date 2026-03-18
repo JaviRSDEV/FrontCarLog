@@ -49,18 +49,30 @@ export class Login {
   onLoginSubmit(){
     if(this.loginForm.valid){
       this.authService.login(this.loginForm.value).subscribe({
-        next: (backendResponse) => {
+        next: (backendResponse: any) => {
 
           sessionStorage.setItem('token', JSON.stringify(backendResponse));
 
           const token = backendResponse.token;
           const rememberMe = this.loginForm.get('rememberMe')?.value
 
+          const usuarioLogueado = {
+            token: backendResponse.token,
+            role: backendResponse.role,
+
+            workshop: backendResponse.workShop ? {
+              workshopName: backendResponse.workShop
+            } : null
+          };
+
+localStorage.setItem('user', JSON.stringify(usuarioLogueado));
+          localStorage.setItem('user', JSON.stringify(usuarioLogueado));
+
           if(rememberMe){
             const expirationDate = new Date();
             expirationDate.setDate(expirationDate.getDate() + 7);
-
             document.cookie = `auth_token=${token}; expires=${expirationDate.toUTCString()}; path=/; SameSite=Strict; Secure`;
+
             console.log("Token almacenado en una Cookie (Recordar sesión)");
           }else{
             sessionStorage.setItem('auth_token', token);
@@ -89,6 +101,7 @@ export class Login {
           const token =  backendResponse.token;
           const rememberMe = this.registerForm.get('rememberMe')?.value;
           sessionStorage.setItem('role', this.registerForm.get('role')?.value);
+
           const rolElegido = this.registerForm.get('role')?.value;
 
           const usuarioConstruido = {
@@ -97,12 +110,15 @@ export class Login {
             workshop: null
           };
 
-          sessionStorage.setItem('user', JSON.stringify(usuarioConstruido));
+          const expirationDate = new Date();
+
+          localStorage.setItem('user', JSON.stringify(usuarioConstruido));
 
           if(rememberMe){
             const expirationDate = new Date();
             expirationDate.setDate(expirationDate.getDate() + 7);
             document.cookie = `auth_token=${token}; expires=${expirationDate.toUTCString()}; path=/; SameSite=Strict; Secure`;
+
             console.log("Auto-login: Token en cookie");
           }else{
             sessionStorage.setItem('auth_token', token);

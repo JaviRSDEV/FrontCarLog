@@ -18,7 +18,7 @@ export class Navbar implements OnInit{
   }
 
   comprobarEstado(){
-    let userJson = sessionStorage.getItem('user');
+    let userJson = localStorage.getItem('user');
     console.log(userJson);
     if(!userJson){
       const cookieMatch = document.cookie.match(/(^|;)\s*user_data\s*=\s*([^;]+)/);

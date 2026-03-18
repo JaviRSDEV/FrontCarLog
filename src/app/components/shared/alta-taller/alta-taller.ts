@@ -28,11 +28,18 @@ export class AltaTaller {
 
       this.tallerService.crearTaller(this.tallerForm.value).subscribe({
         next: (newWorkshop) => {
-          const user = JSON.parse(sessionStorage.getItem('user') || '{}');
 
-          user.workshop = newWorkshop;
+          let userJson = localStorage.getItem('user');
 
-          sessionStorage.setItem('user', JSON.stringify(user));
+          if(userJson){
+            let user = JSON.parse(userJson);
+
+            user.workshop = {
+              workshopName: this.tallerForm.get('nombreTaller')?.value || 'Mi taller'
+            };
+
+            localStorage.setItem('user', JSON.stringify(user));
+          }
 
           window.location.href = '/dashboard';
         },

@@ -6,12 +6,14 @@ import { AltaTaller } from './components/shared/alta-taller/alta-taller';
 import { tallerGuard } from './core/guards/taller-guard';
 import { authguardGuard } from './core/guards/auth-guard';
 import { altaTallerGuard } from './core/guards/alta-taller-guard';
+import { loginGuard } from './core/guards/login-guard';
 export const routes: Routes = [
 
   {
     path: '',
     component: Login,
-    pathMatch: 'full'
+    pathMatch: 'full',
+    canActivate: [loginGuard]
   },
   {
     path: 'dashboard',

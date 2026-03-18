@@ -4,15 +4,15 @@ import { inject } from '@angular/core';
 export const tallerGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
 
-  let userJson = sessionStorage.getItem('user');
-  if(!userJson){
-    const cookieMatch = document.cookie.match(/(^|;)\s*user_data\s*=\s*([^;]+)/);
-    if (cookieMatch) userJson = decodeURIComponent(cookieMatch[2]);
-  }
-
+  let userJson = localStorage.getItem('user');
   const user = userJson ? JSON.parse(userJson) : null;
 
-  if(!user) return false;
+  if(!user){
+    console.log("Usuario no encontrado eliminando cookie");
+    document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    router.navigate(['/']);
+    return false;
+  }
 
   if(user.role === 'MANAGER' && !user.workshop?.workshopName){
     router.navigate(['/dashboard/alta-taller']);
