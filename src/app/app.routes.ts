@@ -5,6 +5,7 @@ import { VehicleListComponent } from './components/shared/vehicle-list-component
 import { AltaTaller } from './components/shared/alta-taller/alta-taller';
 import { tallerGuard } from './core/guards/taller-guard';
 import { authguardGuard } from './core/guards/auth-guard';
+import { altaTallerGuard } from './core/guards/alta-taller-guard';
 export const routes: Routes = [
 
   {
@@ -15,16 +16,23 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardLayout,
-    canActivate: [tallerGuard, authguardGuard],
-    children: [{
+    canActivate: [authguardGuard],
+    children: [
+    {
+      path: '',
+      pathMatch: 'full',
+      canActivate: [tallerGuard],
+      children: []
+    },
+    {
       path: 'vehiculos',
       component: VehicleListComponent,
-      canActivate: [tallerGuard, authguardGuard]
+      canActivate: [tallerGuard]
     },
     {
       path: 'alta-taller',
       component: AltaTaller,
-      canActivate: [authguardGuard]
+      canActivate: [altaTallerGuard]
     }]
   },
   {

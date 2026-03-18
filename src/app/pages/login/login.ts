@@ -51,7 +51,7 @@ export class Login {
       this.authService.login(this.loginForm.value).subscribe({
         next: (backendResponse) => {
 
-          sessionStorage.setItem('user', JSON.stringify(backendResponse));
+          sessionStorage.setItem('token', JSON.stringify(backendResponse));
 
           const token = backendResponse.token;
           const rememberMe = this.loginForm.get('rememberMe')?.value
@@ -84,12 +84,21 @@ export class Login {
       this.authService.register(this.registerForm.value).subscribe({
         next: (backendResponse) => {
 
-          sessionStorage.setItem('user', JSON.stringify(backendResponse));
+          sessionStorage.setItem('token', JSON.stringify(backendResponse));
 
           const token =  backendResponse.token;
           const rememberMe = this.registerForm.get('rememberMe')?.value;
           sessionStorage.setItem('role', this.registerForm.get('role')?.value);
           const rolElegido = this.registerForm.get('role')?.value;
+
+          const usuarioConstruido = {
+            token: token,
+            role: rolElegido,
+            workshop: null
+          };
+
+          sessionStorage.setItem('user', JSON.stringify(usuarioConstruido));
+
           if(rememberMe){
             const expirationDate = new Date();
             expirationDate.setDate(expirationDate.getDate() + 7);

@@ -34,7 +34,7 @@ export class AltaTaller {
 
           sessionStorage.setItem('user', JSON.stringify(user));
 
-          this.router.navigate(['/dashboard']);
+          window.location.href = '/dashboard';
         },
         error: (err) => {
           console.error(err);
