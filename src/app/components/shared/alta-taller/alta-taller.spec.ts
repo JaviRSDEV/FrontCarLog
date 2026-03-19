@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AltaTaller } from './alta-taller';
+import { AltaTaller } from './alta-taller.component';
 
 describe('AltaTaller', () => {
   let component: AltaTaller;

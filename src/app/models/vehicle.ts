@@ -1,4 +1,3 @@
-import { Workshop } from './workshop';
 export interface Vehicle {
   plate: string;
   brand: string;

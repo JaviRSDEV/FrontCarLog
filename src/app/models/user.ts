@@ -1,5 +1,3 @@
-import { Workshop } from "./workshop";
-
 export interface User {
   dni: string;
   name: string;

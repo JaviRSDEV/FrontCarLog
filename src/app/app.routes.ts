@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
 import { Login } from './pages/login/login';
 import { DashboardLayout } from './pages/dashboard-layout/dashboard-layout'
-import { VehicleListComponent } from './components/shared/vehicle-list-component/vehicle-list-component';
-import { AltaTaller } from './components/shared/alta-taller/alta-taller';
+import { VehicleListComponent } from './components/shared/vehicle-list-component/vehicle-list-component.component';
+import { AltaTaller } from './components/shared/alta-taller/alta-taller.component';
 import { tallerGuard } from './core/guards/taller-guard/taller-guard';
 import { authguardGuard } from './core/guards/auth-guard/auth-guard';
 import { altaTallerGuard } from './core/guards/alta-taller-guard/alta-taller-guard';
