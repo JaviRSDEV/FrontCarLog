@@ -1,11 +1,13 @@
 import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
+import { User } from '../../../models/user';
 
 export const tallerGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
 
-  let userJson = localStorage.getItem('user');
-  const user = userJson ? JSON.parse(userJson) : null;
+  const userJson = localStorage.getItem('user');
+
+  const user: User | null = userJson ? JSON.parse(userJson) : null;
 
   if(!user){
     console.log("Usuario no encontrado eliminando cookie");

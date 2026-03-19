@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Taller } from '../../../services/taller';
+import { TallerService } from '../../../services/tallerService/tallerService';
 @Component({
   selector: 'app-alta-taller',
   standalone: true,
@@ -12,7 +12,7 @@ import { Taller } from '../../../services/taller';
 export class AltaTaller {
   tallerForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private router: Router, private tallerService: Taller){
+  constructor(private fb: FormBuilder, private router: Router, private tallerService: TallerService){
     this.tallerForm = this.fb.group({
       workshopName: ['', Validators.required],
       address: ['', [Validators.required]],
