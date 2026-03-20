@@ -1,3 +1,4 @@
+import { Auth } from '../../../services/authService/auth.service';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
@@ -12,6 +13,7 @@ export class Navbar implements OnInit{
 
   isManager = false;
 
+  constructor(private Auth: Auth){}
   ngOnInit() {
     this.comprobarEstado();
 
@@ -32,5 +34,9 @@ export class Navbar implements OnInit{
 
       console.log(this.isManager);
     }
+  }
+
+  cerrarSesion(): void{
+    this.Auth.logout();
   }
 }

@@ -16,7 +16,7 @@ export const tallerGuard: CanActivateFn = (route, state) => {
     return false;
   }
 
-  if(user.role === 'MANAGER' && !user.workShopId){
+  if(user.role === 'MANAGER' && !user.workshop?.workshopName){
     router.navigate(['/dashboard/alta-taller']);
     return false;
   }

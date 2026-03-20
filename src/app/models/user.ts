@@ -5,7 +5,7 @@ export interface User {
   phone: string;
   role: 'MANAGER' | 'CLIENT';
   mustChangePsswd: boolean;
-  workShopId: number | null;
+  workshop?: {workshopName: string};
   vehicles: any[];
 
   password?: string;

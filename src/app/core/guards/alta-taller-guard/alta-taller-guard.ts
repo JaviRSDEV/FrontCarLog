@@ -1,4 +1,5 @@
 import { CanActivateFn, Router } from '@angular/router';
+import { User } from '../../../models/user';
 import { inject } from '@angular/core';
 
 export const altaTallerGuard: CanActivateFn = (route, state) => {
@@ -11,7 +12,7 @@ export const altaTallerGuard: CanActivateFn = (route, state) => {
     if(cookieMatch) userJson = decodeURIComponent(cookieMatch[2]);
   }
 
-  const user = userJson ? JSON.parse(userJson) : null;
+  const user: User | null = userJson ? JSON.parse(userJson) : null;
 
   if(!user) return false;
 
@@ -19,8 +20,8 @@ export const altaTallerGuard: CanActivateFn = (route, state) => {
     router.navigate(['/dashboard']);
     return false;
   }
-
-  if(user.role === 'MANAGER' && !!user.workshop?.workshopName){
+  console.log(user.workshop);
+  if(user.role === 'MANAGER' && user.workshop?.workshopName){
     router.navigate(['/dashboard']);
     return false;
   }
