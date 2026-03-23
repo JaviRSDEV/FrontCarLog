@@ -1,63 +1,171 @@
 <div class="cotainer mt-4 text-white">
-  <h2 class="mb-4">
-    <i class="bi bi-car-front-fill me-2"></i>
-    Gestión de vehículos
-  </h2>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0"><i class="bi bi-car-front-fill me-2 text-primary"></i>Gestión de vehículos</h2>
+
+    @if(activeTab === 'mis-vehiculos'){
+      <button class="btn btn-primary rounded-pill px-4 shadow-sm" (click)="toggleFormulario()">
+        <i class="bi" [class.bi-plus-lg]="!mostrarFormulario" [class.bi-x-lg]="mostrarFormulario"></i>
+        {{ mostrarFormulario ? ' Cancelar' : ' Nuevo vehículo'}}
+      </button>
+    }
+  </div>
 
   <ul class="nav nav-pills mb-4 gap-2">
     <li class="nav-item">
-      <button class="nav-link text-white"
-              [class.active] = "activeTab === 'mis-vehiculos'"
-              (click)="cambiarPestana('mis-vehiculos')">
+      <button class="nav-link text-white" [class.active]="activeTab === 'mis-vehiculos'" (click)="cambiarPestana('mis-vehiculos')">
         <i class="bi bi-person-badge me-1"></i>Mis coches
       </button>
     </li>
 
-    @if(role === 'MANAGER' || role === 'MECHANIC'){
+    @if(role === 'MANAGER' || role === 'CO_MANAGER' || role === 'MECHANIC'){
       <li class="nav-item">
-        <button class="nav-link text-white"
-                [class.active]="activeTab === 'asignados'"
-                (click)="cambiarPestana('asignados')">
-          <i class="bi bi-wrench me-1"></i> Asignados a mí
+        <button class="nav-link text-white" [class.active]="activeTab === 'asignados'" (click)="cambiarPestana('asignados')">
+          <i class="bi bi-wrench me-1"></i>Asignados a mí
         </button>
       </li>
     }
 
     @if(role === 'MANAGER' || role === 'CO_MANAGER'){
       <li class="nav-item">
-        <button class="nav-link text-white"
-                [class.active]="activeTab === 'flota'"
-                (click)="cambiarPestana('flota')">
+        <button class="nav-link text-white" [class.active]="activeTab === 'flota'" (click)="cambiarPestana('flota')">
           <i class="bi bi-collection me-1"></i>Flota del taller
         </button>
       </li>
     }
   </ul>
 
-  <div class="card shadow-sm p-4" style="border-radius: 15px;">
+  @if(mostrarFormulario && activeTab === 'mis-vehiculos'){
+    <div class="card border-0 mb-4 shadow p-4 slide-in">
+      <form [formGroup]="vehiculoForm" (ngSubmit)="guardarVehiculo()" class="row g-3 text-dark">
+        <div class="col-md-3">
+          <label class="form-label fw-bold">Matrícula</label>
+          <input type="text" class="form-control" formControlName="plate" placeholder="Ej: 1234ABC">
+        </div>
+        <div class="col md-3">
+          <label class="form-label fw-bold">Marca</label>
+          <input type="text" class="form-control" formControlName="brand" placeholder="Ej: SEAT">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-bold">Modelo</label>
+          <input type="text" class="form-control" formControlName="model" placeholder="Ej: Ibiza">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-bold">Kilometros</label>
+          <input type="number" class="form-control" formControlName="kilometers">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-bold">Motor</label>
+          <input type="text" class="form-control" formControlName="engine" placeholder="Ej: 1.9TDI">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-bold">CV</label>
+          <input type="number" class="form-control" formControlName="horsePower" placeholder="Ej: 105cv">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-bold">Par motor</label>
+          <input type="number" class="form-control" formControlName="torque" placeholder="Ej: 240nm">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-bold">Neumáticos</label>
+          <input type="text" class="form-control" formControlName="tires" placeholder="Ej: 195/65r15">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-bold">Último mantenimiento</label>
+          <input type="date" class="form-control" formControlName="lastMaintenance">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-bold">Foto del vehículo (Opcional)</label>
+          <input type="file" class="form-control" accept="image/*" (change)="onFileSelected($event)">
+          <div class="form-text">Sube una foto de tu coche (jpg, png).</div>
+        </div>
+
+        <div class="col-12 text-end mt-4 pt-3 border-top">
+          <button type="submit" class="btn btn-success px-5 rounded-pill shadow-sm fw-bold">
+            <i class="bi bi-save me-2"></i> Guardar Vehículo
+          </button>
+        </div>
+
+      </form>
+    </div>
+  }
+
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 fade-in">
 
     @if(activeTab === 'mis-vehiculos'){
-      <div class="fade-in">
-        <h4 class="text-primary mb-3">Mis vehículos</h4>
-        <p class="text-muted">Buscando tus vehículos..</p>
-      </div>
-    }
+      @for(v of misVehiculos; track v.plate){
+        <div class="col">
+          <div class="card h-100 vehicle-card border-0 shadow-sm">
+            <img [src]="v.image || 'https://placehold.co/600x400?text=Coche'" class="card-img-top vehicle-img" [alt]="v.brand">
 
-    @if(activeTab === 'asignados'){
-      <div class="fade-in">
-        <h4 class="text-success mb-3">Vehículos en Reparación</h4>
-          <div class="table-responsive mt-4">
+            <div class="card-body text-dark">
 
+              <div class="d-flex justify-content-between align-items-start mb-2">
+
+                <div class="plate-badge mb-2">{{ v.plate }}</div>
+                @if(v.lastMaintenance){
+                  <span class="badge bg-light text-secondary border border-secondary-subtle" title="Último mantenimiento">
+                    <i class="bi bi-calendar-check me-1"></i> {{ v.lastMaintenance }}
+                  </span>
+                }
+              </div>
+
+              <h5 class="fw-bold mb-3">{{ v.brand }}{{ v.model }}</h5>
+
+              <div class="row g-2 text-muted small mb-4 flex-grow-1">
+                <div class="col-6" title="Kilómetros">
+                  <i class="bi bi-speedometer2 me-1"></i>{{ v.kilometers }} Km
+                </div>
+                <div class="col-6" title="Motor">
+                  <i class="bi bi-cpu text-secondary me-1"></i> {{ v.engine || 'N/A' }}
+                </div>
+                <div class="col-6" title="Potencia">
+                  <i class="bi bi-lightning-charge text-warning me-1"></i>{{ v.horsePower }}CV
+                </div>
+                <div class="col-6" title="Par motor">
+                  <i class="bi bi-arrow-repeat text-danger me-1"></i>{{ v.torque }}NM
+                </div>
+                <div class="col-12 mt-2" title="Neumáticos">
+                  <div class="bg-light rounded p-2 text-center border">
+                    <i class="bi bi-circle text-dark me-1"></i> Neumáticos: <span class="fw-bold">{{ v.tires || 'N/A' }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <button class="btn btn-ouline-primary btn-sm w-100 rounded-pill mt-auto" [routerLink]="['/dashboard/vehiculos', v.plate]">
+                Detalles
+              </button>
+            </div>
           </div>
-      </div>
+        </div>
+      }@empty {
+        <div class="col-12 text-center py-5"><p class="text-white">No tienes vehículos registrados</p></div>
+      }
     }
 
     @if(activeTab === 'flota'){
-      <div class="fade-in">
-        <h4 class="text-warning mb-3">Flota total del taller</h4>
-        <p class="text-muted">Cargando flota del taller..</p>
-      </div>
-    }
+      @for(v of flotaTaller; track v.plate) {
+        <div class="col">
+          <div class="card h-100 vehicle-card border-0 shadow-sm">
+            <img [src]="v.image || 'https://placehold.co/600x400?text=Flota'" class="card-img-top vehicle-img" [alt]="v.brand">
+            <div class="card-body text-dark d-flex flex-column">
+              <div class="plate-badge mb-2">{{ v.plate }}</div>
+              <h5 class="fw-bold mb-2">{{ v.brand }} {{ v.model }}</h5>
 
+              <div class="row g-2 text-muted small mb-3 flex-grow-1">
+                <div class="col-6"><i class="bi bi-speedometer2 me-1"></i> {{ v.kilometers }} Km</div>
+                <div class="col-6"><i class="bi bi-cpu me-1"></i> {{ v.engine }}</div>
+                <div class="col-12"><i class="bi bi-person me-1"></i> Dueño: {{ v.ownerId || 'Taller' }}</div>
+              </div>
+
+              <button class="btn btn-outline-dark btn-sm w-100 rounded-pill mt-auto">
+                Abrir Orden de Trabajo
+              </button>
+            </div>
+          </div>
+        </div>
+      } @empty {
+        <div class="col-12 text-center py-5"><p class="text-white">La flota está vacía.</p></div>
+      }
+    }
   </div>
 </div>

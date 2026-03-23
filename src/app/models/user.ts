@@ -1,3 +1,5 @@
+import { Vehicle } from "./vehicle";
+
 export interface User {
   dni: string;
   name: string;
@@ -5,11 +7,11 @@ export interface User {
   phone: string;
   token?: string;
   role: string;
-  UserDni?: number;
+  userId?: string;
   workshopId?: number;
   mustChangePsswd: boolean;
   workShop?: string;
-  vehicles: any[];
+  vehicles: Vehicle[];
 
   password?: string;
   accountNonExpired: boolean;

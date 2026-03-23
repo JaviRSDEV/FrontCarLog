@@ -62,3 +62,7 @@
 .nav-link:hover i {
   transform: scale(1.2) rotate(-5deg);
 }
+
+.card{
+  border-radius: 20px;
+}
