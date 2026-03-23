@@ -7,6 +7,7 @@ import { tallerGuard } from './core/guards/taller-guard/taller-guard';
 import { authguardGuard } from './core/guards/auth-guard/auth-guard';
 import { altaTallerGuard } from './core/guards/alta-taller-guard/alta-taller-guard';
 import { loginGuard } from './core/guards/login-guard/login-guard';
+import { DashboardComponent } from './components/shared/dashboard.component/dashboard.component';
 export const routes: Routes = [
 
   {
@@ -23,6 +24,7 @@ export const routes: Routes = [
     {
       path: '',
       pathMatch: 'full',
+      component: DashboardComponent,
       canActivate: [tallerGuard],
       children: []
     },

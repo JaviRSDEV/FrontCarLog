@@ -3,6 +3,7 @@ export interface User {
   name: string;
   email: string;
   phone: string;
+  token?: string;
   role: 'MANAGER' | 'CLIENT';
   mustChangePsswd: boolean;
   workshop?: {workshopName: string};
