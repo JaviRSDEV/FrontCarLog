@@ -2,8 +2,8 @@
   <div class="row mb-4">
     <div class="col-12">
       <h2>¡Hola, {{ userName | titlecase }}!</h2>
-      @if(role === 'MANAGER' && workshopName){
-        <p class="text-light">Gestionando el taller: <strong>{{ workshopName }}</strong></p>
+      @if(role === 'MANAGER' && workshop){
+        <p class="text-light">Gestionando el taller: <strong>{{ workshop }}</strong></p>
       } @else {
         <p class="text-light">Bienvenido al panel de control</p>
       }

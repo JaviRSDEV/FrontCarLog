@@ -1,3 +1,4 @@
+import { Workshop } from './../../../models/workshop';
 import { Component } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -34,14 +35,17 @@ export class AltaTaller {
           if(userJson){
             let user = JSON.parse(userJson);
 
-            user.workshop = {
-              workshopName: this.tallerForm.get('nombreTaller')?.value || 'Mi taller'
-            };
+            user.workShop = this.tallerForm.get('workshopName')?.value;
+
+            if(newWorkshop && newWorkshop.workshopId){
+              user.workshopId = newWorkshop.workshopId;
+            }
 
             localStorage.setItem('user', JSON.stringify(user));
           }
 
-          window.location.href = '/dashboard';
+          this.router.navigate(['/dashboard']);
+          //window.location.href = '/dashboard';
         },
         error: (err) => {
           console.error(err);

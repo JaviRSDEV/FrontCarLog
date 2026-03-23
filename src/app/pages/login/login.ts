@@ -52,21 +52,10 @@ export class Login {
         next: (backendResponse: any) => {
 
           sessionStorage.setItem('token', JSON.stringify(backendResponse));
+          localStorage.setItem('user', JSON.stringify(backendResponse));
 
           const token = backendResponse.token;
           const rememberMe = this.loginForm.get('rememberMe')?.value
-
-          const usuarioLogueado = {
-            token: backendResponse.token,
-            role: backendResponse.role,
-
-            workshop: backendResponse.workShop ? {
-              workshopName: backendResponse.workShop
-            } : null
-          };
-
-localStorage.setItem('user', JSON.stringify(usuarioLogueado));
-          localStorage.setItem('user', JSON.stringify(usuarioLogueado));
 
           if(rememberMe){
             const expirationDate = new Date();
@@ -94,25 +83,12 @@ localStorage.setItem('user', JSON.stringify(usuarioLogueado));
   onRegisterSubmit(){
     if(this.registerForm.valid){
       this.authService.register(this.registerForm.value).subscribe({
-        next: (backendResponse) => {
+        next: (backendResponse: any) => {
 
-          sessionStorage.setItem('token', JSON.stringify(backendResponse));
+          localStorage.setItem('user', JSON.stringify(backendResponse));
 
           const token =  backendResponse.token;
           const rememberMe = this.registerForm.get('rememberMe')?.value;
-          sessionStorage.setItem('role', this.registerForm.get('role')?.value);
-
-          const rolElegido = this.registerForm.get('role')?.value;
-
-          const usuarioConstruido = {
-            token: token,
-            role: rolElegido,
-            workshop: null
-          };
-
-          const expirationDate = new Date();
-
-          localStorage.setItem('user', JSON.stringify(usuarioConstruido));
 
           if(rememberMe){
             const expirationDate = new Date();
@@ -125,9 +101,9 @@ localStorage.setItem('user', JSON.stringify(usuarioLogueado));
             console.log("Auto-login: Token en SessionStorage");
           }
 
-
           this.closeRegister();
 
+          const rolElegido = backendResponse.role;
           console.log(rolElegido);
           if(rolElegido === 'MANAGER'){
             console.log("Dueño de taller, redirigiendo a la creación del taller...");

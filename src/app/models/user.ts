@@ -5,8 +5,10 @@ export interface User {
   phone: string;
   token?: string;
   role: 'MANAGER' | 'CLIENT';
+  UserDni?: number;
+  workshopId?: number;
   mustChangePsswd: boolean;
-  workshop?: {workshopName: string};
+  workShop?: string;
   vehicles: any[];
 
   password?: string;

@@ -9,6 +9,9 @@ export const tallerGuard: CanActivateFn = (route, state) => {
 
   const user: User | null = userJson ? JSON.parse(userJson) : null;
 
+  console.log("=== EL OBJETO ENTERO ES ===", user);
+  console.log("=== EL TALLER ES ===", user?.workShop);
+
   if(!user){
     console.log("Usuario no encontrado eliminando cookie");
     document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
@@ -16,7 +19,7 @@ export const tallerGuard: CanActivateFn = (route, state) => {
     return false;
   }
 
-  if(user.role === 'MANAGER' && !user.workshop?.workshopName){
+  if(user.role === 'MANAGER' && !user?.workShop){
     router.navigate(['/dashboard/alta-taller']);
     return false;
   }

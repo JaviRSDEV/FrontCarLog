@@ -20,8 +20,8 @@ export const altaTallerGuard: CanActivateFn = (route, state) => {
     router.navigate(['/dashboard']);
     return false;
   }
-  console.log(user.workshop);
-  if(user.role === 'MANAGER' && user.workshop?.workshopName){
+  console.log(user.workShop);
+  if(user.role === 'MANAGER' && user?.workShop){
     router.navigate(['/dashboard']);
     return false;
   }

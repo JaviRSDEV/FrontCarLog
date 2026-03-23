@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { Auth } from '../../../services/authService/auth.service';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
@@ -13,7 +14,12 @@ export class Navbar implements OnInit{
 
   isManager = false;
 
-  constructor(private Auth: Auth){}
+  constructor(private Auth: Auth, private router: Router){
+
+    this.router.events.subscribe(() => {
+      this.comprobarEstado();
+    })
+  }
   ngOnInit() {
     this.comprobarEstado();
 
@@ -22,6 +28,7 @@ export class Navbar implements OnInit{
   comprobarEstado(){
     let userJson = localStorage.getItem('user');
     console.log(userJson);
+
     if(!userJson){
       const cookieMatch = document.cookie.match(/(^|;)\s*user_data\s*=\s*([^;]+)/);
       if(cookieMatch) userJson = decodeURIComponent(cookieMatch[2]);
@@ -30,7 +37,7 @@ export class Navbar implements OnInit{
     if(userJson){
       const user = JSON.parse(userJson);
 
-      this.isManager = user.role === 'MANAGER' && !user.workshop?.workshopName;
+      this.isManager = user.role === 'MANAGER' && !user.workShop;
 
       console.log(this.isManager);
     }

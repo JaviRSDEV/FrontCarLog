@@ -14,7 +14,7 @@ export class DashboardComponent implements OnInit{
 
   userName: string = 'Usuario';
   role: string = '';
-  workshopName: string = '';
+  workshop: string = '';
 
   ngOnInit(): void {
     this.cargarDatosUsuario();
@@ -27,8 +27,8 @@ export class DashboardComponent implements OnInit{
 
       this.role = user.role;
 
-      if(user.workshop?.workshopName){
-        this.workshopName = user.workshop.workshopName;
+      if(user.workShop){
+        this.workshop = user.workShop;
       }
     }
 
