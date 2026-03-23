@@ -23,4 +23,12 @@ export class VehicleService {
   getAllVehicles(): Observable<Vehicle[]>{
     return this.http.get<Vehicle[]>(this.apiUrl);
   }
+
+  createVehicle(vehicle: Vehicle): Observable<Vehicle>{
+    return this.http.post<Vehicle>(this.apiUrl, vehicle);
+  }
+
+  getVehicleInRepair(mechanicId: string): Observable<Vehicle[]>{
+    return this.http.get<Vehicle[]>(`${this.apiUrl}/repairing?mechanicId=${mechanicId}`);
+  }
 }

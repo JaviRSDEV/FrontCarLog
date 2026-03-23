@@ -1,0 +1,64 @@
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.card {
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  background-color: #ffffff;
+
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-out both;
+}
+
+.nav-pills .nav-link {
+  border-radius: 12px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 500;
+  color: white !important;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border: 1px solid transparent;
+}
+
+.nav-pills .nav-link:hover:not(.active) {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.nav-pills .nav-link.active {
+  background-color: #0d6efd;
+  box-shadow: 0 6px 15px rgba(13, 110, 253, 0.4);
+  transform: translateY(-3px);
+  border-color: #0d6efd;
+}
+
+.nav-link i {
+  transition: transform 0.3s ease;
+  display: inline-block;
+}
+
+.nav-link:hover i {
+  transform: scale(1.2) rotate(-5deg);
+}

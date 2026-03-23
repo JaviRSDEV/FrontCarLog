@@ -4,7 +4,7 @@ export interface User {
   email: string;
   phone: string;
   token?: string;
-  role: 'MANAGER' | 'CLIENT';
+  role: string;
   UserDni?: number;
   workshopId?: number;
   mustChangePsswd: boolean;
