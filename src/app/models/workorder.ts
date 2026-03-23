@@ -1,9 +1,10 @@
-import { Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
-import { Observable } from "rxjs";
+import { Vehicle } from "./vehicle";
 
 export interface Workorder {
   id: number;
+  description?: string;
+  mechanicNotes?: string;
   status: string;
-  description?: string
+  totalAmount: number;
+  vehicle: Vehicle;
 }

@@ -1,14 +1,15 @@
 export interface Vehicle {
+  id?: number;
   plate: string;
   brand: string;
   model: string;
-  kilometers: string;
+  kilometers: number;
   engine: string;
   horsePower: number;
   torque: number;
   tires: string;
   image: string | null;
   lastMaintenance: string | null;
-  workshopId: number | null;
-  ownerId: string;
+  workshopId?: number | null;
+  ownerId?: string;
 }

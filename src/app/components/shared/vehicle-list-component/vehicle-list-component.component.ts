@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { User } from '../../../models/user';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, Form } from '@angular/forms';
+import { Vehicle } from '../../../models/vehicle';
+import { Workorder } from '../../../models/workorder';
+import { VehicleService } from '../../../services/vehicleService/vehicle.service';
+import { WorkOrderService } from '../../../services/workOrderService/work-order.service';
 
 @Component({
   selector: 'app-vehicle-list-component',
@@ -12,53 +16,104 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, Form } from '@
 })
 export class VehicleListComponent implements OnInit{
 
-  activeTab: string = 'mis-vehiculos';
+  activeTab: 'mis-vehiculos' | 'asignados' | 'flota' = 'mis-vehiculos';
   role: string = '';
   userDni: string = '';
-
+  workshopId: number = 0;
   mostrarFormulario: boolean = false;
+
+  misVehiculos: Vehicle[] = [];
+  ordenesAsignadas: Workorder[] = [];
+  flotaTaller: Vehicle[] = [];
+
   vehiculoForm: FormGroup;
 
-  constructor(private fb: FormBuilder){
+  constructor(
+    private fb: FormBuilder,
+    private vehicleService: VehicleService,
+    private workOrderService: WorkOrderService
+  ){
     this.vehiculoForm = this.fb.group({
-      matricula: ['', [Validators.required, Validators.pattern(/^[0-9]{4}[A-Z]{3}$/)]],
-      marca: ['', Validators.required],
-      modelo: ['', Validators.required],
-      dniBueno: ['']
+      plate: ['', [Validators.required]],
+      brand: ['', Validators.required],
+      model: ['', Validators.required],
+      kilometers: [0, [Validators.required, Validators.min(0)]],
+      engine: [''],
+      horsePower: [0],
+      torque: [0],
+      tires:[''],
+      ownerId: ['']
     });
   }
 
-  ngOnInit(): void {
-    this.cargarDatosUsuario();
-  }
-
-  cargarDatosUsuario(){
+ngOnInit(): void {
     const userJson = localStorage.getItem('user');
-    if(userJson){
+    if (userJson) {
       const user: User = JSON.parse(userJson);
       this.role = user.role;
 
-      if(user.UserDni){
-        this.userDni = user.dni;
-      }
+      this.userDni = user.UserDni ? String(user.UserDni) : (user.dni ? String(user.dni) : '');
+
+      this.workshopId = user.workshopId || 0;
+    }
+
+    this.cargarDatos(this.activeTab);
+  }
+
+  cargarDatos(tab: string){
+    if(tab === 'mis-vehiculos' && this.userDni){
+      this.vehicleService.getVehiclesByOwner(this.userDni).subscribe({
+        next: (data) => this.misVehiculos = data,
+        error: (err) => console.error(err)
+      });
+    }
+    else if(tab === 'asignados' && this.userDni){
+      this.workOrderService.getWorkOrdersByMechanic(this.userDni).subscribe({
+        next: (data) => this.ordenesAsignadas = data,
+        error: (err) => console.error(err)
+      });
+    }
+    else if(tab === 'flota' && this.userDni){
+      this.vehicleService.getVehiclesByWorkshop(this.workshopId).subscribe({
+        next: (data) => this.flotaTaller = data,
+        error: (err) => console.error(err)
+      });
     }
   }
 
-  cambiarPestana(pestana: string){
+  cambiarPestana(pestana: any){
     this.activeTab = pestana;
     this.mostrarFormulario = false;
+    this.cargarDatos(pestana);
   }
 
   toggleFormulario(){
     this.mostrarFormulario = !this.mostrarFormulario;
-    this.vehiculoForm.reset();
+    if(!this.mostrarFormulario){
+      this.vehiculoForm.reset({ kilometers: 0, horsePower: 0, torque: 0 });
+    }
   }
 
   guardarVehiculo(){
     if(this.vehiculoForm.valid){
-      const vehiculoData = { ...this.vehiculoForm.value };
+      const vehiculoData: Vehicle = {
+        ...this.vehiculoForm.value,
+        image: null,
+        lastMaintenance: null,
+        workshopId: this.workshopId
+      };
 
-      this.toggleFormulario();
+      if(!vehiculoData.ownerId){
+        vehiculoData.ownerId = this.userDni;
+      }
+
+      this.vehicleService.createVehicle(vehiculoData).subscribe({
+        next: () => {
+          this.toggleFormulario();
+          this.cargarDatos('mis-vehiculos');
+        },
+        error: (err) => console.error(err)
+      });
     }else{
       this.vehiculoForm.markAllAsTouched();
     }
