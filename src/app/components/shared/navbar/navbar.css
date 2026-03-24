@@ -1,20 +1,19 @@
-/* 1. Pintamos el componente entero, que ya está estirado por tu layout padre */
 :host {
   display: block;
   background-color: #00AEEF;
   border-right: 1px solid black;
 }
 
-/* 2. La barra interior ahora es transparente, solo le damos el ancho y colocamos los botones */
 .sidebar {
   width: 80px;
   padding: 20px 10px;
   display: flex;
   flex-direction: column;
-  /* Fíjate que le hemos quitado el background-color y el border a esta clase */
+
+  position: sticky;
+  top:20px
 }
 
-/* 3. Tus efectos de hover (se quedan igual) */
 .sidebar .btn:hover {
   background-color: rgba(255, 255, 255, 0.2);
 }
