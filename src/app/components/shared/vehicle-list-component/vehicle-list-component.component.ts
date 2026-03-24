@@ -28,6 +28,7 @@ export class VehicleListComponent implements OnInit{
   flotaTaller: Vehicle[] = [];
 
   vehiculoForm: FormGroup;
+  vehiculoSeleccionado: Vehicle | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -108,6 +109,14 @@ ngOnInit(): void {
     if(!this.mostrarFormulario){
       this.vehiculoForm.reset({ kilometers: 0, horsePower: 0, torque: 0 });
     }
+  }
+
+  abrirDetalles(vehiculo: Vehicle){
+    this.vehiculoSeleccionado = vehiculo;
+  }
+
+  cerrarDetalles(){
+    this.vehiculoSeleccionado = null;
   }
 
   async onFileSelected(event: any) {
