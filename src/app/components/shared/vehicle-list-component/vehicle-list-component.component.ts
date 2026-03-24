@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { User } from '../../../models/user';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, Form } from '@angular/forms';
@@ -32,7 +32,8 @@ export class VehicleListComponent implements OnInit{
   constructor(
     private fb: FormBuilder,
     private vehicleService: VehicleService,
-    private workOrderService: WorkOrderService
+    private workOrderService: WorkOrderService,
+    private cdr: ChangeDetectorRef
   ){
     this.vehiculoForm = this.fb.group({
       plate: ['', [Validators.required]],
@@ -60,25 +61,37 @@ ngOnInit(): void {
       this.workshopId = user.workshopId || 0;
     }
 
-    this.cargarDatos(this.activeTab);
+    setTimeout(() => {
+      this.cargarDatos(this.activeTab);
+    });
+
   }
 
   cargarDatos(tab: string){
     if(tab === 'mis-vehiculos' && this.userDni){
       this.vehicleService.getVehiclesByOwner(this.userDni).subscribe({
-        next: (data) => this.misVehiculos = data,
+        next: (data) =>{
+          this.misVehiculos = data;
+          this.cdr.detectChanges();
+        },
         error: (err) => console.error(err)
       });
     }
     else if(tab === 'asignados' && this.userDni){
       this.workOrderService.getWorkOrdersByMechanic(this.userDni).subscribe({
-        next: (data) => this.ordenesAsignadas = data,
+        next: (data) => {
+          this.ordenesAsignadas = data;
+          this.cdr.detectChanges();
+        },
         error: (err) => console.error(err)
       });
     }
     else if(tab === 'flota' && this.userDni){
       this.vehicleService.getVehiclesByWorkshop(this.workshopId).subscribe({
-        next: (data) => this.flotaTaller = data,
+        next: (data) => {
+          this.flotaTaller = data;
+          this.cdr.detectChanges();
+        },
         error: (err) => console.error(err)
       });
     }
