@@ -8,7 +8,7 @@ export interface Vehicle {
   horsePower: number;
   torque: number;
   tires: string;
-  image: string | null;
+  images?: string[];
   lastMaintenance: string | null;
   workshopId?: number | null;
   ownerId?: string;

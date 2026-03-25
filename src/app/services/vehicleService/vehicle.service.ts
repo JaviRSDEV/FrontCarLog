@@ -31,4 +31,15 @@ export class VehicleService {
   getVehicleInRepair(mechanicId: string): Observable<Vehicle[]>{
     return this.http.get<Vehicle[]>(`${this.apiUrl}/repairing?mechanicId=${mechanicId}`);
   }
+
+  deleteVehicle(plate: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${plate}`,{
+      responseType: 'text',
+      withCredentials: true
+    });
+  }
+
+  updateVehicle(plate: string, vehicleData: Vehicle): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${plate}`, vehicleData);
+  }
 }
