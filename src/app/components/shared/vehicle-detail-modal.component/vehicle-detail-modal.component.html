@@ -1,0 +1,113 @@
+<div class="modal-overlay" (click)="onCerrar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+
+    <button class="btn-close-modal" (click)="onCerrar()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+
+    <div class="position-relative bg-light">
+      @if (vehiculo.images && vehiculo.images.length > 0) {
+        <div id="carruselVehiculoModal" class="carousel slide" data-bs-ride="carousel">
+          @if (vehiculo.images.length > 1) {
+            <div class="carousel-indicators">
+              @for (img of vehiculo.images; track $index) {
+                <button type="button" data-bs-target="#carruselVehiculoModal"
+                        [attr.data-bs-slide-to]="$index" [class.active]="$index === 0"></button>
+              }
+            </div>
+          }
+          <div class="carousel-inner">
+            @for (img of vehiculo.images; track $index) {
+              <div class="carousel-item" [class.active]="$index === 0">
+                <img [src]="img" class="d-block w-100 object-fit-cover modal-car-img" alt="Foto del vehículo">
+              </div>
+            }
+          </div>
+          @if (vehiculo.images.length > 1) {
+            <button class="carousel-control-prev" type="button" data-bs-target="#carruselVehiculoModal" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon bg-dark rounded-circle p-2" aria-hidden="true"></span>
+              <span class="visually-hidden">Anterior</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carruselVehiculoModal" data-bs-slide="next">
+              <span class="carousel-control-next-icon bg-dark rounded-circle p-2" aria-hidden="true"></span>
+              <span class="visually-hidden">Siguiente</span>
+            </button>
+          }
+        </div>
+      } @else {
+        <img src="https://placehold.co/600x400?text=Sin+Foto" class="w-100 object-fit-cover modal-car-img" alt="Sin foto" />
+      }
+
+      <div class="position-absolute top-0 start-0 p-3 d-flex gap-2" style="z-index: 10;">
+        <button class="btn btn-light btn-sm rounded-circle shadow" title="Editar" (click)="onEditar()">
+          <i class="bi bi-pencil-fill text-primary"></i>
+        </button>
+        <button class="btn btn-light btn-sm rounded-circle shadow" title="Eliminar" (click)="onEliminar()">
+          <i class="bi bi-trash3-fill text-danger"></i>
+        </button>
+      </div>
+
+      <div class="position-absolute bottom-0 w-100 d-flex justify-content-between align-items-center p-3 header-gradient" style="z-index: 10;">
+        <h2 class="m-0 text-dark fw-bold text-shadow-sm" style="text-shadow: 1px 1px 3px white;">
+          {{ vehiculo.brand }} {{ vehiculo.model }}
+        </h2>
+        <div class="d-inline-flex align-items-stretch border border-dark border-2 rounded shadow-sm overflow-hidden eu-plate bg-white">
+          <div class="d-flex flex-column justify-content-center align-items-center px-2 text-white eu-plate-blue">
+            <i class="bi bi-star-fill text-warning eu-star"></i>
+            <span class="fw-bold eu-letter">E</span>
+          </div>
+          <div class="bg-white text-dark d-flex align-items-center px-3 fw-bold font-monospace fs-5">
+            {{ vehiculo.plate }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-4 text-dark">
+      <div class="row g-4">
+        <div class="col-6 d-flex align-items-center gap-3">
+          <i class="bi bi-speedometer2 text-primary fs-1"></i>
+          <div>
+            <small class="text-muted text-uppercase fw-bold detail-label">Kilometraje</small>
+            <p class="m-0 fw-bold fs-5">{{ vehiculo.kilometers }} km</p>
+          </div>
+        </div>
+        <div class="col-6 d-flex align-items-center gap-3">
+          <i class="bi bi-gear-fill text-primary fs-1"></i>
+          <div>
+            <small class="text-muted text-uppercase fw-bold detail-label">Motor</small>
+            <p class="m-0 fw-bold fs-5">{{ vehiculo.engine || 'N/A' }}</p>
+          </div>
+        </div>
+        <div class="col-6 d-flex align-items-center gap-3">
+          <i class="bi bi-lightning-charge-fill text-warning fs-1"></i>
+          <div>
+            <small class="text-muted text-uppercase fw-bold detail-label">Potencia</small>
+            <p class="m-0 fw-bold fs-5">{{ vehiculo.horsePower }} CV</p>
+          </div>
+        </div>
+        <div class="col-6 d-flex align-items-center gap-3">
+          <i class="bi bi-wrench-adjustable text-secondary fs-1"></i>
+          <div>
+            <small class="text-muted text-uppercase fw-bold detail-label">Par Motor</small>
+            <p class="m-0 fw-bold fs-5">{{ vehiculo.torque }} Nm</p>
+          </div>
+        </div>
+        <div class="col-6 d-flex align-items-center gap-3">
+          <i class="bi bi-vinyl-fill text-dark fs-1"></i>
+          <div>
+            <small class="text-muted text-uppercase fw-bold detail-label">Neumáticos</small>
+            <p class="m-0 fw-bold fs-5">{{ vehiculo.tires || 'N/A' }}</p>
+          </div>
+        </div>
+        <div class="col-6 d-flex align-items-center gap-3">
+          <i class="bi bi-calendar-check-fill text-success fs-1"></i>
+          <div>
+            <small class="text-muted text-uppercase fw-bold detail-label">Último Mantenimiento</small>
+            <p class="m-0 fw-bold fs-5">{{ vehiculo.lastMaintenance || 'Sin registro' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

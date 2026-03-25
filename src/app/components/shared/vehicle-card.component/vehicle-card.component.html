@@ -1,0 +1,52 @@
+<div class="card h-100 vehicle-card border-0 shadow-sm">
+  <img [src]="(vehiculo.images && vehiculo.images.length > 0) ? vehiculo.images[0] : (modoFlota ? 'https://placehold.co/600x400?text=Flota' : 'https://placehold.co/600x400?text=Coche')"
+       class="card-img-top vehicle-img"
+       [alt]="vehiculo.brand" />
+
+  <div class="card-body text-dark d-flex flex-column">
+    <div class="d-flex justify-content-between align-items-start mb-2">
+      <div class="plate-badge mb-2">{{ vehiculo.plate }}</div>
+
+      @if (!modoFlota && vehiculo.lastMaintenance) {
+        <span class="badge bg-light text-secondary border border-secondary-subtle" title="Último mantenimiento">
+          <i class="bi bi-calendar-check me-1"></i> {{ vehiculo.lastMaintenance }}
+        </span>
+      }
+    </div>
+
+    <h5 class="fw-bold mb-3">{{ vehiculo.brand }} {{ vehiculo.model }}</h5>
+
+    <div class="row g-2 text-muted small mb-4 flex-grow-1">
+      <div class="col-6" title="Kilómetros"><i class="bi bi-speedometer2 me-1"></i>{{ vehiculo.kilometers }} Km</div>
+      <div class="col-6" title="Motor"><i class="bi bi-cpu text-secondary me-1"></i> {{ vehiculo.engine || 'N/A' }}</div>
+
+      @if (!modoFlota) {
+        <div class="col-6" title="Potencia"><i class="bi bi-lightning-charge text-warning me-1"></i>{{ vehiculo.horsePower }}CV</div>
+        <div class="col-6" title="Par motor"><i class="bi bi-arrow-repeat text-danger me-1"></i>{{ vehiculo.torque }}NM</div>
+        <div class="col-12 mt-2" title="Neumáticos">
+          <div class="bg-light rounded p-2 text-center border">
+            <i class="bi bi-circle text-dark me-1"></i> Neumáticos: <span class="fw-bold">{{ vehiculo.tires || 'N/A' }}</span>
+          </div>
+        </div>
+      } @else {
+        <div class="col-12"><i class="bi bi-person me-1"></i> Dueño: <span class="fw-bold">{{ vehiculo.ownerId || 'Taller' }}</span></div>
+      }
+    </div>
+
+    <div class="mt-auto d-flex gap-2">
+      <button class="btn btn-outline-primary btn-sm flex-grow-1 rounded-pill" (click)="onDetalles()">
+        Detalles
+      </button>
+
+      @if (modoFlota) {
+        <button class="btn btn-outline-dark btn-sm flex-grow-1 rounded-pill" title="Nueva Orden">
+          <i class="bi bi-wrench"></i>
+        </button>
+
+        <button class="btn btn-outline-danger btn-sm flex-grow-1 rounded-pill" (click)="onSalida()" title="Registrar Salida">
+          <i class="bi bi-box-arrow-right"></i>
+        </button>
+      }
+    </div>
+  </div>
+</div>

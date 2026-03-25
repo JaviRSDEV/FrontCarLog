@@ -1,0 +1,78 @@
+<div class="card border-0 mb-4 shadow p-4 slide-in">
+  <form [formGroup]="vehiculoForm" (ngSubmit)="guardarVehiculo()" class="row g-3 text-dark">
+
+    <div class="col-md-3">
+      <label class="form-label fw-bold">Matrícula</label>
+      <input type="text" class="form-control" formControlName="plate" placeholder="Ej: 1234ABC" />
+    </div>
+
+    <div class="col-md-3">
+      <label class="form-label fw-bold">Marca</label>
+      <input type="text" class="form-control" formControlName="brand" placeholder="Ej: SEAT" />
+    </div>
+
+    <div class="col-md-3">
+      <label class="form-label fw-bold">Modelo</label>
+      <input type="text" class="form-control" formControlName="model" placeholder="Ej: Ibiza" />
+    </div>
+
+    <div class="col-md-3">
+      <label class="form-label fw-bold">Kilómetros</label>
+      <input type="number" class="form-control" formControlName="kilometers" />
+    </div>
+
+    <div class="col-md-3">
+      <label class="form-label fw-bold">Motor</label>
+      <input type="text" class="form-control" formControlName="engine" placeholder="Ej: 1.9TDI" />
+    </div>
+
+    <div class="col-md-3">
+      <label class="form-label fw-bold">CV</label>
+      <input type="number" class="form-control" formControlName="horsePower" />
+    </div>
+
+    <div class="col-md-3">
+      <label class="form-label fw-bold">Par motor (Nm)</label>
+      <input type="number" class="form-control" formControlName="torque" />
+    </div>
+
+    <div class="col-md-3">
+      <label class="form-label fw-bold">Neumáticos</label>
+      <input type="text" class="form-control" formControlName="tires" placeholder="Ej: 225/45 R17" />
+    </div>
+
+    <div class="col-md-3">
+      <label class="form-label fw-bold">Último mantenimiento</label>
+      <input type="date" class="form-control" formControlName="lastMaintenance" />
+    </div>
+
+    <div class="col-12 mt-3 border-top pt-3">
+      <label class="form-label fw-bold">Fotos del vehículo</label>
+      <input type="file" class="form-control" accept="image/*" multiple (change)="onFileSelected($event)" />
+
+      @if(imagenesTemporales.length > 0){
+        <div class="d-flex flex-wrap gap-3 mt-3 p-3 bg-light rounded border">
+          @for(img of imagenesTemporales; track $index){
+            <div class="position-relative" style="width: 120px; height: 90px;">
+              <img [src]="img" class="w-100 h-100 object-fit-cover rounded shadow-sm border">
+              <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 translate-middle rounded-circle shadow"
+                      style="width: 25px; height: 25px; padding: 0; line-height: 0;"
+                      (click)="eliminarImagenPrevia($index)" title="Eliminar foto">
+                <i class="bi bi-x"></i>
+              </button>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="form-text mt-2">Puedes seleccionar varias fotos a la vez para crear una galería.</div>
+      }
+    </div>
+
+    <div class="col-12 text-end mt-4 pt-3 border-top">
+      <button type="submit" class="btn btn-success px-5 rounded-pill shadow-sm fw-bold">
+        <i class="bi bi-save me-2"></i>
+        {{ isEditing ? 'Actualizar Vehículo' : 'Guardar Vehículo' }}
+      </button>
+    </div>
+  </form>
+</div>
