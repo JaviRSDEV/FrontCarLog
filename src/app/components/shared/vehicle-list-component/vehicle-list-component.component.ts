@@ -192,7 +192,7 @@ export class VehicleListComponent implements OnInit {
       torque: vehiculo.torque,
       tires: vehiculo.tires,
       lastMaintenance: vehiculo.lastMaintenance,
-      image: this.imagenesTemporales,
+      images: this.imagenesTemporales,
     });
   }
 

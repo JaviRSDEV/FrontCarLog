@@ -43,3 +43,4 @@ export class VehicleService {
     return this.http.put(`${this.apiUrl}/${plate}`, vehicleData);
   }
 }
+
