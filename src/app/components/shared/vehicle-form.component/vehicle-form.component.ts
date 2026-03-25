@@ -17,7 +17,6 @@ export class VehicleFormComponent implements OnInit {
   @Input() workshopId: number = 0;
   @Input() isEditing: boolean = false;
 
-  // 🔥 Cambiado de 'actualizado' a 'guardado' para que el Padre lo entienda
   @Output() guardado = new EventEmitter<void>();
   @Output() cerrar = new EventEmitter<void>();
 
@@ -123,7 +122,7 @@ export class VehicleFormComponent implements OnInit {
 
       operacion.subscribe({
         next: () => {
-          // 🔥 Avisamos al padre de que hemos terminado con éxito
+
           this.guardado.emit();
         },
         error: (err) => console.error('Error en la operación:', err)

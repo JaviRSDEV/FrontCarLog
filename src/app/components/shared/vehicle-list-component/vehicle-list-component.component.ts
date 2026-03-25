@@ -7,7 +7,6 @@ import { Workorder } from '../../../models/workorder';
 import { VehicleService } from '../../../services/vehicleService/vehicle.service';
 import { WorkOrderService } from '../../../services/workOrderService/work-order.service';
 
-// Importación de los hijos
 import { VehicleFormComponent } from '../vehicle-form.component/vehicle-form.component';
 import { VehicleCardComponent } from '../vehicle-card.component/vehicle-card.component';
 import { VehicleDetailModalComponent } from '../vehicle-detail-modal.component/vehicle-detail-modal.component';
@@ -37,7 +36,7 @@ export class VehicleListComponent implements OnInit {
 
   mostrarFormulario: boolean = false;
   isEditing: boolean = false;
-  vehiculoParaEditar: Vehicle | null = null; // Coincide con tu [vehiculoEdicion]
+  vehiculoParaEditar: Vehicle | null = null;
   vehiculoSeleccionado: Vehicle | null = null;
 
   constructor(
@@ -90,25 +89,21 @@ export class VehicleListComponent implements OnInit {
     }
   }
 
-  // Se llama desde (verDetalles) en la card
   abrirDetalles(vehiculo: Vehicle) {
     this.vehiculoSeleccionado = vehiculo;
   }
 
-  // Se llama desde (cerrarModal) en el detalle
   cerrarDetalles() {
     this.vehiculoSeleccionado = null;
   }
 
-  // Se llama desde (editar) en el detalle. Coincide con tu HTML.
   editarVehiculo(vehiculo: Vehicle) {
     this.vehiculoParaEditar = vehiculo;
     this.isEditing = true;
     this.mostrarFormulario = true;
-    this.vehiculoSeleccionado = null; // Cerramos el modal para ver el form
+    this.vehiculoSeleccionado = null;
   }
 
-  // Se llama desde (eliminar) en el detalle. Coincide con tu HTML.
   eliminarVehiculo(plate: string) {
     if (confirm(`¿Estás seguro de que quieres eliminar el vehículo ${plate}?`)) {
       this.vehicleService.deleteVehicle(plate).subscribe({
@@ -121,7 +116,6 @@ export class VehicleListComponent implements OnInit {
     }
   }
 
-  // Se llama desde (guardado) en el formulario. Coincide con tu HTML.
   onVehiculoGuardado() {
     this.cargarDatos(this.activeTab);
     this.toggleFormulario();

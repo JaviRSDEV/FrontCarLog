@@ -12,12 +12,10 @@ import { Vehicle } from '../../../models/vehicle';
 export class VehicleDetailModalComponent {
   @Input() vehiculo!: Vehicle;
 
-  // 🔥 Cambiado a 'cerrarModal' para que coincida con el Padre
   @Output() cerrarModal = new EventEmitter<void>();
   @Output() editar = new EventEmitter<Vehicle>();
   @Output() eliminar = new EventEmitter<string>();
 
-  // Función para agrupar el cierre
   onCerrar() {
     this.cerrarModal.emit();
   }
