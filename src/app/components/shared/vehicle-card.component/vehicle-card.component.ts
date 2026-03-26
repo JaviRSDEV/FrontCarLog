@@ -16,11 +16,22 @@ export class VehicleCardComponent {
   @Output() verDetalles = new EventEmitter<Vehicle>();
   @Output() salida = new EventEmitter<string>();
 
+  @Output() aprobar = new EventEmitter<string>();
+  @Output() rechazar = new EventEmitter<string>();
+
   onDetalles() {
     this.verDetalles.emit(this.vehiculo);
   }
 
   onSalida() {
     this.salida.emit(this.vehiculo.plate);
+  }
+
+  onAprobar() {
+    this.aprobar.emit(this.vehiculo.plate);
+  }
+
+  onRechazar(){
+    this.rechazar.emit(this.vehiculo.plate);
   }
 }

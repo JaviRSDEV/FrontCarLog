@@ -16,6 +16,22 @@
 
     <h5 class="fw-bold mb-3">{{ vehiculo.brand }} {{ vehiculo.model }}</h5>
 
+    @if(!modoFlota && vehiculo.pendingWorkshopId){
+      <div class="alert alert-warning p-2 text-center shadow-sm rounded-3 mb-3">
+        <p class="small mb-2 fw-bold">
+          <i class="bi bi-exclamation-triangle-fill me-1">El taller solicita ingresar este vehículo</i>
+        </p>
+        <div class="d-flex gap-2 justify-content-center">
+          <button class="btn btn-success btn-sm flex-grow-1 rounded-pill fw-bold" (click)="onAprobar()">
+            <i class="bi bi-check-lg">Aceptar</i>
+          </button>
+          <button class="btn btn-danger btn-sm flex-grow-1 rounded-pill fw-bold" (click)="onRechazar()">
+            <i class="bi bi-x-lg">Rechazar</i>
+          </button>
+        </div>
+      </div>
+    }
+
     <div class="row g-2 text-muted small mb-4 flex-grow-1">
       <div class="col-6" title="Kilómetros"><i class="bi bi-speedometer2 me-1"></i>{{ vehiculo.kilometers }} Km</div>
       <div class="col-6" title="Motor"><i class="bi bi-cpu text-secondary me-1"></i> {{ vehiculo.engine || 'N/A' }}</div>

@@ -4,7 +4,11 @@
 
     @if (activeTab === 'mis-vehiculos') {
       <button class="btn btn-primary rounded-pill px-4 shadow-sm" (click)="toggleFormulario()">
-        <i class="bi" [class.bi-plus-lg]="!mostrarFormulario" [class.bi-x-lg]="mostrarFormulario"></i>
+        <i
+          class="bi"
+          [class.bi-plus-lg]="!mostrarFormulario"
+          [class.bi-x-lg]="mostrarFormulario"
+        ></i>
         {{ mostrarFormulario ? ' Cancelar' : ' Nuevo vehículo' }}
       </button>
     }
@@ -12,20 +16,32 @@
 
   <ul class="nav nav-pills mb-4 gap-2">
     <li class="nav-item">
-      <button class="nav-link text-white" [class.active]="activeTab === 'mis-vehiculos'" (click)="cambiarPestana('mis-vehiculos')">
+      <button
+        class="nav-link text-white"
+        [class.active]="activeTab === 'mis-vehiculos'"
+        (click)="cambiarPestana('mis-vehiculos')"
+      >
         <i class="bi bi-person-badge me-1"></i>Mis coches
       </button>
     </li>
     @if (role === 'MANAGER' || role === 'CO_MANAGER' || role === 'MECHANIC') {
       <li class="nav-item">
-        <button class="nav-link text-white" [class.active]="activeTab === 'asignados'" (click)="cambiarPestana('asignados')">
+        <button
+          class="nav-link text-white"
+          [class.active]="activeTab === 'asignados'"
+          (click)="cambiarPestana('asignados')"
+        >
           <i class="bi bi-wrench me-1"></i>Asignados a mí
         </button>
       </li>
     }
     @if (role === 'MANAGER' || role === 'CO_MANAGER') {
       <li class="nav-item">
-        <button class="nav-link text-white" [class.active]="activeTab === 'flota'" (click)="cambiarPestana('flota')">
+        <button
+          class="nav-link text-white"
+          [class.active]="activeTab === 'flota'"
+          (click)="cambiarPestana('flota')"
+        >
           <i class="bi bi-collection me-1"></i>Flota del taller
         </button>
       </li>
@@ -38,22 +54,63 @@
       [isEditing]="isEditing"
       [userDni]="userDni"
       [workshopId]="workshopId"
-      (guardado)="onVehiculoGuardado()">
+      (guardado)="onVehiculoGuardado()"
+    >
     </app-vehicle-form>
   }
 
+  @if (activeTab === 'flota' || activeTab === 'asignados') {
+    <div class="card bg-dark bg-opacity-50 border-secondary mb-4 fade-in">
+      <div class="card-body d-flex flex-column flex-md-row gap-3 align-items-center">
+        <div class="text-white flex-grow-1">
+          <h5 class="mb-1">
+            <i class="bi bi-search me-2"></i>Ingresar Vehículo
+          </h5>
+          <small class="text-white-50">Introduce la matrícula para pedir autorización al cliente.</small>
+        </div>
+        <div class="input-group" style="max-width: 400px;">
+          <input type="text" class="form-control text-uppercase" placeholder="Ej: 1234ABC" [(ngModel)]="matriculaBuscada">
+          <button class="btn btn-primary fw-bold" type="button" (click)="solicitarIngreso()" [disabled]="!matriculaBuscada">Solicitar</button>
+        </div>
+      </div>
+    </div>
+  }
+
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 fade-in">
+
     @if (activeTab === 'mis-vehiculos') {
       @for (v of misVehiculos; track v.plate) {
         <div class="col">
           <app-vehicle-card
             [vehiculo]="v"
             [modoFlota]="false"
-            (verDetalles)="abrirDetalles($event)">
+            (verDetalles)="abrirDetalles($event)"
+            (aprobar)="aprobarSolicitud($event)"
+            (rechazar)="rechazarSolicitud($event)"
+          >
           </app-vehicle-card>
         </div>
       } @empty {
-        <div class="col-12 text-center py-5"><p class="text-white">No tienes vehículos registrados</p></div>
+        <div class="col-12 text-center py-5">
+          <p class="text-white">No tienes vehículos registrados</p>
+        </div>
+      }
+    }
+
+    @if(activeTab === 'asignados'){
+      @for(orden of ordenesAsignadas; track orden.id){
+        <div class="col">
+          <app-vehicle-card
+            [vehiculo]="orden.vehicle"
+            [modoFlota]="true"
+            (verDetalles)="abrirDetalles($event)"
+            (salida)="registerExit($event)">
+          </app-vehicle-card>
+        </div>
+      }@empty {
+        <div class="col-12 text-center py-5">
+          <p class="text-white">No tienes vehiculos asignados actualmente</p>
+        </div>
       }
     }
 
@@ -63,11 +120,14 @@
           <app-vehicle-card
             [vehiculo]="v"
             [modoFlota]="true"
-            (verDetalles)="abrirDetalles($event)">
+            (verDetalles)="abrirDetalles($event)"
+            (salida)="registerExit($event)">
           </app-vehicle-card>
         </div>
       } @empty {
-        <div class="col-12 text-center py-5"><p class="text-white">La flota está vacía.</p></div>
+        <div class="col-12 text-center py-5">
+          <p class="text-white">La flota está vacía.</p>
+        </div>
       }
     }
   </div>
@@ -78,6 +138,7 @@
     [vehiculo]="vehiculoSeleccionado"
     (cerrarModal)="cerrarDetalles()"
     (editar)="editarVehiculo($event)"
-    (eliminar)="eliminarVehiculo($event)">
+    (eliminar)="eliminarVehiculo($event)"
+  >
   </app-vehicle-detail-modal>
 }

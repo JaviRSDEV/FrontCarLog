@@ -1,3 +1,4 @@
+import { Workshop } from './../../models/workshop';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -41,6 +42,26 @@ export class VehicleService {
 
   updateVehicle(plate: string, vehicleData: Vehicle): Observable<any> {
     return this.http.put(`${this.apiUrl}/${plate}`, vehicleData);
+  }
+
+  /*registerEntry(plate: string, workshopId: number){
+    return this.http.put(`${this.apiUrl}/${plate}/entry/${workshopId}`, {});
+  }*/
+
+  registerExit(plate: string, workshopId: number){
+    return this.http.post(`${this.apiUrl}/${plate}/exit/${workshopId}`, {}, {withCredentials: true});
+  }
+
+  requestEntry(plate: string, workshopId: number){
+    return this.http.put(`${this.apiUrl}/${plate}/request-entry/${workshopId}`, {}, {withCredentials: true});
+  }
+
+  approveEntry(plate: string){
+    return this.http.put(`${this.apiUrl}/${plate}/approve-entry`, {}, {withCredentials: true});
+  }
+
+  rejectEntry(plate: string){
+    return this.http.put(`${this.apiUrl}/${plate}/reject-entry`, {}, {withCredentials: true});
   }
 }
 

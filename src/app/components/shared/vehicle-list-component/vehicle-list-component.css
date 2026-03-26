@@ -42,3 +42,7 @@
 .nav-link:hover i {
   transform: scale(1.2) rotate(-5deg);
 }
+
+.input-group{
+  max-width: 300px;
+}

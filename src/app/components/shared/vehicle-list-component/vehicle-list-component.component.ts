@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { User } from '../../../models/user';
 import { Vehicle } from '../../../models/vehicle';
 import { Workorder } from '../../../models/workorder';
@@ -17,6 +18,7 @@ import { VehicleDetailModalComponent } from '../vehicle-detail-modal.component/v
   imports: [
     CommonModule,
     RouterModule,
+    FormsModule,
     VehicleFormComponent,
     VehicleCardComponent,
     VehicleDetailModalComponent
@@ -38,6 +40,7 @@ export class VehicleListComponent implements OnInit {
   isEditing: boolean = false;
   vehiculoParaEditar: Vehicle | null = null;
   vehiculoSeleccionado: Vehicle | null = null;
+  matriculaBuscada: string = '';
 
   constructor(
     private vehicleService: VehicleService,
@@ -119,5 +122,66 @@ export class VehicleListComponent implements OnInit {
   onVehiculoGuardado() {
     this.cargarDatos(this.activeTab);
     this.toggleFormulario();
+  }
+
+  /*registerEntry(plate: string){
+    if(confirm(`¿Confirmas la ENTRADA del vehículo ${plate} al taller?`)){
+      this.vehicleService.registerEntry(plate, this.workshopId).subscribe({
+        next: () => {
+          this.cargarDatos(this.activeTab);
+        },
+        error: (err) => {
+          console.error(err);
+          alert('No se pudo registrar la entrada del vehículo');
+        }
+      });
+    }
+  }*/
+
+  registerExit(plate: string){
+    if(confirm(`¿Confirmas la SALIDA del vehículo ${plate} del taller?`)){
+      this.vehicleService.registerExit(plate.toUpperCase(), this.workshopId).subscribe({
+        next: () => {
+          this.cargarDatos(this.activeTab);
+        },
+        error: (err) => {
+          console.error(err);
+          alert('No se pudo registrar la salida del vehículo');
+        }
+      });
+    }
+  }
+
+  solicitarIngreso(){
+    if(!this.matriculaBuscada.trim()) return;
+
+    this.vehicleService.requestEntry(this.matriculaBuscada.toUpperCase(), this.workshopId).subscribe({
+      next: () => {
+        alert(`Solicitud enviada al propiertario del vehículo ${this.matriculaBuscada.toUpperCase()}.`);
+        this.matriculaBuscada = '';
+      },
+      error: (err) => {
+        const msg = err.error?.message || 'Error al solicitar el ingreso.';
+        alert(msg);
+      }
+    });
+  }
+
+  aprobarSolicitud(plate: string){
+    this.vehicleService.approveEntry(plate).subscribe({
+      next: () => {
+        this.cargarDatos('mis-vehiculos');
+      },
+      error: (err) => alert('No se pudo aprobar la solicitud.')
+    });
+  }
+
+  rechazarSolicitud(plate: string){
+    this.vehicleService.rejectEntry(plate).subscribe({
+      next: () => {
+        this.cargarDatos('mis-vehiculos');
+      },
+      error: (err) => alert('No se pudo rechazar la solicitud.')
+    })
   }
 }
