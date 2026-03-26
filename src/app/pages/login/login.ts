@@ -16,6 +16,9 @@ export class Login {
   loginForm: FormGroup;
   registerForm: FormGroup;
 
+  loginError: string = '';
+  registerError: string = '';
+
   constructor(private fb: FormBuilder, private authService: Auth, private router: Router){
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -73,6 +76,7 @@ export class Login {
         },
         error: (backendError) => {
           console.error("Error al iniciar sesión:", backendError)
+          this.loginError = 'Correo o contraseña incorrectos. Inténtalo de nuevo.'
         }
       });
     } else {
@@ -115,6 +119,7 @@ export class Login {
         },
           error: (errorBackend) => {
             console.error('Error al registrar usuario', errorBackend)
+            this.registerError = errorBackend.error?.message || 'Error al registrarse. Comprueba los datos o si el correo ya existe';
         }
       });
     }else {

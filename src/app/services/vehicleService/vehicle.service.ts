@@ -44,10 +44,6 @@ export class VehicleService {
     return this.http.put(`${this.apiUrl}/${plate}`, vehicleData);
   }
 
-  /*registerEntry(plate: string, workshopId: number){
-    return this.http.put(`${this.apiUrl}/${plate}/entry/${workshopId}`, {});
-  }*/
-
   registerExit(plate: string, workshopId: number){
     return this.http.post(`${this.apiUrl}/${plate}/exit/${workshopId}`, {}, {withCredentials: true});
   }

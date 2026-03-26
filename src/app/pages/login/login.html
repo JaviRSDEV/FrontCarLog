@@ -69,7 +69,7 @@
       </div>
     </div>
   </footer>
-<!--Modal de login-->
+
 @if(showLogin){
   <div class="modal fade show modal-animado" tabindex="-1" style="display: block;">
     <div class="modal-dialog modal-dialog-centered">
@@ -80,6 +80,12 @@
             <span style="color: #004E7C;">CAR</span><span style="color: #00AEEF;">LOG</span>
           </h2>
           <h4 class="fw-bold mb-4" style="color: #333;">Iniciar <span style="color: #00AEEF;">Sesión</span></h4>
+
+          @if (loginError) {
+            <div class="alert alert-danger p-2 text-center rounded-3 mb-4 text-danger border border-danger">
+              <small class="fw-bold"><i class="bi bi-exclamation-triangle-fill me-1"></i> {{ loginError }}</small>
+            </div>
+          }
 
           <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
 
@@ -124,7 +130,7 @@
     </div>
   </div>
 }
-<!--Modal de registro-->
+
 @if (showRegister) {
   <div class="modal fade show modal-animado" tabindex="-1" style="display: block;">
     <div class="modal-dialog modal-dialog-centered">
@@ -138,6 +144,12 @@
             <span style="color: #004E7C;">CAR</span><span style="color: #00AEEF;">LOG</span>
           </h2>
           <h4 class="fw-bold mb-4" style="color: #333;">Reg<span style="color: #00AEEF;">istrate</span></h4>
+
+          @if (registerError) {
+            <div class="alert alert-danger p-2 text-center rounded-3 mb-4 text-danger border border-danger">
+              <small class="fw-bold"><i class="bi bi-exclamation-triangle-fill me-1"></i> {{ registerError }}</small>
+            </div>
+          }
 
           <form [formGroup]="registerForm" (ngSubmit)="onRegisterSubmit()">
 
