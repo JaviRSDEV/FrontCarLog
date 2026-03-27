@@ -18,4 +18,8 @@ export class WorkOrderService {
   getAllWorkOrders(): Observable<Workorder[]>{
     return this.http.get<Workorder[]>(this.apiUrl);
   }
+
+  createWorkOrder(workOrderData: {description: string, vehiclePlate: string}): Observable<Workorder>{
+    return this.http.post<Workorder>(this.apiUrl, workOrderData);
+  }
 }

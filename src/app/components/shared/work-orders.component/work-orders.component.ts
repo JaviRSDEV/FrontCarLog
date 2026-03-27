@@ -14,6 +14,7 @@ export class WorkOrdersComponent {
 
   activeTab: string = '';
   ordenes: Workorder[] = [];
+  mostrarFormulario: boolean = false;
 
   constructor(private WorkOrderService: WorkOrderService) {}
 
@@ -54,5 +55,19 @@ export class WorkOrdersComponent {
       next: (data) => this.ordenes = data,
       error: (err) => console.error('Error al cargar las órdenes del mecánico', err)
     });
+  }
+
+  onOrdenGuardada(){
+    this.mostrarFormulario = false;
+
+    if(this.activeTab === 'todas'){
+      this.cargarTodasLasOrdenes();
+    }else{
+      this.cargarOrdenesDelMecanico();
+    }
+  }
+
+   toggleFormulario(){
+    this.mostrarFormulario = !this.mostrarFormulario;
   }
 }
