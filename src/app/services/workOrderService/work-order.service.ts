@@ -7,11 +7,15 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class WorkOrderService {
-  private apiUrl = 'http://localhost:8081/api/workoders';
+  private apiUrl = 'http://localhost:8081/api/workorders';
 
   constructor(private http: HttpClient){}
 
   getWorkOrdersByMechanic(dni: string): Observable<Workorder[]>{
     return this.http.get<Workorder[]>(`${this.apiUrl}?mechanicDni=${dni}`)
+  }
+
+  getAllWorkOrders(): Observable<Workorder[]>{
+    return this.http.get<Workorder[]>(this.apiUrl);
   }
 }
