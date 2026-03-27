@@ -35,7 +35,7 @@
         </button>
       </li>
     }
-    @if (role === 'MANAGER' || role === 'CO_MANAGER') {
+    @if (role === 'MANAGER' || role === 'CO_MANAGER' || role === 'MECHANIC') {
       <li class="nav-item">
         <button
           class="nav-link text-white"
@@ -59,7 +59,7 @@
     </app-vehicle-form>
   }
 
-  @if (activeTab === 'flota' || activeTab === 'asignados') {
+  @if (activeTab === 'flota') {
     <div class="card bg-dark bg-opacity-50 border-secondary mb-4 fade-in">
       <div class="card-body d-flex flex-column flex-md-row gap-3 align-items-center">
         <div class="text-white flex-grow-1">

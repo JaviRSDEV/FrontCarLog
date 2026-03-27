@@ -16,6 +16,17 @@ export class VehicleDetailModalComponent {
   @Output() editar = new EventEmitter<Vehicle>();
   @Output() eliminar = new EventEmitter<string>();
 
+  currentUserDni: string = '';
+
+  ngOnInit(): void {
+    const userJson = localStorage.getItem('user');
+    if(userJson){
+      const user = JSON.parse(userJson);
+
+      this.currentUserDni = user.userId ? String(user.userId) : user.dni;
+    }
+  }
+
   onCerrar() {
     this.cerrarModal.emit();
   }

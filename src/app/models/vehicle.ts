@@ -13,4 +13,5 @@ export interface Vehicle {
   workshopId?: number | null;
   ownerId?: string;
   pendingWorkshopId?: number | null;
+  pendingWorkshopName?: number | null;
 }
