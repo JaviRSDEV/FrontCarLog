@@ -2,10 +2,51 @@
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="mb-0"><i class="bi bi-clipboard-data me-2 text-primary"></i>Gestión de Órdenes</h2>
 
-    @if(role === 'MANAGER' ||role === 'CO_MANAGER'){
+    @if (role === 'MANAGER' || role === 'CO_MANAGER') {
       <button class="btn btn-primary rounded-pill px-4 shadow-sm">
         <i class="bi bi-plus-lg"></i>Nueva Orden
       </button>
+    }
+  </div>
+
+  <ul class="nav nav-pills mb-4 gap-2">
+    @if (role === 'MANAGER' || role === 'CO_MANAGER') {
+      <li class="nav-item">
+        <button
+          class="nav-link text-white"
+          [class.active]="activeTab === 'todas'"
+          (click)="cambiarPestana('todas')">
+          <i class="bi bi-card-list me-1"></i>Todas las ordenes
+        </button>
+      </li>
+    }
+
+    @if(role === 'MANAGER' || role === 'CO_MANAGER' || role === 'MECHANIC'){
+      <li class="nav-item">
+        <button class="nav-link text-white"
+          [class.active]="activeTab === 'asignadas'"
+          (click)="cambiarPestana('asignadas')">
+          <i class="bi bi-wrench-adjustable me-1"></i>Mis asignadas
+        </button>
+      </li>
+    }
+  </ul>
+
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 fade-in">
+    @for(orden of ordenes; track orden.id){
+      <div class="col">
+        <div class="card bg-dark border-secondary text-white p-3">
+          <h5>{{ orden.vehicle.brand }} {{ orden.vehicle.model }}</h5>
+          <p>Matricula: {{ orden.vehicle.plate }}</p>
+          <span class="badge bg-warning">{{ orden.status }}</span>
+        </div>
+      </div>
+    }@empty {
+      <div class="col-12 text-center py-5">
+        <p class="text-white opacity-75">
+          <i class="bi bi-inbox fs-1 d-block mb-2"></i>No hay ordenes para mostrar
+        </p>
+      </div>
     }
   </div>
 </div>

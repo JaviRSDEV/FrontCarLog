@@ -8,6 +8,7 @@ import { authguardGuard } from './core/guards/auth-guard/auth-guard';
 import { altaTallerGuard } from './core/guards/alta-taller-guard/alta-taller-guard';
 import { loginGuard } from './core/guards/login-guard/login-guard';
 import { DashboardComponent } from './components/shared/dashboard.component/dashboard.component';
+import { WorkOrdersComponent } from './components/shared/work-orders.component/work-orders.component';
 export const routes: Routes = [
 
   {
@@ -37,6 +38,11 @@ export const routes: Routes = [
       path: 'alta-taller',
       component: AltaTaller,
       canActivate: [altaTallerGuard]
+    },
+    {
+      path: 'mantenimientos',
+      component: WorkOrdersComponent,
+      canActivate: [tallerGuard]
     }]
   },
   {
