@@ -49,7 +49,10 @@ export class WorkOrderLinesComponent {
 
   guardarEdicion() {
     if (!this.lineaEnEdicion) return;
-    this.onUpdate.emit({ lineId: this.lineaEnEdicion.id, data: this.lineaEnEdicion });
+    this.onUpdate.emit({
+      lineId: this.lineaEnEdicion.id,
+      data: this.lineaEnEdicion,
+    });
     this.cancelarEdicion();
   }
 }

@@ -8,7 +8,7 @@ import { WorkOrderLinesComponent } from '../work-order-lines.component/work-orde
 @Component({
   selector: 'app-work-order-detail',
   standalone: true,
-  imports: [CurrencyPipe, DatePipe, UpperCasePipe, WorkOrderLinesComponent],
+  imports: [DatePipe, UpperCasePipe, WorkOrderLinesComponent],
   templateUrl: './work-order-detail.component.html',
   styleUrl: './work-order-detail.component.css',
 })
