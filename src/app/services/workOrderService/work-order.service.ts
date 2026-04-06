@@ -19,6 +19,15 @@ export class WorkOrderService {
     return this.http.get<Workorder[]>(this.apiUrl);
   }
 
+  getWorkOrderById(id: number): Observable<Workorder>{
+    const url = `${this.apiUrl}/${id}`;
+    console.log('--- LLAMADA REAL A:', url);
+    return this.http.get<Workorder>(url);
+    /*console.log('Intentado GET a:', this.apiUrl);
+    return this.http.get<Workorder>(`${this.apiUrl}/${id}`);*/
+
+  }
+
   createWorkOrder(workOrderData: {description: string, vehiclePlate: string}): Observable<Workorder>{
     return this.http.post<Workorder>(this.apiUrl, workOrderData);
   }

@@ -1,1 +1,156 @@
-<p>work-order-detail.component works!</p>
+<div class="container mt-4 text-white">
+
+  @if (orden) {
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div class="d-flex align-items-center">
+        <button class="btn btn-outline-light btn-sm me-3 rounded-pill" (click)="volver()">
+          <i class="bi bi-arrow-left"></i>
+        </button>
+        <h2 class="mb-0">
+          Orden #{{ orden.id }}
+          <small class="text-white-50 fs-6">({{ orden.createdAt | date:'dd/MM/yyyy HH:mm' }})</small>
+        </h2>
+      </div>
+
+      <div class="d-flex gap-2">
+        @if (orden.status !== 'COMPLETED') {
+          <button class="btn btn-outline-danger btn-sm" (click)="borrarOrden()" title="Eliminar orden">
+            <i class="bi bi-trash"></i>
+          </button>
+
+          @if (orden.status === 'PENDING') {
+            <button class="btn btn-primary px-4" (click)="cambiarEstado('IN_PROGRESS')">
+              <i class="bi bi-play-fill me-1"></i> Iniciar Trabajo
+            </button>
+          }
+
+          @if (orden.status === 'IN_PROGRESS') {
+            <button class="btn btn-success px-4" (click)="cambiarEstado('COMPLETED')">
+              <i class="bi bi-check-lg me-1"></i> Cerrar Orden
+            </button>
+          }
+        } @else {
+          <span class="text-success-emphasis fw-bold">
+            <i class="bi bi-lock-fill me-1"></i> Orden Finalizada
+          </span>
+        }
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card bg-dark border-secondary text-white p-3 shadow-sm h-100">
+          <h5 class="text-primary border-bottom border-secondary pb-2">
+            <i class="bi bi-car-front me-2"></i>Vehículo
+          </h5>
+          <p class="mb-1 fs-5"><strong>{{ orden.vehicle.brand }} {{ orden.vehicle.model }}</strong></p>
+          <p class="text-white-50 small mb-4">{{ orden.vehicle.plate }}</p>
+
+          <div class="mt-auto">
+            <span class="badge w-100 py-2 fs-6 shadow-sm"
+                  [class.bg-warning]="orden.status === 'PENDING'"
+                  [class.bg-primary]="orden.status === 'IN_PROGRESS'"
+                  [class.bg-success]="orden.status === 'COMPLETED'">
+              {{ orden.status }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-8">
+        <div class="card bg-dark border-secondary text-white p-3 shadow-sm mb-4">
+          <h5 class="text-primary border-bottom border-secondary pb-2">
+            <i class="bi bi-chat-left-text me-2"></i>Descripción Inicial
+          </h5>
+          <p class="fst-italic opacity-75">"{{ orden.description }}"</p>
+        </div>
+
+        <div class="card bg-dark border-secondary text-white shadow-sm overflow-hidden">
+          <div class="card-header border-secondary bg-transparent d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0">Servicios y Repuestos</h5>
+            <div class="text-end">
+                <small class="d-block text-white-50">Total Facturado</small>
+                <span class="text-success fw-bold fs-3">{{ orden.totalAmount | currency:'EUR' }}</span>
+            </div>
+          </div>
+
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-dark table-hover mb-0">
+                <thead class="table-secondary">
+                  <tr>
+                    <th class="ps-3">Concepto</th>
+                    <th class="text-center">Cant.</th>
+                    <th class="text-end">Precio Ud.</th>
+                    <th class="text-end">Subtotal</th>
+                    <th class="text-center">Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (linea of orden.lines; track $index) {
+                    <tr>
+                      <td class="ps-3">{{ linea.concept }}</td>
+                      <td class="text-center">{{ linea.quantity }}</td>
+                      <td class="text-end">{{ linea.pricePerUnit | currency:'EUR' }}</td>
+                      <td class="text-end fw-bold text-info">{{ (linea.quantity * linea.pricePerUnit) | currency:'EUR' }}</td>
+                      <td class="text-center">
+                        @if (orden.status !== 'COMPLETED') {
+                          <button class="btn btn-link text-danger btn-sm p-0" (click)="eliminarLinea(linea.id!)">
+                            <i class="bi bi-trash3"></i>
+                          </button>
+                        }
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="5" class="text-center py-5 text-white-50">
+                        <i class="bi bi-tools d-block fs-2 mb-2"></i>
+                        No hay líneas de trabajo añadidas todavía
+                      </td>
+                    </tr>
+                  }
+
+                  @if (orden.status !== 'COMPLETED') {
+                    <tr class="table-active">
+                      <td class="ps-3">
+                        <input type="text" class="form-control form-control-sm bg-secondary text-white border-0"
+                               placeholder="Ej: Filtro de aceite" [(ngModel)]="nuevaLinea.concept">
+                      </td>
+                      <td style="width: 80px;">
+                        <input type="number" class="form-control form-control-sm bg-secondary text-white border-0 text-center"
+                               [(ngModel)]="nuevaLinea.quantity" min="1">
+                      </td>
+                      <td style="width: 120px;">
+                        <input type="number" class="form-control form-control-sm bg-secondary text-white border-0 text-end"
+                               placeholder="0.00" [(ngModel)]="nuevaLinea.pricePerUnit">
+                      </td>
+                      <td colspan="2" class="text-center">
+                        <button class="btn btn-sm btn-primary w-75" (click)="agregarLinea()" [disabled]="!nuevaLinea.concept">
+                          <i class="bi bi-plus-lg"></i> Añadir
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  } @else if (cargando) {
+    <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px;">
+      <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
+      <p class="h5 text-white-50">Sincronizando con el taller...</p>
+    </div>
+  } @else {
+    <div class="alert alert-danger mt-5 text-center">
+      <i class="bi bi-exclamation-triangle-fill fs-1 d-block mb-3"></i>
+      <h4>Error al cargar la orden</h4>
+      <p>No se ha podido encontrar la orden solicitada o no tienes permisos.</p>
+      <button class="btn btn-light mt-2" (click)="volver()">Volver al listado</button>
+    </div>
+  }
+
+</div>

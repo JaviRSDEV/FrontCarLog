@@ -3,6 +3,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Workorder } from '../../../models/workorder';
 import { WorkOrderFormComponent } from '../work-order-form.component/work-order-form.component';
 import { CurrencyPipe } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-work-orders',
@@ -20,7 +21,10 @@ export class WorkOrdersComponent implements OnInit{
   ordenes: Workorder[] = [];
   mostrarFormulario: boolean = false;
 
-  constructor(private workOrderService: WorkOrderService, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private workOrderService: WorkOrderService,
+    private cdr: ChangeDetectorRef,
+    private router: Router) {}
 
   ngOnInit(): void{
     const userJson = localStorage.getItem('user');
@@ -39,7 +43,11 @@ export class WorkOrdersComponent implements OnInit{
   }
 
   abrirDetallesOrden(orden: Workorder){
-
+    if(orden.id){
+      this.router.navigate(['/dashboard/mantenimientos', orden.id]);
+    }else{
+      console.error('error no tiene id')
+    }
   }
 
   cambiarPestana(tab: string){

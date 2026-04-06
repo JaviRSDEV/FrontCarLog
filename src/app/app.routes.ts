@@ -9,6 +9,7 @@ import { altaTallerGuard } from './core/guards/alta-taller-guard/alta-taller-gua
 import { loginGuard } from './core/guards/login-guard/login-guard';
 import { DashboardComponent } from './components/shared/dashboard.component/dashboard.component';
 import { WorkOrdersComponent } from './components/shared/work-orders.component/work-orders.component';
+import { WorkOrderDetailComponent } from './components/shared/work-order-detail.component/work-order-detail.component';
 export const routes: Routes = [
 
   {
@@ -43,7 +44,13 @@ export const routes: Routes = [
       path: 'mantenimientos',
       component: WorkOrdersComponent,
       canActivate: [tallerGuard]
-    }]
+    },
+    {
+      path: 'mantenimientos/:id',
+      component: WorkOrderDetailComponent,
+      canActivate: [tallerGuard]
+    }
+  ]
   },
   {
     path: '**',

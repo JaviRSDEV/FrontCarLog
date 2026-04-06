@@ -1,6 +1,6 @@
 export interface WorkOrderLine {
   id?: number;
-  description?: number;
+  concept?: string;
   quantity: number;
   pricePerUnit: number;
   iva: number;
