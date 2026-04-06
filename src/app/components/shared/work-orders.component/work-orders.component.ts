@@ -2,11 +2,12 @@ import { WorkOrderService } from './../../../services/workOrderService/work-orde
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Workorder } from '../../../models/workorder';
 import { WorkOrderFormComponent } from '../work-order-form.component/work-order-form.component';
+import { CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'app-work-orders',
   standalone: true,
-  imports: [WorkOrderFormComponent],
+  imports: [WorkOrderFormComponent, CurrencyPipe],
   templateUrl: './work-orders.component.html',
   styleUrl: './work-orders.component.css',
 })
@@ -35,6 +36,10 @@ export class WorkOrdersComponent implements OnInit{
         this.cambiarPestana('asignadas');
       }
     }
+  }
+
+  abrirDetallesOrden(orden: Workorder){
+
   }
 
   cambiarPestana(tab: string){

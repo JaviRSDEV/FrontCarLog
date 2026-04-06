@@ -22,4 +22,20 @@ export class WorkOrderService {
   createWorkOrder(workOrderData: {description: string, vehiclePlate: string}): Observable<Workorder>{
     return this.http.post<Workorder>(this.apiUrl, workOrderData);
   }
+
+  updateWorkOrder(id: number, updateData: { mechanicNotes?: string; status?: string }): Observable<Workorder> {
+    return this.http.put<Workorder>(`${this.apiUrl}/${id}`, updateData);
+  }
+
+  deleteWorkOrder(id: number): Observable<Workorder> {
+    return this.http.delete<Workorder>(`$this.apiUrl/${id}`);
+  }
+
+  addWorkOrderLine(orderId: number, lineData: { concept: string; quantity: number; pricePerUnit: number, IVA: number; discount: number }): Observable<Workorder>{
+    return this.http.post<Workorder>(`${this.apiUrl}/${orderId}/lines`, lineData);
+  }
+
+  deleteWorkOrderLine(orderId: number, lineId: number): Observable<Workorder>{
+    return this.http.delete<Workorder>(`${this.apiUrl}/${orderId}/lines/${lineId}`);
+  }
 }
