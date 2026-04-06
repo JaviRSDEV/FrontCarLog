@@ -1,9 +1,12 @@
 import { WorkOrderService } from './../../../services/workOrderService/work-order.service';
-import { Component, input, OnInit, EventEmitter, Input, Output } from '@angular/core';
+import { Component, OnInit, EventEmitter, Input, Output, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { VehicleService } from '../../../services/vehicleService/vehicle.service';
+import { Vehicle } from '../../../models/vehicle';
 
 @Component({
-  selector: 'app-work-order-form.component',
+  selector: 'app-work-order-form',
+  standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './work-order-form.component.html',
   styleUrl: './work-order-form.component.css',
@@ -17,9 +20,13 @@ export class WorkOrderFormComponent implements OnInit{
   workOrderForm!: FormGroup;
   mensajeError: string = '';
 
+  vehiculosFlota: Vehicle[] = [];
+
   constructor(
     private fb: FormBuilder,
-    private workOrderService: WorkOrderService
+    private workOrderService: WorkOrderService,
+    private vehicleService: VehicleService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -27,6 +34,21 @@ export class WorkOrderFormComponent implements OnInit{
       vehiclePlate: ['', [Validators.required, Validators.pattern(/^[0-9]{4}[A-Z]{3}$/i)]],
       description: ['', [Validators.required, Validators.minLength(10)]]
     });
+
+    this.cargarVehiculos();
+  }
+
+  cargarVehiculos(){
+    this.vehicleService.getAllVehicles().subscribe({
+      next: (data: any) => {
+        this.vehiculosFlota = data;
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        console.error(err);
+        this.mensajeError = 'No se pudieron cargar los vehiculos del taller'
+      }
+    })
   }
 
   onSubmit(){

@@ -1,0 +1,71 @@
+<div class="card bg-dark bg-opacity-75 border-secondary text-white shadow-lg mb-4 fade-in">
+  <div class="card-header border-bottom border-secondary d-flex justify-content-between align-items-center py-3">
+    <h5 class="mb-0 text-primary">
+      <i class="bi bi-file-earmark-plus me-2"></i>
+      Nueva Orden de Trabajo
+    </h5>
+    <button type="button" class="btn-close btn-close-white" (click)="onCancelar()"></button>
+  </div>
+
+  <div class="card-body p-4">
+    @if(mensajeError){
+      <div class="alert alert-danger p-2 text-center rounded-3 mb-4 border border-danger">
+        <small class="fw-bold">
+          <i class="bi bi-exclamation-triangle-fill me-1"></i>
+          {{ mensajeError }}
+        </small>
+      </div>
+    }
+
+    <form [formGroup]="workOrderForm" (ngSubmit)="onSubmit()">
+
+      <div class="row g-3">
+
+        <div class="col-md-4">
+          <label class="form-label fw-bold text-info">
+            Matrícula del Vehículo
+          </label>
+
+          <!--PENDIENTE DE IMPLEMENTAR-->
+          <select class="form-select text-uppercase" formControlName="vehiclePlate">
+            <option value="" disabled selected>Selecciona un vehículo...</option>
+            @for(vehiculo of vehiculosFlota; track vehiculo.plate){
+              <option [value]="vehiculo.plate">
+                {{ vehiculo.plate }} - {{ vehiculo.brand }} {{ vehiculo.model }}
+              </option>
+            }
+          </select>
+
+          @if(workOrderForm.get('vehiclePlate')?.invalid && workOrderForm.get('vehiclePlate')?.touched){
+            @if(workOrderForm.get('vehiclePlate')?.hasError('required')){
+              <small class="text-danger fw-semibold">Debes seleccionar un vehículo</small>
+            }
+          }
+        </div>
+
+        <div class="cold-md-8">
+          <label class="form-label fw-bold text-info">Descripción</label>
+          <textarea class="form-control" formControlName="description" rows="3" placeholder="Describa el problema del vehículo o trabajo a realizar..."></textarea>
+
+          @if(workOrderForm.get('description')?.invalid && workOrderForm.get('description')?.touched){
+            @if(workOrderForm.get('description')?.hasError('required')){
+              <small class="text-danger fw-semibold">La descripción es obligatoria</small>
+            }
+            @if(workOrderForm.get('description')?.hasError('minlength')) {
+              <small class="text-danger fw-semibold">Sé un poco más detallado (mín. 10 carácteres)</small>
+            }
+          }
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top border-secondary">
+        <button type="button" class="btn btn-outline-light rounded-pill px-4" (click)="onCancelar()">Cancelar</button>
+        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" [disabled]="workOrderForm.invalid">
+          <i class="bi bi-save me-1"></i>
+          Crear Orden
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
