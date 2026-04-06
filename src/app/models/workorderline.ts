@@ -1,8 +1,9 @@
 export interface WorkOrderLine {
-  id?: number;
+  id: number;
   concept?: string;
   quantity: number;
   pricePerUnit: number;
-  iva: number;
+  IVA: number;
+  discount: number;
   subTotal?: number;
 }

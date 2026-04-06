@@ -1,0 +1,177 @@
+<div class="card bg-dark border-secondary text-white shadow-sm overflow-hidden">
+  <div
+    class="card-header border-secondary bg-transparent d-flex justify-content-between align-items-center py-3"
+  >
+    <h5 class="mb-0">Servicios y Repuestos</h5>
+    <div class="text-end">
+      <small class="d-block text-white-50">Total Facturado</small>
+      <span class="text-success fw-bold fs-3">{{ totalAmount() | currency: 'EUR' }}</span>
+    </div>
+  </div>
+
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-dark table-hover mb-0">
+        <thead class="table-secondary text-dark">
+          <tr>
+            <th class="ps-3">Concepto</th>
+            <th class="text-center">Cant.</th>
+            <th class="text-end">Precio Ud.</th>
+            <th class="text-center">% Desc.</th>
+            <th class="text-center">% IVA</th>
+            <th class="text-end">Subtotal</th>
+            <th class="text-center"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (linea of lineas(); track linea.id) {
+            <tr [class.table-primary]="editandoId() === linea.id">
+              @if (editandoId() === linea.id) {
+                <td class="ps-3">
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    [(ngModel)]="lineaEnEdicion.concept"
+                  />
+                </td>
+                <td style="width: 70px">
+                  <input
+                    type="number"
+                    class="form-control form-control-sm text-center"
+                    [(ngModel)]="lineaEnEdicion.quantity"
+                  />
+                </td>
+                <td style="width: 100px">
+                  <input
+                    type="number"
+                    class="form-control form-control-sm text-end"
+                    [(ngModel)]="lineaEnEdicion.pricePerUnit"
+                  />
+                </td>
+                <td style="width: 80px">
+                  <input
+                    type="number"
+                    class="form-control form-control-sm text-center"
+                    [(ngModel)]="lineaEnEdicion.discount"
+                  />
+                </td>
+                <td style="width: 90px">
+                  <select
+                    class="form-select form-select-sm text-center"
+                    [(ngModel)]="lineaEnEdicion.IVA"
+                  >
+                    <option [ngValue]="21">21%</option>
+                    <option [ngValue]="10">10%</option>
+                    <option [ngValue]="4">4%</option>
+                    <option [ngValue]="0">0%</option>
+                  </select>
+                </td>
+                <td class="text-end text-muted fst-italic">Calculando...</td>
+                <td class="text-center">
+                  <div class="btn-group">
+                    <button class="btn btn-sm btn-success" (click)="guardarEdicion()">
+                      <i class="bi bi-check-lg"></i>
+                    </button>
+                    <button class="btn btn-sm btn-secondary" (click)="cancelarEdicion()">
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                  </div>
+                </td>
+              } @else {
+                <td class="ps-3">{{ linea.concept }}</td>
+                <td class="text-center">{{ linea.quantity }}</td>
+                <td class="text-end">{{ linea.pricePerUnit | currency: 'EUR' }}</td>
+                <td class="text-center text-warning">{{ linea.discount }}%</td>
+                <td class="text-center text-info">{{ linea.IVA || linea.IVA }}%</td>
+                <td class="text-end fw-bold text-success">
+                  {{ linea.subTotal | currency: 'EUR' }}
+                </td>
+
+                <td class="text-center">
+                  @if (!isReadOnly()) {
+                    <button
+                      class="btn btn-link text-info btn-sm p-0 me-2"
+                      (click)="iniciarEdicion(linea)"
+                    >
+                      <i class="bi bi-pencil-square"></i>
+                    </button>
+                    <button
+                      class="btn btn-link text-danger btn-sm p-0"
+                      (click)="eliminarLinea(linea.id)"
+                    >
+                      <i class="bi bi-trash3"></i>
+                    </button>
+                  }
+                </td>
+              }
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="text-center py-5 text-white-50">
+                <i class="bi bi-tools d-block fs-2 mb-2"></i>
+                No hay líneas de trabajo añadidas todavía
+              </td>
+            </tr>
+          }
+
+          @if (!isReadOnly()) {
+            <tr class="table-active">
+              <td class="ps-3">
+                <input
+                  type="text"
+                  class="form-control form-control-sm bg-secondary text-white border-0"
+                  placeholder="Concepto"
+                  [(ngModel)]="nuevaLinea.concept"
+                />
+              </td>
+              <td style="width: 70px">
+                <input
+                  type="number"
+                  class="form-control form-control-sm bg-secondary text-white border-0 text-center"
+                  [(ngModel)]="nuevaLinea.quantity"
+                  min="1"
+                />
+              </td>
+              <td style="width: 100px">
+                <input
+                  type="number"
+                  class="form-control form-control-sm bg-secondary text-white border-0 text-end"
+                  placeholder="0.00"
+                  [(ngModel)]="nuevaLinea.pricePerUnit"
+                />
+              </td>
+              <td style="width: 80px">
+                <input
+                  type="number"
+                  class="form-control form-control-sm bg-secondary text-white border-0 text-center text-warning"
+                  placeholder="0"
+                  [(ngModel)]="nuevaLinea.discount"
+                />
+              </td>
+              <td style="width: 90px">
+                <select
+                  class="form-select form-select-sm bg-secondary text-white border-0 text-center text-info"
+                  [(ngModel)]="nuevaLinea.IVA"
+                >
+                  <option [ngValue]="21">21%</option>
+                  <option [ngValue]="10">10%</option>
+                  <option [ngValue]="4">4%</option>
+                  <option [ngValue]="0">0%</option>
+                </select>
+              </td>
+              <td colspan="2" class="text-center">
+                <button
+                  class="btn btn-sm btn-primary w-100"
+                  (click)="agregarLinea()"
+                  [disabled]="!nuevaLinea.concept"
+                >
+                  <i class="bi bi-plus-lg"></i>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
