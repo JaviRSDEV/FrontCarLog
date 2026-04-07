@@ -65,4 +65,11 @@ export class WorkOrderService {
   updateWorkOrderLine(orderId: number, lineId: number, lineData: any): Observable<Workorder> {
     return this.http.put<Workorder>(`${this.apiUrl}/${orderId}/lines/${lineId}`, lineData);
   }
+
+  reassignWorkOrder(orderId: number, newMechanicId: string): Observable<Workorder> {
+    return this.http.patch<Workorder>(
+      `${this.apiUrl}/${orderId}/reassign?newMechanicId=${newMechanicId}`,
+      {},
+    );
+  }
 }

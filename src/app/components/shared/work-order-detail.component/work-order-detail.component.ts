@@ -4,27 +4,51 @@ import { CurrencyPipe, DatePipe, UpperCasePipe } from '@angular/common';
 import { WorkOrderService } from './../../../services/workOrderService/work-order.service';
 import { Workorder } from './../../../models/workorder';
 import { WorkOrderLinesComponent } from '../work-order-lines.component/work-order-lines.component';
+import { UserService } from '../../../services/userService/user.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-work-order-detail',
   standalone: true,
-  imports: [DatePipe, UpperCasePipe, WorkOrderLinesComponent],
+  imports: [DatePipe, UpperCasePipe, FormsModule, WorkOrderLinesComponent],
   templateUrl: './work-order-detail.component.html',
   styleUrl: './work-order-detail.component.css',
 })
 export class WorkOrderDetailComponent implements OnInit {
   orden?: Workorder;
   cargando: boolean = true;
+  esManager: boolean = false;
+  mecanicosDisponibles: any[] = [];
+  mecanicoSeleccionado: string = '';
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private workOrderService: WorkOrderService,
+    private userService: UserService,
     private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
+    const userStorage = localStorage.getItem('user');
+
+    if (userStorage) {
+      try {
+        const userData = JSON.parse(userStorage);
+
+        this.esManager = userData.role === 'MANAGER';
+        const miWorkshopId = userData.workshopId;
+
+        if (this.esManager && miWorkshopId != null) {
+          this.cargarMecanicosDelTaller(miWorkshopId);
+        }
+      } catch (e) {
+        console.error(e);
+        this.esManager = false;
+      }
+    }
+
     if (id) {
       this.cargarOrden(+id);
     } else {
@@ -37,17 +61,19 @@ export class WorkOrderDetailComponent implements OnInit {
       next: (data: any) => {
         this.orden = data;
         this.cargando = false;
+
+        const nombreMecanico = (this.orden as any)?.mechanicName;
+        if (nombreMecanico && this.mecanicosDisponibles.length > 0) {
+          const encontrado = this.mecanicosDisponibles.find(
+            (m) => m.name.toLowerCase() === nombreMecanico.toLowerCase(),
+          );
+          if (encontrado) this.mecanicoSeleccionado = encontrado.dni;
+        }
+
         this.cdr.detectChanges();
       },
       error: () => this.router.navigate(['/dashboard/mantenimientos']),
     });
-
-    setTimeout(() => {
-      if (this.cargando) {
-        this.cargando = false;
-        this.cdr.detectChanges();
-      }
-    }, 5000);
   }
 
   cambiarEstado(nuevoEstado: string) {
@@ -86,6 +112,41 @@ export class WorkOrderDetailComponent implements OnInit {
     if (!this.orden) return;
     this.workOrderService.updateWorkOrderLine(this.orden.id, evento.lineId, evento.data).subscribe({
       next: () => this.cargarOrden(this.orden!.id),
+    });
+  }
+
+  cargarMecanicosDelTaller(workshopId: number) {
+    this.userService.getMecanicosPorTaller(workshopId).subscribe({
+      next: (mecanicos) => {
+        this.mecanicosDisponibles = mecanicos;
+
+        const nombreMecanico = (this.orden as any)?.mechanicName;
+
+        if (nombreMecanico) {
+          const mecanicoEncontrado = this.mecanicosDisponibles.find(
+            (m) => m.name.toLowerCase() === nombreMecanico.toLowerCase(),
+          );
+
+          if (mecanicoEncontrado) {
+            this.mecanicoSeleccionado = mecanicoEncontrado.dni;
+          }
+        }
+
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error(err),
+    });
+  }
+
+  reasignarMecanico(nuevoMechanicId: string) {
+    if (!this.orden || !nuevoMechanicId) return;
+    if (!confirm('¿Seguro que quieres asignar esta orden a otro mecánico?')) return;
+
+    this.workOrderService.reassignWorkOrder(this.orden.id, nuevoMechanicId).subscribe({
+      next: () => {
+        this.cargarOrden(this.orden!.id);
+      },
+      error: (err) => console.error('Error al asignar', err),
     });
   }
 }

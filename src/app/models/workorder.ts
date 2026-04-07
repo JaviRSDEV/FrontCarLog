@@ -1,6 +1,6 @@
 import { Workshop } from './workshop';
-import { Vehicle } from "./vehicle";
-import { User } from "./user";
+import { Vehicle } from './vehicle';
+import { User } from './user';
 import { WorkOrderLine } from './workorderline';
 
 export interface Workorder {
@@ -12,7 +12,7 @@ export interface Workorder {
   closedAt?: string;
   vehicle: Vehicle;
   mechanic: User;
-  Workshop: Workshop;
+  workshop: Workshop;
   totalAmount: number;
   lines?: WorkOrderLine[];
 }
