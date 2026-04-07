@@ -1,0 +1,26 @@
+/* Pestaña activa con línea azul debajo */
+.nav-link {
+    background: transparent !important;
+    font-weight: bold;
+    opacity: 0.6;
+    transition: 0.3s;
+}
+
+.nav-link:hover {
+    opacity: 1;
+}
+
+.active-tab {
+    opacity: 1 !important;
+    border-bottom: 3px solid #0d6efd !important;
+    border-radius: 0;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

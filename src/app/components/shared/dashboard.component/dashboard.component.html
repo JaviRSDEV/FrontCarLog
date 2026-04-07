@@ -1,9 +1,30 @@
+@if (user && user.pendingWorkshop) {
+  <div
+    class="alert alert-info border-primary shadow-sm d-flex justify-content-between align-items-center mt-3"
+  >
+    <div>
+      <i class="bi bi-briefcase-fill me-2"></i>
+      El taller con ID <strong>{{ user.pendingWorkshop }}</strong> quiere contratarte.
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-success btn-sm px-4 fw-bold" (click)="gestionarInvitacion(true)">
+        Aceptar
+      </button>
+      <button class="btn btn-outline-danger btn-sm" (click)="gestionarInvitacion(false)">
+        Rechazar
+      </button>
+    </div>
+  </div>
+}
+
 <div class="container mt-5 text-white">
   <div class="row mb-4">
     <div class="col-12">
       <h2>¡Hola, {{ userName | titlecase }}!</h2>
-      @if(role === 'MANAGER' && workshop){
-        <p class="text-light">Gestionando el taller: <strong>{{ workshop }}</strong></p>
+      @if (role === 'MANAGER' && workshop) {
+        <p class="text-light">
+          Gestionando el taller: <strong>{{ workshop }}</strong>
+        </p>
       } @else {
         <p class="text-light">Bienvenido al panel de control</p>
       }
@@ -11,14 +32,15 @@
   </div>
 
   <div class="row g-4">
-
     <div class="col-md-6 col-lg-4">
       <div class="card h-100 shadow-sm panel-card" [routerLink]="['/dashboard/vehiculos']">
-        <div class="card-body text-center d-flex flex-column justify-content-center align-items-center py-5">
+        <div
+          class="card-body text-center d-flex flex-column justify-content-center align-items-center py-5"
+        >
           <i class="bi bi-car-front-fill display-4 text-primary mb-3"></i>
           <h4 class="card-title">Mis Vehículos</h4>
           <p class="card-text text-muted">
-            @if (role === 'MANAGER'){
+            @if (role === 'MANAGER') {
               Gestiona la flota actual de tu taller
             } @else {
               Consulta el estado de tus coches
@@ -30,25 +52,28 @@
 
     <div class="col-md-6 col-lg-4">
       <div class="card h-100 shadow-sm panel-card" [routerLink]="['/dashboard/mantenimientos']">
-        <div class="card-body text-center d-flex flex-column justify-content-center align-items-center py-5">
+        <div
+          class="card-body text-center d-flex flex-column justify-content-center align-items-center py-5"
+        >
           <i class="bi bi-tools display-4 text-success mb-3"></i>
-          <h4 class="card-title">mantenimientos</h4>
+          <h4 class="card-title">Mantenimientos</h4>
           <p class="card-text text-muted">Revisa el historial y las próximas revisiones</p>
         </div>
       </div>
     </div>
 
-    @if(role === 'MANAGER'){
+    @if (role === 'MANAGER') {
       <div class="col-md-6 col-lg-4">
         <div class="card h-100 shadow-sm panel-card" [routerLink]="['/buscar']">
-          <div class="card-body text-center d-flex flex-column justify-content-center align-items-center py-5">
+          <div
+            class="card-body text-center d-flex flex-column justify-content-center align-items-center py-5"
+          >
             <i class="bi bi-search display-4 text-warning mb-3"></i>
-            <h4 class="card-title">Buscar Cliente/Vehiculo</h4>
+            <h4 class="card-title">Buscar Cliente/Vehículo</h4>
             <p class="card-text text-muted">Encuentra clientes y registra nuevas entradas</p>
           </div>
         </div>
       </div>
     }
-
   </div>
 </div>

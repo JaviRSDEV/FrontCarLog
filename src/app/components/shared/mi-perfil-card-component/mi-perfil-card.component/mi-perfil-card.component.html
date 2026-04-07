@@ -1,0 +1,21 @@
+<div class="card bg-dark border-secondary text-white shadow">
+  <div class="card-body text-center p-4">
+    <div class="mb-3">
+      <i class="bi bi-person-circle text-primary"></i>
+    </div>
+
+    <h3 class="mb-1">{{ user?.name }}</h3>
+    <p class="badge bg-primary fs-6 mb-4">{{ user?.role }}</p>
+
+    <div class="text-start border-top border-secondary pt-3">
+      <p class="mb-2"><strong class="text-primary">DNI:</strong> {{ user?.dni }}</p>
+      <p class="mb-2"><strong class="text-primary">Email:</strong> {{ user?.email }}</p>
+      <p class="mb-2">
+        <strong class="text-primary">Teléfono:</strong> {{ user?.phone || 'No disponible' }}
+      </p>
+      <p class="mb-0">
+        <strong class="text-primary">Taller:</strong> {{ user?.workShop || 'Sin taller asignado' }}
+      </p>
+    </div>
+  </div>
+</div>

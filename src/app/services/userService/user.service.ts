@@ -6,11 +6,41 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root',
 })
 export class UserService {
-  private apiUrl = 'http://localhost:8081/api/workshop';
+  private apiUrl = 'http://localhost:8081/api/users';
 
   constructor(private http: HttpClient) {}
 
-  getMecanicosPorTaller(workshopId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/${workshopId}/employees`);
+  getUserByDni(dni: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/${dni}`);
+  }
+
+  contratarEmpleados(managerDni: string, employeeDni: string, newRole: string): Observable<any> {
+    const params = {
+      managerDni: managerDni,
+      employeeDni: employeeDni,
+      newRole: newRole,
+    };
+
+    return this.http.patch(`${this.apiUrl}/promote`, null, { params });
+  }
+
+  invite(dni: string, managerDni: string, newRole: string): Observable<any> {
+    return this.http.patch(
+      `${this.apiUrl}/${dni}/invite?managerDni=${managerDni}&newRole=${newRole}`,
+      null,
+      { withCredentials: true },
+    );
+  }
+
+  acceptInvitation(dni: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${dni}/accept`, {});
+  }
+
+  rejectInvitation(dni: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${dni}/reject`, {});
+  }
+
+  fireEmployee(dni: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${dni}/fire`, {}, { withCredentials: true });
   }
 }

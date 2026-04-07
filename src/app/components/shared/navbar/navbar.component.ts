@@ -10,32 +10,40 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
-export class Navbar implements OnInit{
-
+export class Navbar implements OnInit {
+  role: string = '';
   isManager = false;
+  isMechanic = false;
 
-  constructor(private Auth: Auth, private router: Router){
-
+  constructor(
+    private Auth: Auth,
+    private router: Router,
+  ) {
     this.router.events.subscribe(() => {
       this.comprobarEstado();
-    })
+    });
   }
   ngOnInit() {
     this.comprobarEstado();
-
   }
 
-  comprobarEstado(){
+  comprobarEstado() {
     let userJson = localStorage.getItem('user');
     console.log(userJson);
 
-    if(!userJson){
+    if (!userJson) {
       const cookieMatch = document.cookie.match(/(^|;)\s*user_data\s*=\s*([^;]+)/);
-      if(cookieMatch) userJson = decodeURIComponent(cookieMatch[2]);
+      if (cookieMatch) userJson = decodeURIComponent(cookieMatch[2]);
     }
 
-    if(userJson){
+    if (userJson) {
       const user = JSON.parse(userJson);
+
+      this.role = user.role?.replace(/"/g, '').toUpperCase();
+
+      this.isManager = this.role === 'MANAGER' || this.role === 'CO_MANAGER';
+
+      this.isMechanic = this.role === 'MECHANIC';
 
       this.isManager = user.role === 'MANAGER' && !user.workShop;
 
@@ -43,7 +51,7 @@ export class Navbar implements OnInit{
     }
   }
 
-  cerrarSesion(): void{
+  cerrarSesion(): void {
     this.Auth.logout();
   }
 }

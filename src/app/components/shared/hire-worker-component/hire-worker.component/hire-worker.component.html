@@ -1,0 +1,40 @@
+<div class="card bg-dark border-secondary text-white shadow-sm mb-4">
+  <div class="card-body">
+    <h5 class="text-primary mb-3">
+      <i class="bi bi-person-plus-fill me-2"></i>Contratar Nuevo Empleado.
+    </h5>
+
+    @if (mensaje) {
+      <div class="alert shadow-sm py-2" [ngClass]="error ? 'alert-danger' : 'alert-success'">
+        {{ mensaje }}
+      </div>
+    }
+
+    <div class="row g-2">
+      <div class="col-md-5">
+        <input
+          type="text"
+          [(ngModel)]="dniBusqueda"
+          name="dniBusqueda"
+          class="form-control bg-dark text-white border-secondary"
+          placeholder="Introduce DNI del usuario..."
+        />
+      </div>
+      <div class="col-md-4">
+        <select [(ngModel)]="rolElegido" class="form-select bg-dark text-white border-secondary">
+          <option value="MECHANIC">Mecánico</option>
+          <option value="CO_MANAGER">Manager</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <button
+          class="btn btn-primary w-100 fw-bold"
+          (click)="enviarInvitacion()"
+          [disabled]="!dniBusqueda"
+        >
+          Enviar Respuesta
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

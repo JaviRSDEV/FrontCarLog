@@ -6,6 +6,7 @@ import { Workorder } from './../../../models/workorder';
 import { WorkOrderLinesComponent } from '../work-order-lines.component/work-order-lines.component';
 import { UserService } from '../../../services/userService/user.service';
 import { FormsModule } from '@angular/forms';
+import { TallerService } from '../../../services/tallerService/taller.service';
 
 @Component({
   selector: 'app-work-order-detail',
@@ -25,7 +26,7 @@ export class WorkOrderDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private workOrderService: WorkOrderService,
-    private userService: UserService,
+    private tallerService: TallerService,
     private cdr: ChangeDetectorRef,
   ) {}
 
@@ -116,7 +117,7 @@ export class WorkOrderDetailComponent implements OnInit {
   }
 
   cargarMecanicosDelTaller(workshopId: number) {
-    this.userService.getMecanicosPorTaller(workshopId).subscribe({
+    this.tallerService.getMecanicosPorTaller(workshopId).subscribe({
       next: (mecanicos) => {
         this.mecanicosDisponibles = mecanicos;
 
@@ -134,7 +135,7 @@ export class WorkOrderDetailComponent implements OnInit {
 
         this.cdr.detectChanges();
       },
-      error: (err) => console.error(err),
+      error: (err: any) => console.error(err),
     });
   }
 
