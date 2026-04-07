@@ -22,7 +22,7 @@ CarLog es una plataforma web de gestión de talleres mecánicos que digitaliza e
 
 - [Node.js](https://nodejs.org/) (v20+ recomendado)
 - npm 11+
-- API REST backend corriendo en `http://localhost:8081`
+- API REST backend corriendo en `Springboot`
 
 ## Instalación
 
