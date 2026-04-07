@@ -143,8 +143,6 @@ Los tests unitarios se ejecutan con [Vitest](https://vitest.dev/) mediante el bu
 ## Licencia
 
 Este proyecto es privado. Consulta con el propietario del repositorio para más información.
-```
-
 ---
 
 ### Citations
