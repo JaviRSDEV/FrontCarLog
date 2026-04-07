@@ -2,7 +2,6 @@ Aquí tienes un README completo para la raíz del repositorio:
 
 ---
 
-```markdown
 # CarLog — Plataforma de Gestión de Taller
 
 CarLog es una plataforma web de gestión de talleres mecánicos que digitaliza el ciclo de vida del mantenimiento vehicular: desde el alta del taller hasta la gestión de órdenes de trabajo con facturación detallada. Ofrece interfaces especializadas para distintos roles de usuario (Gerentes, Mecánicos y Clientes).
