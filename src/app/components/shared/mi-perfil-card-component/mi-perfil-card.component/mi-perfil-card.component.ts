@@ -19,7 +19,9 @@ export class MiPerfilCardComponent implements OnInit {
 
   ngOnInit() {
     console.log(this.user);
-    this.obtenerTaller(this.user.workShopId);
+    if (this.user.workShopId) {
+      this.obtenerTaller(this.user.workShopId);
+    }
   }
 
   obtenerTaller(tallerId: number) {

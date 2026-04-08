@@ -25,10 +25,10 @@ export class EmployeeListComponent implements OnInit {
     if (userJson) {
       const user = JSON.parse(userJson);
 
-      this.managerDni = user.userId;
+      this.managerDni = user.dni;
 
-      if (user.workshopId) {
-        this.tallerService.getMecanicosPorTaller(user.workshopId).subscribe({
+      if (user.workShopId) {
+        this.tallerService.getMecanicosPorTaller(user.workShopId).subscribe({
           next: (data) => {
             this.empleados = data;
             this.cdr.detectChanges();

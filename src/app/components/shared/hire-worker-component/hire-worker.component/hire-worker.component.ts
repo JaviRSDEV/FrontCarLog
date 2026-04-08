@@ -29,7 +29,8 @@ export class HireWorkerComponent {
     if (!userJson) return;
     const manager = JSON.parse(userJson);
 
-    const managerDni = manager.userId;
+    const managerDni = manager.dni;
+    console.log(managerDni);
 
     this.userService.invite(this.dniBusqueda, managerDni, this.rolElegido).subscribe({
       next: () => {
