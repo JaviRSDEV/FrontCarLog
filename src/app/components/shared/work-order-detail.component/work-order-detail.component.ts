@@ -1,10 +1,9 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CurrencyPipe, DatePipe, UpperCasePipe } from '@angular/common';
+import { DatePipe, UpperCasePipe } from '@angular/common';
 import { WorkOrderService } from './../../../services/workOrderService/work-order.service';
 import { Workorder } from './../../../models/workorder';
 import { WorkOrderLinesComponent } from '../work-order-lines.component/work-order-lines.component';
-import { UserService } from '../../../services/userService/user.service';
 import { FormsModule } from '@angular/forms';
 import { TallerService } from '../../../services/tallerService/taller.service';
 
@@ -39,7 +38,9 @@ export class WorkOrderDetailComponent implements OnInit {
         const userData = JSON.parse(userStorage);
 
         this.esManager = userData.role === 'MANAGER';
-        const miWorkshopId = userData.workshopId;
+        const miWorkshopId = userData.workShopId;
+        console.log(userData);
+        console.log(miWorkshopId);
 
         if (this.esManager && miWorkshopId != null) {
           this.cargarMecanicosDelTaller(miWorkshopId);

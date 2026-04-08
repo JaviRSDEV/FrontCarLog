@@ -12,8 +12,7 @@ import { Router } from '@angular/router';
   templateUrl: './work-orders.component.html',
   styleUrl: './work-orders.component.css',
 })
-
-export class WorkOrdersComponent implements OnInit{
+export class WorkOrdersComponent implements OnInit {
   role: string = '';
   userDni: string = '';
 
@@ -24,72 +23,73 @@ export class WorkOrdersComponent implements OnInit{
   constructor(
     private workOrderService: WorkOrderService,
     private cdr: ChangeDetectorRef,
-    private router: Router) {}
+    private router: Router,
+  ) {}
 
-  ngOnInit(): void{
+  ngOnInit(): void {
     const userJson = localStorage.getItem('user');
 
-    if(userJson){
+    if (userJson) {
       const user = JSON.parse(userJson);
       this.role = user.role;
-      this.userDni = user.userId;
+      this.userDni = user.dni;
 
-      if(this.role === 'MANAGER' || this.role === 'CO_MANAGER'){
+      if (this.role === 'MANAGER' || this.role === 'CO_MANAGER') {
         this.cambiarPestana('todas');
-      }else if (this.role === 'MECHANIC'){
+      } else if (this.role === 'MECHANIC') {
         this.cambiarPestana('asignadas');
       }
     }
   }
 
-  abrirDetallesOrden(orden: Workorder){
-    if(orden.id){
+  abrirDetallesOrden(orden: Workorder) {
+    if (orden.id) {
       this.router.navigate(['/dashboard/mantenimientos', orden.id]);
-    }else{
-      console.error('error no tiene id')
+    } else {
+      console.error('error no tiene id');
     }
   }
 
-  cambiarPestana(tab: string){
+  cambiarPestana(tab: string) {
     this.activeTab = tab;
-    if(tab === 'todas'){
+    if (tab === 'todas') {
       this.cargarTodasLasOrdenes();
-    }else if(tab === 'asignadas'){
+    } else if (tab === 'asignadas') {
       this.cargarOrdenesDelMecanico();
     }
   }
 
-  cargarTodasLasOrdenes(){
+  cargarTodasLasOrdenes() {
     this.workOrderService.getAllWorkOrders().subscribe({
       next: (data: any) => {
         this.ordenes = data;
         this.cdr.detectChanges();
       },
-        error: (err: any) => console.error(err)
+      error: (err: any) => console.error(err),
     });
   }
 
-  cargarOrdenesDelMecanico(){
+  cargarOrdenesDelMecanico() {
     this.workOrderService.getWorkOrdersByMechanic(this.userDni).subscribe({
       next: (data) => {
         this.ordenes = data;
         this.cdr.detectChanges();
       },
-        error: (err) => console.error('Error al cargar las órdenes del mecánico', err)
+      error: (err) => console.error('Error al cargar las órdenes del mecánico', err),
     });
   }
 
-  onOrdenGuardada(){
+  onOrdenGuardada() {
     this.mostrarFormulario = false;
 
-    if(this.activeTab === 'todas'){
+    if (this.activeTab === 'todas') {
       this.cargarTodasLasOrdenes();
-    }else{
+    } else {
       this.cargarOrdenesDelMecanico();
     }
   }
 
-   toggleFormulario(){
+  toggleFormulario() {
     this.mostrarFormulario = !this.mostrarFormulario;
   }
 }

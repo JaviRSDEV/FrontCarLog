@@ -1,5 +1,5 @@
 <nav class="sidebar">
-  @if (!isManager) {
+  @if (isManager || isMechanic || isClient) {
     <!--Botón de home o pantalla principal-->
     <button
       [routerLink]="['/dashboard']"

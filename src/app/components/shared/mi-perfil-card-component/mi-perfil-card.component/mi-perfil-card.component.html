@@ -14,7 +14,8 @@
         <strong class="text-primary">Teléfono:</strong> {{ user?.phone || 'No disponible' }}
       </p>
       <p class="mb-0">
-        <strong class="text-primary">Taller:</strong> {{ user?.workShop || 'Sin taller asignado' }}
+        <strong class="text-primary">Taller:</strong>
+        {{ workShop?.workshopName || 'Sin taller asignado' }}
       </p>
     </div>
   </div>

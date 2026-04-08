@@ -21,7 +21,7 @@ import { VehicleDetailModalComponent } from '../vehicle-detail-modal.component/v
     FormsModule,
     VehicleFormComponent,
     VehicleCardComponent,
-    VehicleDetailModalComponent
+    VehicleDetailModalComponent,
   ],
   templateUrl: './vehicle-list-component.html',
   styleUrl: './vehicle-list-component.css',
@@ -54,24 +54,24 @@ export class VehicleListComponent implements OnInit {
       const user: User = JSON.parse(userJson);
       this.role = user.role;
       this.userDni = user.userId ? String(user.userId) : '';
-      this.workshopId = user.workshopId || 0;
+      this.workshopId = user.workShopId || 0;
     }
     this.cargarDatos(this.activeTab);
   }
 
   cargarDatos(tab: string) {
     if (tab === 'mis-vehiculos') {
-      this.vehicleService.getVehiclesByOwner(this.userDni).subscribe(data => {
+      this.vehicleService.getVehiclesByOwner(this.userDni).subscribe((data) => {
         this.misVehiculos = data;
         this.cdr.detectChanges();
       });
     } else if (tab === 'asignados') {
-      this.workOrderService.getWorkOrdersByMechanic(this.userDni).subscribe(data => {
+      this.workOrderService.getWorkOrdersByMechanic(this.userDni).subscribe((data) => {
         this.ordenesAsignadas = data;
         this.cdr.detectChanges();
       });
     } else if (tab === 'flota') {
-      this.vehicleService.getVehiclesByWorkshop(this.workshopId).subscribe(data => {
+      this.vehicleService.getVehiclesByWorkshop(this.workshopId).subscribe((data) => {
         this.flotaTaller = data;
         this.cdr.detectChanges();
       });
@@ -114,7 +114,7 @@ export class VehicleListComponent implements OnInit {
           this.cargarDatos(this.activeTab);
           this.vehiculoSeleccionado = null;
         },
-        error: (err) => alert('Error al eliminar')
+        error: (err) => alert('Error al eliminar'),
       });
     }
   }
@@ -138,8 +138,8 @@ export class VehicleListComponent implements OnInit {
     }
   }*/
 
-  registerExit(plate: string){
-    if(confirm(`¿Confirmas la SALIDA del vehículo ${plate} del taller?`)){
+  registerExit(plate: string) {
+    if (confirm(`¿Confirmas la SALIDA del vehículo ${plate} del taller?`)) {
       this.vehicleService.registerExit(plate.toUpperCase(), this.workshopId).subscribe({
         next: () => {
           this.cargarDatos(this.activeTab);
@@ -147,41 +147,45 @@ export class VehicleListComponent implements OnInit {
         error: (err) => {
           console.error(err);
           alert('No se pudo registrar la salida del vehículo');
-        }
+        },
       });
     }
   }
 
-  solicitarIngreso(){
-    if(!this.matriculaBuscada.trim()) return;
+  solicitarIngreso() {
+    if (!this.matriculaBuscada.trim()) return;
 
-    this.vehicleService.requestEntry(this.matriculaBuscada.toUpperCase(), this.workshopId).subscribe({
-      next: () => {
-        alert(`Solicitud enviada al propiertario del vehículo ${this.matriculaBuscada.toUpperCase()}.`);
-        this.matriculaBuscada = '';
-      },
-      error: (err) => {
-        const msg = err.error?.message || 'Error al solicitar el ingreso.';
-        alert(msg);
-      }
-    });
+    this.vehicleService
+      .requestEntry(this.matriculaBuscada.toUpperCase(), this.workshopId)
+      .subscribe({
+        next: () => {
+          alert(
+            `Solicitud enviada al propiertario del vehículo ${this.matriculaBuscada.toUpperCase()}.`,
+          );
+          this.matriculaBuscada = '';
+        },
+        error: (err) => {
+          const msg = err.error?.message || 'Error al solicitar el ingreso.';
+          alert(msg);
+        },
+      });
   }
 
-  aprobarSolicitud(plate: string){
+  aprobarSolicitud(plate: string) {
     this.vehicleService.approveEntry(plate).subscribe({
       next: () => {
         this.cargarDatos('mis-vehiculos');
       },
-      error: (err) => alert('No se pudo aprobar la solicitud.')
+      error: (err) => alert('No se pudo aprobar la solicitud.'),
     });
   }
 
-  rechazarSolicitud(plate: string){
+  rechazarSolicitud(plate: string) {
     this.vehicleService.rejectEntry(plate).subscribe({
       next: () => {
         this.cargarDatos('mis-vehiculos');
       },
-      error: (err) => alert('No se pudo rechazar la solicitud.')
-    })
+      error: (err) => alert('No se pudo rechazar la solicitud.'),
+    });
   }
 }

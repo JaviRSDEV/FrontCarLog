@@ -16,6 +16,11 @@ export class TallerService {
   }
 
   getMecanicosPorTaller(workshopId: number): Observable<any[]> {
+    console.log(`${this.apiUrl}/${workshopId}/employees`);
     return this.http.get<any[]>(`${this.apiUrl}/${workshopId}/employees`);
+  }
+
+  getTallerPorId(workshopId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/details/${workshopId}`);
   }
 }

@@ -7,19 +7,21 @@ export const tallerGuard: CanActivateFn = (route, state) => {
 
   const userJson = localStorage.getItem('user');
 
-  const user: User | null = userJson ? JSON.parse(userJson) : null;
+  const user: any = userJson ? JSON.parse(userJson) : null;
 
-  console.log("=== EL OBJETO ENTERO ES ===", user);
-  console.log("=== EL TALLER ES ===", user?.workShop);
+  console.log('=== EL OBJETO ENTERO ES ===', user);
+  console.log('=== EL TALLER ES ===', user?.workShopId);
 
-  if(!user){
-    console.log("Usuario no encontrado eliminando cookie");
-    document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  if (!user) {
+    console.log('Usuario no encontrado eliminando cookie');
+    document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     router.navigate(['/']);
     return false;
   }
 
-  if(user.role === 'MANAGER' && !user?.workShop){
+  const tieneTaller = user?.workshopId || user?.workShopId || user?.workShop;
+
+  if (user.role === 'MANAGER' && !tieneTaller) {
     router.navigate(['/dashboard/alta-taller']);
     return false;
   }

@@ -8,14 +8,31 @@ export const ErrorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 403) {
-        console.warn('Acceso denegado o permisos revocados. Limpiando sesión...');
+      let mensajeParaMostrar = 'Ha ocurrido un error inesperado';
 
-        localStorage.removeItem('user');
-        sessionStorage.clear();
-
-        router.navigate(['/login']);
+      if (error.error && error.error.message) {
+        mensajeParaMostrar = error.error.message;
+      } else if (error.status === 500) {
+        mensajeParaMostrar = 'Error interno del servidor (500)';
+      } else if (error.status === 0) {
+        mensajeParaMostrar = 'No hay conexión con el servidor';
       }
+
+      if (error.status === 403) {
+        alert(`🚫 Acceso denegado: ${mensajeParaMostrar}`);
+
+        if (
+          mensajeParaMostrar.toLowerCase().includes('taller') ||
+          mensajeParaMostrar.toLowerCase().includes('sesión')
+        ) {
+          localStorage.removeItem('user');
+          sessionStorage.clear();
+          router.navigate(['/login']);
+        }
+      } else {
+        alert(`⚠️ ${mensajeParaMostrar}`);
+      }
+
       return throwError(() => error);
     }),
   );

@@ -1,7 +1,8 @@
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { Auth } from '../../../services/authService/auth.service';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -14,15 +15,17 @@ export class Navbar implements OnInit {
   role: string = '';
   isManager = false;
   isMechanic = false;
+  isClient = false;
 
   constructor(
     private Auth: Auth,
     private router: Router,
   ) {
-    this.router.events.subscribe(() => {
+    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
       this.comprobarEstado();
     });
   }
+
   ngOnInit() {
     this.comprobarEstado();
   }
@@ -45,9 +48,11 @@ export class Navbar implements OnInit {
 
       this.isMechanic = this.role === 'MECHANIC';
 
-      this.isManager = user.role === 'MANAGER' && !user.workShop;
-
-      console.log(this.isManager);
+      this.isClient = this.role === 'CLIENT';
+    } else {
+      this.role = '';
+      this.isManager = false;
+      this.isMechanic = false;
     }
   }
 

@@ -7,21 +7,23 @@ export const altaTallerGuard: CanActivateFn = (route, state) => {
 
   let userJson = localStorage.getItem('user');
   console.log(userJson);
-  if(!userJson){
+  if (!userJson) {
     const cookieMatch = document.cookie.match(/(^|;)\s*user_data\s*=\s*([^;]+)/);
-    if(cookieMatch) userJson = decodeURIComponent(cookieMatch[2]);
+    if (cookieMatch) userJson = decodeURIComponent(cookieMatch[2]);
   }
 
-  const user: User | null = userJson ? JSON.parse(userJson) : null;
+  //const user: User | null = userJson ? JSON.parse(userJson) : null;
+  const user: any = userJson ? JSON.parse(userJson) : null;
+  if (!user) return false;
 
-  if(!user) return false;
-
-  if(user.role === 'CLIENT'){
+  if (user.role === 'CLIENT') {
     router.navigate(['/dashboard']);
     return false;
   }
-  console.log(user.workShop);
-  if(user.role === 'MANAGER' && user?.workShop){
+
+  const tieneTaller = user?.workshopId || user?.workShopId || user?.workShop;
+  console.log(user.workShopId);
+  if (user.role === 'MANAGER' && tieneTaller) {
     router.navigate(['/dashboard']);
     return false;
   }

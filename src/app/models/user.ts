@@ -1,4 +1,4 @@
-import { Vehicle } from "./vehicle";
+import { Vehicle } from './vehicle';
 
 export interface User {
   dni: string;
@@ -8,7 +8,7 @@ export interface User {
   token?: string;
   role: string;
   userId?: string;
-  workshopId?: number;
+  workShopId?: number;
   mustChangePsswd: boolean;
   workShop?: string;
   vehicles: Vehicle[];

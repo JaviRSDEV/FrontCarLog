@@ -29,12 +29,13 @@ export class DashboardComponent implements OnInit {
     const userJson = localStorage.getItem('user');
     if (userJson) {
       const localUser = JSON.parse(userJson);
-      const dniBuscado = localUser.dni;
+      const dniBuscado = localUser.dni || localUser.userId || localUser.DNI;
 
       if (dniBuscado) {
         this.userService.getUserByDni(dniBuscado).subscribe({
           next: (fullUser: any) => {
             setTimeout(() => {
+              console.log('Datos frescos recibidos del backend: ', fullUser);
               this.user = fullUser;
               this.role = this.user.role;
 
