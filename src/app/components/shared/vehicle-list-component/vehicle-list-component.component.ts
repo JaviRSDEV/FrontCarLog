@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -11,6 +11,8 @@ import { WorkOrderService } from '../../../services/workOrderService/work-order.
 import { VehicleFormComponent } from '../vehicle-form.component/vehicle-form.component';
 import { VehicleCardComponent } from '../vehicle-card.component/vehicle-card.component';
 import { VehicleDetailModalComponent } from '../vehicle-detail-modal.component/vehicle-detail-modal.component';
+import { SharedNotification } from '../../../services/shared-notification/shared-notification';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-vehicle-list-component',
@@ -26,7 +28,7 @@ import { VehicleDetailModalComponent } from '../vehicle-detail-modal.component/v
   templateUrl: './vehicle-list-component.html',
   styleUrl: './vehicle-list-component.css',
 })
-export class VehicleListComponent implements OnInit {
+export class VehicleListComponent implements OnInit, OnDestroy {
   activeTab: 'mis-vehiculos' | 'asignados' | 'flota' = 'mis-vehiculos';
   role: string = '';
   userDni: string = '';
@@ -42,10 +44,12 @@ export class VehicleListComponent implements OnInit {
   vehiculoSeleccionado: Vehicle | null = null;
   matriculaBuscada: string = '';
 
+  private notifSub?: Subscription;
   constructor(
     private vehicleService: VehicleService,
     private workOrderService: WorkOrderService,
     private cdr: ChangeDetectorRef,
+    private sharedNotifService: SharedNotification,
   ) {}
 
   ngOnInit(): void {
@@ -53,10 +57,27 @@ export class VehicleListComponent implements OnInit {
     if (userJson) {
       const user: User = JSON.parse(userJson);
       this.role = user.role;
-      this.userDni = user.dni ? String(user.dni) : '';
+      const dniSeguro = user.dni || user.userId;
+      this.userDni = dniSeguro ? String(dniSeguro) : '';
       this.workshopId = user.workShopId || 0;
     }
     this.cargarDatos(this.activeTab);
+
+    window.addEventListener('recargar-coches', () => {
+      console.log('🔥 OREJA NATIVA: Escuché el grito de la Navbar');
+
+      setTimeout(() => {
+        if (this.activeTab === 'mis-vehiculos') {
+          this.cargarDatos('mis-vehiculos');
+        }
+      }, 500);
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.notifSub) {
+      this.notifSub?.unsubscribe();
+    }
   }
 
   cargarDatos(tab: string) {
