@@ -53,7 +53,7 @@ export class VehicleListComponent implements OnInit {
     if (userJson) {
       const user: User = JSON.parse(userJson);
       this.role = user.role;
-      this.userDni = user.userId ? String(user.userId) : '';
+      this.userDni = user.dni ? String(user.dni) : '';
       this.workshopId = user.workShopId || 0;
     }
     this.cargarDatos(this.activeTab);
@@ -123,20 +123,6 @@ export class VehicleListComponent implements OnInit {
     this.cargarDatos(this.activeTab);
     this.toggleFormulario();
   }
-
-  /*registerEntry(plate: string){
-    if(confirm(`¿Confirmas la ENTRADA del vehículo ${plate} al taller?`)){
-      this.vehicleService.registerEntry(plate, this.workshopId).subscribe({
-        next: () => {
-          this.cargarDatos(this.activeTab);
-        },
-        error: (err) => {
-          console.error(err);
-          alert('No se pudo registrar la entrada del vehículo');
-        }
-      });
-    }
-  }*/
 
   registerExit(plate: string) {
     if (confirm(`¿Confirmas la SALIDA del vehículo ${plate} del taller?`)) {

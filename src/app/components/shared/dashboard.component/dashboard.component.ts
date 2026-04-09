@@ -86,12 +86,20 @@ export class DashboardComponent implements OnInit {
     accion.subscribe({
       next: (res: any) => {
         if (aceptar) {
-          alert('¡Invitación aceptada! Actualizando permisos...');
-          window.location.reload();
+          this.user = res;
+          this.role = this.user.role;
+          this.workshop = this.user.workShop?.workshopName || this.user.workShop;
+
+          this.user.pendingWorkshopName = null;
+          this.user.pendingRole = null;
+
+          localStorage.setItem('user', JSON.stringify(this.user));
+          this.cdr.detectChanges();
         } else {
           this.user.pendingWorkshopName = null;
           this.user.pendingRole = null;
           localStorage.setItem('user', JSON.stringify(this.user));
+          this.cdr.detectChanges();
         }
       },
       error: (err: any) => console.error('Error al gestionar invitación', err),
