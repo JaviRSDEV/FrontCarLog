@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy, NgZone } from '@angular/core'; // 🔥 Añadido NgZone, quitado HostListener
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -11,8 +11,6 @@ import { WorkOrderService } from '../../../services/workOrderService/work-order.
 import { VehicleFormComponent } from '../vehicle-form.component/vehicle-form.component';
 import { VehicleCardComponent } from '../vehicle-card.component/vehicle-card.component';
 import { VehicleDetailModalComponent } from '../vehicle-detail-modal.component/vehicle-detail-modal.component';
-import { SharedNotification } from '../../../services/shared-notification/shared-notification';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-vehicle-list-component',
@@ -44,12 +42,21 @@ export class VehicleListComponent implements OnInit, OnDestroy {
   vehiculoSeleccionado: Vehicle | null = null;
   matriculaBuscada: string = '';
 
-  private notifSub?: Subscription;
+  private recargarListener = () => {
+    this.ngZone.run(() => {
+      console.log('Aviso del Layout');
+
+      setTimeout(() => {
+        this.cargarDatos(this.activeTab);
+      }, 500);
+    });
+  };
+
   constructor(
     private vehicleService: VehicleService,
     private workOrderService: WorkOrderService,
     private cdr: ChangeDetectorRef,
-    private sharedNotifService: SharedNotification,
+    private ngZone: NgZone,
   ) {}
 
   ngOnInit(): void {
@@ -63,21 +70,11 @@ export class VehicleListComponent implements OnInit, OnDestroy {
     }
     this.cargarDatos(this.activeTab);
 
-    window.addEventListener('recargar-coches', () => {
-      console.log('🔥 OREJA NATIVA: Escuché el grito de la Navbar');
-
-      setTimeout(() => {
-        if (this.activeTab === 'mis-vehiculos') {
-          this.cargarDatos('mis-vehiculos');
-        }
-      }, 500);
-    });
+    window.addEventListener('recargar-coches', this.recargarListener);
   }
 
   ngOnDestroy(): void {
-    if (this.notifSub) {
-      this.notifSub?.unsubscribe();
-    }
+    window.removeEventListener('recargar-coches', this.recargarListener);
   }
 
   cargarDatos(tab: string) {

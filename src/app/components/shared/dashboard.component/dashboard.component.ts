@@ -1,5 +1,5 @@
 import { UserService } from './../../../services/userService/user.service';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy, NgZone } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -10,19 +10,36 @@ import { CommonModule } from '@angular/common';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   userName: string = 'Usuario';
   role: string = '';
   workshop: string = '';
   user: any;
 
+  private invitacionListener = () => {
+    this.ngZone.run(() => {
+      console.log(' Grito de invitación recibido en el Dashboard');
+
+      setTimeout(() => {
+        this.cargarDatosUsuario();
+      }, 500);
+    });
+  };
+
   constructor(
     private userService: UserService,
     private cdr: ChangeDetectorRef,
+    private ngZone: NgZone,
   ) {}
 
   ngOnInit(): void {
     this.cargarDatosUsuario();
+
+    window.addEventListener('nueva-invitacion', this.invitacionListener);
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('nueva-invitacion', this.invitacionListener);
   }
 
   cargarDatosUsuario() {

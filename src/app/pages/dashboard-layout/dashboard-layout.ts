@@ -75,6 +75,18 @@ export class DashboardLayout implements OnInit, OnDestroy {
 
             break;
 
+          case 'NEW_EMPLOYEE':
+            console.log('Layout: Nuevo empleado en el taller');
+            window.dispatchEvent(new CustomEvent('recargar-empleados'));
+
+            break;
+
+          case 'NEW_FLEET_VEHICLE':
+            console.log('Layout: Coche nuevo en el taller');
+            window.dispatchEvent(new CustomEvent('recargar-coches'));
+
+            break;
+
           default:
             console.log('Notificación recibida: ', notification);
         }
