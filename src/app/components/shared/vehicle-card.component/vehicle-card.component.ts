@@ -7,7 +7,7 @@ import { Vehicle } from '../../../models/vehicle';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './vehicle-card.component.html',
-  styleUrl: './vehicle-card.component.css'
+  styleUrl: './vehicle-card.component.css',
 })
 export class VehicleCardComponent {
   @Input() vehiculo!: Vehicle;
@@ -18,6 +18,8 @@ export class VehicleCardComponent {
 
   @Output() aprobar = new EventEmitter<string>();
   @Output() rechazar = new EventEmitter<string>();
+
+  @Output() historial = new EventEmitter<string>();
 
   onDetalles() {
     this.verDetalles.emit(this.vehiculo);
@@ -31,7 +33,11 @@ export class VehicleCardComponent {
     this.aprobar.emit(this.vehiculo.plate);
   }
 
-  onRechazar(){
+  onRechazar() {
     this.rechazar.emit(this.vehiculo.plate);
+  }
+
+  onHistorial() {
+    this.historial.emit(this.vehiculo.plate);
   }
 }

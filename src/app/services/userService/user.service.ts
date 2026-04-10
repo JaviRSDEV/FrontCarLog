@@ -14,6 +14,12 @@ export class UserService {
     return this.http.get(`${this.apiUrl}/${dni}`);
   }
 
+  edit(userData: any, dni: string): Observable<any> {
+    const url = `${this.apiUrl}/${dni}`;
+
+    return this.http.put<any>(url, userData);
+  }
+
   contratarEmpleados(managerDni: string, employeeDni: string, newRole: string): Observable<any> {
     const params = {
       managerDni: managerDni,

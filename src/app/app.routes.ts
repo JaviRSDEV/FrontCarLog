@@ -11,6 +11,7 @@ import { DashboardComponent } from './components/shared/dashboard.component/dash
 import { WorkOrdersComponent } from './components/shared/work-orders.component/work-orders.component';
 import { WorkOrderDetailComponent } from './components/shared/work-order-detail.component/work-order-detail.component';
 import { GestionTallerComponent } from './components/shared/gestion-taller-component/gestion-taller.component/gestion-taller.component';
+import { VehicleHistoryComponent } from './components/shared/vehicle-history-component/vehicle-history.component/vehicle-history.component';
 export const routes: Routes = [
   {
     path: '',
@@ -58,6 +59,12 @@ export const routes: Routes = [
       {
         path: 'perfil',
         component: GestionTallerComponent,
+        canActivate: [tallerGuard],
+      },
+      {
+        path: 'historial/:plate',
+        component: VehicleHistoryComponent,
+        canActivate: [tallerGuard],
       },
     ],
   },

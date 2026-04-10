@@ -91,7 +91,11 @@
       </button>
 
       @if (modoFlota) {
-        <button class="btn btn-outline-dark btn-sm flex-grow-1 rounded-pill" title="Nueva Orden">
+        <button
+          class="btn btn-outline-dark btn-sm flex-grow-1 rounded-pill"
+          title="Nueva Orden"
+          (click)="onHistorial()"
+        >
           <i class="bi bi-wrench"></i>
         </button>
 

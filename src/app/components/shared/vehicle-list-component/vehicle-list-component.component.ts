@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef, OnDestroy, NgZone } from '@angular/core'; // 🔥 Añadido NgZone, quitado HostListener
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Route, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { User } from '../../../models/user';
 import { Vehicle } from '../../../models/vehicle';
@@ -34,6 +34,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
 
   misVehiculos: Vehicle[] = [];
   ordenesAsignadas: Workorder[] = [];
+  vehiculosAsignados: Vehicle[] = [];
   flotaTaller: Vehicle[] = [];
 
   mostrarFormulario: boolean = false;
@@ -57,6 +58,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
     private workOrderService: WorkOrderService,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -86,6 +88,15 @@ export class VehicleListComponent implements OnInit, OnDestroy {
     } else if (tab === 'asignados') {
       this.workOrderService.getWorkOrdersByMechanic(this.userDni).subscribe((data) => {
         this.ordenesAsignadas = data;
+
+        const cochesUnicos = new Map<string, Vehicle>();
+        data.forEach((orden) => {
+          if (orden.vehicle && !cochesUnicos.has(orden.vehicle.plate)) {
+            cochesUnicos.set(orden.vehicle.plate, orden.vehicle);
+          }
+        });
+
+        this.vehiculosAsignados = Array.from(cochesUnicos.values());
         this.cdr.detectChanges();
       });
     } else if (tab === 'flota') {
@@ -94,6 +105,11 @@ export class VehicleListComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       });
     }
+  }
+
+  irAlHistorial(plate: string) {
+    console.log('/dashboard/historial');
+    this.router.navigate(['/dashboard/historial', plate]);
   }
 
   cambiarPestana(pestana: any) {
