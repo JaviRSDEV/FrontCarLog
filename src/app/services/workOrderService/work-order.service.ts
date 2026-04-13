@@ -16,8 +16,8 @@ export class WorkOrderService {
     return this.http.get<Workorder[]>(`${this.apiUrl}/mechanic/${dni}`);
   }
 
-  getAllWorkOrders(): Observable<Workorder[]> {
-    return this.http.get<Workorder[]>(this.apiUrl);
+  getAllWorkOrders(id: number): Observable<Workorder[]> {
+    return this.http.get<Workorder[]>(`${this.apiUrl}/workshop/${id}`);
   }
 
   getWorkOrderById(id: number): Observable<Workorder> {

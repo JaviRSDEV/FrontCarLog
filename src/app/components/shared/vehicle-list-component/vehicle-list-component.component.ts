@@ -91,7 +91,11 @@ export class VehicleListComponent implements OnInit, OnDestroy {
 
         const cochesUnicos = new Map<string, Vehicle>();
         data.forEach((orden) => {
-          if (orden.vehicle && !cochesUnicos.has(orden.vehicle.plate)) {
+          if (
+            orden.vehicle &&
+            orden.status !== 'COMPLETED' &&
+            !cochesUnicos.has(orden.vehicle.plate)
+          ) {
             cochesUnicos.set(orden.vehicle.plate, orden.vehicle);
           }
         });

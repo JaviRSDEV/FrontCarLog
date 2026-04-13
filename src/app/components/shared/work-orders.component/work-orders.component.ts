@@ -15,6 +15,7 @@ import { Router } from '@angular/router';
 export class WorkOrdersComponent implements OnInit {
   role: string = '';
   userDni: string = '';
+  workshopId: number = 0;
 
   activeTab: string = '';
   ordenes: Workorder[] = [];
@@ -33,6 +34,7 @@ export class WorkOrdersComponent implements OnInit {
       const user = JSON.parse(userJson);
       this.role = user.role;
       this.userDni = user.dni;
+      this.workshopId = user.workShopId || 0;
 
       if (this.role === 'MANAGER' || this.role === 'CO_MANAGER') {
         this.cambiarPestana('todas');
@@ -60,7 +62,7 @@ export class WorkOrdersComponent implements OnInit {
   }
 
   cargarTodasLasOrdenes() {
-    this.workOrderService.getAllWorkOrders().subscribe({
+    this.workOrderService.getAllWorkOrders(this.workshopId).subscribe({
       next: (data: any) => {
         this.ordenes = data;
         this.cdr.detectChanges();
