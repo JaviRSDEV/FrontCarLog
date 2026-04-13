@@ -63,7 +63,7 @@
     <div class="card bg-dark bg-opacity-50 border-secondary mb-4 fade-in">
       <div class="card-body d-flex flex-column flex-md-row gap-3 align-items-center">
         <div class="text-white flex-grow-1">
-          <h5 class="mb-1"><i class="bi bi-search me-2"></i>Ingresar Vehículo</h5>
+          <h5 class="mb-1"><i class="bi bi-box-arrow-in-right me-2"></i>Ingresar Vehículo</h5>
           <small class="text-white-50"
             >Introduce la matrícula para pedir autorización al cliente.</small
           >
@@ -87,6 +87,14 @@
       </div>
     </div>
   }
+
+  <div class="mb-4 fade-in">
+    <app-search
+      placeholder="Buscar vehículo por matrícula o marca..."
+      (busquedaLista)="buscarVehiculos($event)"
+    >
+    </app-search>
+  </div>
 
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 fade-in">
     @if (activeTab === 'mis-vehiculos') {

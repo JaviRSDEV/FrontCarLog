@@ -60,4 +60,14 @@ export class VehicleService {
   getHistoryByPlate(plate: string) {
     return this.http.get(`${this.apiUrl}/${plate}/history`, {});
   }
+
+  searchVehicles(q: string, workshopId: number, type: string): Observable<Vehicle[]> {
+    const params = {
+      q: q,
+      workshopId: workshopId.toString(),
+      type: type,
+    };
+
+    return this.http.get<Vehicle[]>(`${this.apiUrl}/search`, { params });
+  }
 }

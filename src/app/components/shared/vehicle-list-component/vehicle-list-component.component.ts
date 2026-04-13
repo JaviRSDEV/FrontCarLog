@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, OnDestroy, NgZone } from '@angular/core'; // 🔥 Añadido NgZone, quitado HostListener
+import { Component, OnInit, ChangeDetectorRef, OnDestroy, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Route, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -11,6 +11,7 @@ import { WorkOrderService } from '../../../services/workOrderService/work-order.
 import { VehicleFormComponent } from '../vehicle-form.component/vehicle-form.component';
 import { VehicleCardComponent } from '../vehicle-card.component/vehicle-card.component';
 import { VehicleDetailModalComponent } from '../vehicle-detail-modal.component/vehicle-detail-modal.component';
+import { SearchComponent } from '../search-component/search.component/search.component';
 
 @Component({
   selector: 'app-vehicle-list-component',
@@ -22,6 +23,7 @@ import { VehicleDetailModalComponent } from '../vehicle-detail-modal.component/v
     VehicleFormComponent,
     VehicleCardComponent,
     VehicleDetailModalComponent,
+    SearchComponent,
   ],
   templateUrl: './vehicle-list-component.html',
   styleUrl: './vehicle-list-component.css',
@@ -46,7 +48,6 @@ export class VehicleListComponent implements OnInit, OnDestroy {
   private recargarListener = () => {
     this.ngZone.run(() => {
       console.log('Aviso del Layout');
-
       setTimeout(() => {
         this.cargarDatos(this.activeTab);
       }, 500);
@@ -77,6 +78,31 @@ export class VehicleListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     window.removeEventListener('recargar-coches', this.recargarListener);
+  }
+
+  buscarVehiculos(texto: string) {
+    if (!texto.trim()) {
+      this.cargarDatos(this.activeTab);
+      return;
+    }
+
+    let searchType = 'OWNER';
+    if (this.activeTab === 'flota') searchType = 'WORKSHOP';
+    else if (this.activeTab === 'asignados') searchType = 'ASSIGNED';
+
+    this.vehicleService.searchVehicles(texto, this.workshopId, searchType).subscribe({
+      next: (data: any) => {
+        if (this.activeTab === 'flota') {
+          this.flotaTaller = data;
+        } else if (this.activeTab === 'asignados') {
+          this.vehiculosAsignados = data;
+        } else {
+          this.misVehiculos = data;
+        }
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error en la búsqueda', err),
+    });
   }
 
   cargarDatos(tab: string) {
@@ -184,7 +210,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           alert(
-            `Solicitud enviada al propiertario del vehículo ${this.matriculaBuscada.toUpperCase()}.`,
+            `Solicitud enviada al propietario del vehículo ${this.matriculaBuscada.toUpperCase()}.`,
           );
           this.matriculaBuscada = '';
         },
