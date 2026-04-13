@@ -76,7 +76,7 @@ export class WorkOrderDetailComponent implements OnInit {
       },
       error: (err: any) => {
         const msj = err.error?.message || err.message || 'Error desconocido';
-        alert('⚠️ Fallo en el backend: ' + msj);
+        alert('Fallo en el backend: ' + msj);
         console.error('Detalle completo del error:', err);
         this.cargando = false;
       },

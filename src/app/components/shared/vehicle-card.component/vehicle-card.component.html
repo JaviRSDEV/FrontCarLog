@@ -90,15 +90,15 @@
         Detalles
       </button>
 
-      @if (modoFlota) {
-        <button
-          class="btn btn-outline-dark btn-sm flex-grow-1 rounded-pill"
-          title="Nueva Orden"
-          (click)="onHistorial()"
-        >
-          <i class="bi bi-wrench"></i>
-        </button>
+      <button
+        class="btn btn-outline-dark btn-sm flex-grow-1 rounded-pill"
+        title="Historial / Mantenimientos"
+        (click)="onHistorial()"
+      >
+        <i class="bi bi-wrench"></i>
+      </button>
 
+      @if (modoFlota) {
         <button
           class="btn btn-outline-danger btn-sm flex-grow-1 rounded-pill"
           (click)="onSalida()"

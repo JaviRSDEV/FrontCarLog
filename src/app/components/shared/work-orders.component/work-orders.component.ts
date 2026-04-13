@@ -17,8 +17,12 @@ export class WorkOrdersComponent implements OnInit {
   userDni: string = '';
   workshopId: number = 0;
 
-  activeTab: string = '';
-  ordenes: Workorder[] = [];
+  activeTab: string = 'activas';
+  modoVista: string = '';
+
+  ordenesActivas: Workorder[] = [];
+  ordenesCompletadas: Workorder[] = [];
+
   mostrarFormulario: boolean = false;
 
   constructor(
@@ -37,10 +41,12 @@ export class WorkOrdersComponent implements OnInit {
       this.workshopId = user.workShopId || 0;
 
       if (this.role === 'MANAGER' || this.role === 'CO_MANAGER') {
-        this.cambiarPestana('todas');
+        this.modoVista = 'todas';
       } else if (this.role === 'MECHANIC') {
-        this.cambiarPestana('asignadas');
+        this.modoVista = 'asignadas';
       }
+
+      this.cargarDatos();
     }
   }
 
@@ -54,41 +60,29 @@ export class WorkOrdersComponent implements OnInit {
 
   cambiarPestana(tab: string) {
     this.activeTab = tab;
-    if (tab === 'todas') {
-      this.cargarTodasLasOrdenes();
-    } else if (tab === 'asignadas') {
-      this.cargarOrdenesDelMecanico();
-    }
   }
 
-  cargarTodasLasOrdenes() {
-    this.workOrderService.getAllWorkOrders(this.workshopId).subscribe({
-      next: (data: any) => {
-        this.ordenes = data;
-        this.cdr.detectChanges();
-      },
-      error: (err: any) => console.error(err),
-    });
-  }
+  cargarDatos() {
+    const peticion$ =
+      this.modoVista === 'todas'
+        ? this.workOrderService.getAllWorkOrders(this.workshopId)
+        : this.workOrderService.getWorkOrdersByMechanic(this.userDni);
 
-  cargarOrdenesDelMecanico() {
-    this.workOrderService.getWorkOrdersByMechanic(this.userDni).subscribe({
-      next: (data) => {
-        this.ordenes = data;
+    peticion$.subscribe({
+      next: (data: Workorder[]) => {
+        this.ordenesActivas = data.filter((o) => o.status !== 'COMPLETED');
+
+        this.ordenesCompletadas = data.filter((o) => o.status === 'COMPLETED');
+
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Error al cargar las órdenes del mecánico', err),
+      error: (err: any) => console.error('Error al cargar órdenes', err),
     });
   }
 
   onOrdenGuardada() {
     this.mostrarFormulario = false;
-
-    if (this.activeTab === 'todas') {
-      this.cargarTodasLasOrdenes();
-    } else {
-      this.cargarOrdenesDelMecanico();
-    }
+    this.cargarDatos();
   }
 
   toggleFormulario() {
