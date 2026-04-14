@@ -4,6 +4,10 @@ import { MiPerfilCardComponent } from '../../mi-perfil-card-component/mi-perfil-
 import { EmployeeListComponent } from '../../employee-list-component/employee-list.component/employee-list.component';
 import { HireWorkerComponent } from '../../hire-worker-component/hire-worker.component/hire-worker.component';
 import { UserService } from '../../../../services/userService/user.service';
+import { User } from '../../../../models/user';
+import { HttpErrorResponse } from '@angular/common/http';
+
+type TabType = 'perfil' | 'plantilla';
 
 @Component({
   selector: 'app-gestion-taller.component',
@@ -13,10 +17,10 @@ import { UserService } from '../../../../services/userService/user.service';
   styleUrl: './gestion-taller.component.css',
 })
 export class GestionTallerComponent implements OnInit {
-  user: any;
+  user?: User;
   role: string = '';
   isManager: boolean = false;
-  tabActiva: string = 'perfil';
+  tabActiva: TabType = 'perfil';
 
   constructor(
     private userService: UserService,
@@ -25,37 +29,38 @@ export class GestionTallerComponent implements OnInit {
 
   ngOnInit(): void {
     const userJson = localStorage.getItem('user');
+
     if (userJson) {
-      const localUser = JSON.parse(userJson);
+      try {
+        const localUser: User = JSON.parse(userJson);
+        this.user = localUser;
 
-      this.user = localUser;
-      this.role = this.user.role?.replace(/"/g, '').toUpperCase();
-      this.isManager = this.role === 'MANAGER' || this.role === 'CO_MANAGER';
+        this.role = (localUser.role || '').replace(/"/g, '').toUpperCase();
+        this.isManager = this.role === 'MANAGER' || this.role === 'CO_MANAGER';
 
-      const dniBuscado = localUser.dni || localUser.DNI || localUser.userId;
+        const dniBuscado = localUser.dni || localUser.userId;
 
-      if (dniBuscado) {
-        this.userService.getUserByDni(dniBuscado).subscribe({
-          next: (fullUser: any) => {
-            this.user = {
-              ...fullUser,
-              workShop: localUser.workShop || localUser.workshop,
-            };
-            this.cdr.detectChanges();
-          },
-          error: (err: any) => {
-            console.error('Error al traer los datos completos del usuario', err);
-          },
-        });
-      } else {
-        console.error('Error: Puta madre marge');
+        if (dniBuscado) {
+          this.userService.getUserByDni(dniBuscado).subscribe({
+            next: (fullUser: User) => {
+              this.user = {
+                ...fullUser,
+                workShop: localUser.workShop,
+              };
+              this.cdr.detectChanges();
+            },
+            error: (err: HttpErrorResponse) => {
+              console.error('Error al traer los datos completos del usuario', err);
+            },
+          });
+        }
+      } catch (e) {
+        console.error('Error al parsear el usuario del localStorage', e);
       }
-    } else {
-      console.error('Error: Bomboclat con el puto localstorage');
     }
   }
 
-  cambiarTab(tab: string) {
+  cambiarTab(tab: TabType): void {
     this.tabActiva = tab;
   }
 }

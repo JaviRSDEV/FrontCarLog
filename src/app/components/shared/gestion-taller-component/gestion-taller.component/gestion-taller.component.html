@@ -30,7 +30,9 @@
     @if (tabActiva === 'perfil') {
       <div class="row animate-fade-in">
         <div class="col-md-6 mx-auto">
-          <app-mi-perfil-card [user]="user"></app-mi-perfil-card>
+          @if (user) {
+            <app-mi-perfil-card [user]="user"></app-mi-perfil-card>
+          }
         </div>
       </div>
     }

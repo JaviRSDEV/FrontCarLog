@@ -3,13 +3,15 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Vehicle } from '../../../models/vehicle';
 import { VehicleService } from '../../../services/vehicleService/vehicle.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-vehicle-form',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './vehicle-form.component.html',
-  styleUrl: './vehicle-form.component.css'
+  styleUrl: './vehicle-form.component.css',
 })
 export class VehicleFormComponent implements OnInit {
   @Input() vehiculoEdicion: Vehicle | null = null;
@@ -26,7 +28,7 @@ export class VehicleFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private vehicleService: VehicleService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
     this.vehiculoForm = this.fb.group({
       plate: ['', [Validators.required]],
@@ -48,14 +50,18 @@ export class VehicleFormComponent implements OnInit {
       this.imagenesTemporales = this.vehiculoEdicion.images ? [...this.vehiculoEdicion.images] : [];
       this.vehiculoForm.patchValue({
         ...this.vehiculoEdicion,
-        images: this.imagenesTemporales
+        images: this.imagenesTemporales,
       });
     }
   }
 
-  async onFileSelected(event: any) {
-    const files = Array.from(event.target.files) as File[];
-    for(let file of files){
+  async onFileSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const files = Array.from(input.files);
+
+    for (let file of files) {
       try {
         const compressedBase64 = await this.compressImage(file, 800, 600, 0.7);
         this.imagenesTemporales.push(compressedBase64);
@@ -63,6 +69,7 @@ export class VehicleFormComponent implements OnInit {
         console.error('Error al comprimir la imagen', error);
       }
     }
+
     this.vehiculoForm.patchValue({ images: this.imagenesTemporales });
     this.cdr.detectChanges();
   }
@@ -71,13 +78,19 @@ export class VehicleFormComponent implements OnInit {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
-      reader.onload = (event: any) => {
+
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        const result = e.target?.result;
+        if (typeof result !== 'string') return reject('Error al leer archivo');
+
         const img = new Image();
-        img.src = event.target.result;
+        img.src = result;
+
         img.onload = () => {
           const canvas = document.createElement('canvas');
           let width = img.width;
           let height = img.height;
+
           if (width > height) {
             if (width > maxWidth) {
               height *= maxWidth / width;
@@ -89,23 +102,30 @@ export class VehicleFormComponent implements OnInit {
               height = maxHeight;
             }
           }
+
           canvas.width = width;
           canvas.height = height;
+
           const ctx = canvas.getContext('2d');
-          ctx?.drawImage(img, 0, 0, width, height);
+          if (!ctx) return reject('No se pudo obtener el contexto 2D');
+
+          ctx.drawImage(img, 0, 0, width, height);
           resolve(canvas.toDataURL('image/webp', quality));
         };
+
+        img.onerror = (err) => reject(err);
       };
-      reader.onerror = (error) => reject(error);
+
+      reader.onerror = (err) => reject(err);
     });
   }
 
-  eliminarImagenPrevia(index: number) {
+  eliminarImagenPrevia(index: number): void {
     this.imagenesTemporales.splice(index, 1);
     this.vehiculoForm.patchValue({ images: this.imagenesTemporales });
   }
 
-  guardarVehiculo() {
+  guardarVehiculo(): void {
     if (this.vehiculoForm.valid) {
       const vehiculoData: Vehicle = {
         ...this.vehiculoForm.value,
@@ -116,16 +136,18 @@ export class VehicleFormComponent implements OnInit {
         vehiculoData.ownerId = this.userDni;
       }
 
-      const operacion = (this.isEditing && this.vehiculoEdicion)
-        ? this.vehicleService.updateVehicle(this.vehiculoEdicion.plate, vehiculoData)
-        : this.vehicleService.createVehicle(vehiculoData);
+      const operacion: Observable<Vehicle> =
+        this.isEditing && this.vehiculoEdicion
+          ? this.vehicleService.updateVehicle(this.vehiculoEdicion.plate, vehiculoData)
+          : this.vehicleService.createVehicle(vehiculoData);
 
       operacion.subscribe({
         next: () => {
-
           this.guardado.emit();
         },
-        error: (err) => console.error('Error en la operación:', err)
+        error: (err: HttpErrorResponse) => {
+          console.error('Error en la operación:', err);
+        },
       });
     } else {
       this.vehiculoForm.markAllAsTouched();

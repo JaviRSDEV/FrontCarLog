@@ -7,12 +7,15 @@ import { Vehicle } from '../../../models/vehicle';
 import { Workorder } from '../../../models/workorder';
 import { VehicleService } from '../../../services/vehicleService/vehicle.service';
 import { WorkOrderService } from '../../../services/workOrderService/work-order.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import { VehicleFormComponent } from '../vehicle-form.component/vehicle-form.component';
 import { VehicleCardComponent } from '../vehicle-card.component/vehicle-card.component';
 import { VehicleDetailModalComponent } from '../vehicle-detail-modal.component/vehicle-detail-modal.component';
 import { SearchComponent } from '../search-component/search.component/search.component';
 import Swal from 'sweetalert2';
+
+type TabType = 'mis-vehiculos' | 'asignados' | 'flota';
 
 @Component({
   selector: 'app-vehicle-list-component',
@@ -30,7 +33,7 @@ import Swal from 'sweetalert2';
   styleUrl: './vehicle-list-component.css',
 })
 export class VehicleListComponent implements OnInit, OnDestroy {
-  activeTab: 'mis-vehiculos' | 'asignados' | 'flota' = 'mis-vehiculos';
+  activeTab: TabType = 'mis-vehiculos';
   role: string = '';
   userDni: string = '';
   workshopId: number = 0;
@@ -80,7 +83,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
     window.removeEventListener('recargar-coches', this.recargarListener);
   }
 
-  buscarVehiculos(texto: string) {
+  buscarVehiculos(texto: string): void {
     if (!texto.trim()) {
       this.cargarDatos(this.activeTab);
       return;
@@ -91,7 +94,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
     else if (this.activeTab === 'asignados') searchType = 'ASSIGNED';
 
     this.vehicleService.searchVehicles(texto, this.workshopId, searchType).subscribe({
-      next: (data: any) => {
+      next: (data: Vehicle[]) => {
         if (this.activeTab === 'flota') {
           this.flotaTaller = data;
         } else if (this.activeTab === 'asignados') {
@@ -101,53 +104,62 @@ export class VehicleListComponent implements OnInit, OnDestroy {
         }
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Error en la búsqueda', err),
+      error: (err: HttpErrorResponse) => console.error('Error en la búsqueda', err),
     });
   }
 
-  cargarDatos(tab: string) {
+  cargarDatos(tab: TabType): void {
     if (tab === 'mis-vehiculos') {
-      this.vehicleService.getVehiclesByOwner(this.userDni).subscribe((data) => {
-        this.misVehiculos = data;
-        this.cdr.detectChanges();
+      this.vehicleService.getVehiclesByOwner(this.userDni).subscribe({
+        next: (data: Vehicle[]) => {
+          this.misVehiculos = data;
+          this.cdr.detectChanges();
+        },
+        error: (err: HttpErrorResponse) => console.error(err),
       });
     } else if (tab === 'asignados') {
-      this.workOrderService.getWorkOrdersByMechanic(this.userDni).subscribe((data) => {
-        this.ordenesAsignadas = data;
+      this.workOrderService.getWorkOrdersByMechanic(this.userDni).subscribe({
+        next: (data: Workorder[]) => {
+          this.ordenesAsignadas = data;
 
-        const cochesUnicos = new Map<string, Vehicle>();
-        data.forEach((orden) => {
-          if (
-            orden.vehicle &&
-            orden.status !== 'COMPLETED' &&
-            !cochesUnicos.has(orden.vehicle.plate)
-          ) {
-            cochesUnicos.set(orden.vehicle.plate, orden.vehicle);
-          }
-        });
+          const cochesUnicos = new Map<string, Vehicle>();
+          data.forEach((orden) => {
+            if (
+              orden.vehicle &&
+              orden.status !== 'COMPLETED' &&
+              !cochesUnicos.has(orden.vehicle.plate)
+            ) {
+              cochesUnicos.set(orden.vehicle.plate, orden.vehicle);
+            }
+          });
 
-        this.vehiculosAsignados = Array.from(cochesUnicos.values());
-        this.cdr.detectChanges();
+          this.vehiculosAsignados = Array.from(cochesUnicos.values());
+          this.cdr.detectChanges();
+        },
+        error: (err: HttpErrorResponse) => console.error(err),
       });
     } else if (tab === 'flota') {
-      this.vehicleService.getVehiclesByWorkshop(this.workshopId).subscribe((data) => {
-        this.flotaTaller = data;
-        this.cdr.detectChanges();
+      this.vehicleService.getVehiclesByWorkshop(this.workshopId).subscribe({
+        next: (data: Vehicle[]) => {
+          this.flotaTaller = data;
+          this.cdr.detectChanges();
+        },
+        error: (err: HttpErrorResponse) => console.error(err),
       });
     }
   }
 
-  irAlHistorial(plate: string) {
+  irAlHistorial(plate: string): void {
     this.router.navigate(['/dashboard/historial', plate]);
   }
 
-  cambiarPestana(pestana: any) {
+  cambiarPestana(pestana: TabType): void {
     this.activeTab = pestana;
     this.mostrarFormulario = false;
     this.cargarDatos(pestana);
   }
 
-  toggleFormulario() {
+  toggleFormulario(): void {
     this.mostrarFormulario = !this.mostrarFormulario;
     if (!this.mostrarFormulario) {
       this.isEditing = false;
@@ -155,22 +167,22 @@ export class VehicleListComponent implements OnInit, OnDestroy {
     }
   }
 
-  abrirDetalles(vehiculo: Vehicle) {
+  abrirDetalles(vehiculo: Vehicle): void {
     this.vehiculoSeleccionado = vehiculo;
   }
 
-  cerrarDetalles() {
+  cerrarDetalles(): void {
     this.vehiculoSeleccionado = null;
   }
 
-  editarVehiculo(vehiculo: Vehicle) {
+  editarVehiculo(vehiculo: Vehicle): void {
     this.vehiculoParaEditar = vehiculo;
     this.isEditing = true;
     this.mostrarFormulario = true;
     this.vehiculoSeleccionado = null;
   }
 
-  eliminarVehiculo(plate: string) {
+  eliminarVehiculo(plate: string): void {
     Swal.fire({
       title: '¿Estás seguro?',
       text: `Vas a eliminar el vehículo ${plate}. Esta acción no se puede deshacer`,
@@ -189,7 +201,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
             this.cargarDatos(this.activeTab);
             this.vehiculoSeleccionado = null;
           },
-          error: (err) => {
+          error: (err: HttpErrorResponse) => {
             Swal.fire({
               title: 'Error',
               text: 'Error al eliminar el vehículo',
@@ -203,12 +215,12 @@ export class VehicleListComponent implements OnInit, OnDestroy {
     });
   }
 
-  onVehiculoGuardado() {
+  onVehiculoGuardado(): void {
     this.cargarDatos(this.activeTab);
     this.toggleFormulario();
   }
 
-  registerExit(plate: string) {
+  registerExit(plate: string): void {
     Swal.fire({
       title: 'Registrar Salida',
       text: `¿Confirmas la SALIDA del vehículo ${plate} del taller?`,
@@ -235,7 +247,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
               showConfirmButton: false,
             });
           },
-          error: (err) => {
+          error: (err: HttpErrorResponse) => {
             console.error(err);
             Swal.fire({
               title: 'Error',
@@ -251,7 +263,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
     });
   }
 
-  solicitarIngreso() {
+  solicitarIngreso(): void {
     if (!this.matriculaBuscada.trim()) return;
 
     this.vehicleService
@@ -268,7 +280,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
           });
           this.matriculaBuscada = '';
         },
-        error: (err) => {
+        error: (err: HttpErrorResponse) => {
           const msg = err.error?.message || 'Error al solicitar el ingreso.';
           Swal.fire({
             title: 'Atención',
@@ -282,7 +294,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
       });
   }
 
-  aprobarSolicitud(plate: string) {
+  aprobarSolicitud(plate: string): void {
     this.vehicleService.approveEntry(plate).subscribe({
       next: () => {
         this.cargarDatos('mis-vehiculos');
@@ -298,7 +310,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
           toast: true,
         });
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         Swal.fire({
           title: 'Error',
           text: 'No se pudo aprobar la solicitud.',
@@ -310,7 +322,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
     });
   }
 
-  rechazarSolicitud(plate: string) {
+  rechazarSolicitud(plate: string): void {
     this.vehicleService.rejectEntry(plate).subscribe({
       next: () => {
         this.cargarDatos('mis-vehiculos');
@@ -326,7 +338,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
           toast: true,
         });
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         Swal.fire({
           title: 'Error',
           text: 'No se pudo rechazar la solicitud.',

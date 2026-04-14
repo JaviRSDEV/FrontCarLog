@@ -1,3 +1,5 @@
+import { Vehicle } from './vehicle';
+
 export interface Workshop {
   workshopId: number;
   workshopName: string;
@@ -5,5 +7,5 @@ export interface Workshop {
   workshopPhone: string;
   workshopEmail: string;
   icon: string;
-  vehicles: any[]
+  vehicles: Vehicle[];
 }

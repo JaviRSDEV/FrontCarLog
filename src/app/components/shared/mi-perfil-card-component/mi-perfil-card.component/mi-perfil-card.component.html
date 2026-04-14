@@ -5,14 +5,14 @@
     </div>
 
     @if (!isEditing) {
-      <h3 class="mb-1">{{ user?.name }}</h3>
-      <p class="badge bg-primary fs-6 mb-4">{{ user?.role }}</p>
+      <h3 class="mb-1">{{ user.name }}</h3>
+      <p class="badge bg-primary fs-6 mb-4">{{ user.role }}</p>
 
       <div class="text-start border-top border-secondary pt-3">
-        <p class="mb-2"><strong class="text-primary">DNI:</strong> {{ user?.dni }}</p>
-        <p class="mb-2"><strong class="text-primary">Email:</strong> {{ user?.email }}</p>
+        <p class="mb-2"><strong class="text-primary">DNI:</strong> {{ user.dni }}</p>
+        <p class="mb-2"><strong class="text-primary">Email:</strong> {{ user.email }}</p>
         <p class="mb-2">
-          <strong class="text-primary">Teléfono:</strong> {{ user?.phone || 'No disponible' }}
+          <strong class="text-primary">Teléfono:</strong> {{ user.phone || 'No disponible' }}
         </p>
         <p class="mb-3">
           <strong class="text-primary">Taller:</strong>
@@ -23,7 +23,7 @@
       </div>
     } @else {
       <h4 class="mb-1">Editar Perfil</h4>
-      <p class="badge bg-secondary fs-6 mb-4">{{ user?.dni }}</p>
+      <p class="badge bg-secondary fs-6 mb-4">{{ user.dni }}</p>
 
       <div class="text-start border-top border-secondary pt-3">
         <div class="mb-3">

@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Vehicle } from '../../models/vehicle';
+import { Workorder } from '../../models/workorder';
 
 @Injectable({
   providedIn: 'root',
@@ -12,11 +13,13 @@ export class VehicleService {
   constructor(private http: HttpClient) {}
 
   getVehiclesByWorkshop(workshopId: number): Observable<Vehicle[]> {
-    return this.http.get<Vehicle[]>(`${this.apiUrl}?workshopId=${workshopId}`);
+    const params = new HttpParams().set('workshopId', workshopId.toString());
+    return this.http.get<Vehicle[]>(this.apiUrl, { params });
   }
 
   getVehiclesByOwner(ownerId: string): Observable<Vehicle[]> {
-    return this.http.get<Vehicle[]>(`${this.apiUrl}?ownerId=${ownerId}`);
+    const params = new HttpParams().set('ownerId', ownerId);
+    return this.http.get<Vehicle[]>(this.apiUrl, { params });
   }
 
   getAllVehicles(): Observable<Vehicle[]> {
@@ -28,45 +31,45 @@ export class VehicleService {
   }
 
   getVehicleInRepair(mechanicId: string): Observable<Vehicle[]> {
-    return this.http.get<Vehicle[]>(`${this.apiUrl}/repairing?mechanicId=${mechanicId}`);
+    const params = new HttpParams().set('mechanicId', mechanicId);
+    return this.http.get<Vehicle[]>(`${this.apiUrl}/repairing`, { params });
   }
 
-  deleteVehicle(plate: string): Observable<any> {
+  deleteVehicle(plate: string): Observable<string> {
     return this.http.delete(`${this.apiUrl}/${plate}`, {
       responseType: 'text',
     });
   }
 
-  updateVehicle(plate: string, vehicleData: Vehicle): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${plate}`, vehicleData);
+  updateVehicle(plate: string, vehicleData: Vehicle): Observable<Vehicle> {
+    return this.http.put<Vehicle>(`${this.apiUrl}/${plate}`, vehicleData);
   }
 
-  registerExit(plate: string, workshopId: number) {
-    return this.http.post(`${this.apiUrl}/${plate}/exit/${workshopId}`, {});
+  registerExit(plate: string, workshopId: number): Observable<Vehicle> {
+    return this.http.post<Vehicle>(`${this.apiUrl}/${plate}/exit/${workshopId}`, {});
   }
 
-  requestEntry(plate: string, workshopId: number) {
-    return this.http.put(`${this.apiUrl}/${plate}/request-entry/${workshopId}`, {});
+  requestEntry(plate: string, workshopId: number): Observable<Vehicle> {
+    return this.http.put<Vehicle>(`${this.apiUrl}/${plate}/request-entry/${workshopId}`, {});
   }
 
-  approveEntry(plate: string) {
-    return this.http.put(`${this.apiUrl}/${plate}/approve-entry`, {});
+  approveEntry(plate: string): Observable<Vehicle> {
+    return this.http.put<Vehicle>(`${this.apiUrl}/${plate}/approve-entry`, {});
   }
 
-  rejectEntry(plate: string) {
-    return this.http.put(`${this.apiUrl}/${plate}/reject-entry`, {});
+  rejectEntry(plate: string): Observable<Vehicle> {
+    return this.http.put<Vehicle>(`${this.apiUrl}/${plate}/reject-entry`, {});
   }
 
-  getHistoryByPlate(plate: string) {
-    return this.http.get(`${this.apiUrl}/${plate}/history`, {});
+  getHistoryByPlate(plate: string): Observable<Workorder[]> {
+    return this.http.get<Workorder[]>(`${this.apiUrl}/${plate}/history`);
   }
 
   searchVehicles(q: string, workshopId: number, type: string): Observable<Vehicle[]> {
-    const params = {
-      q: q,
-      workshopId: workshopId.toString(),
-      type: type,
-    };
+    const params = new HttpParams()
+      .set('q', q)
+      .set('workshopId', workshopId.toString())
+      .set('type', type);
 
     return this.http.get<Vehicle[]>(`${this.apiUrl}/search`, { params });
   }

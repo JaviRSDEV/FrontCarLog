@@ -1,18 +1,20 @@
 import { UserService } from './../../../../services/userService/user.service';
 import { TallerService } from './../../../../services/tallerService/taller.service';
 import { CommonModule, UpperCasePipe } from '@angular/common';
-import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { User } from '../../../../models/user';
 import { FormsModule } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-employee-list',
+  standalone: true,
   imports: [CommonModule, UpperCasePipe, FormsModule],
   templateUrl: './employee-list.component.html',
   styleUrl: './employee-list.component.css',
 })
-export class EmployeeListComponent implements OnInit {
+export class EmployeeListComponent implements OnInit, OnDestroy {
   empleados: User[] = [];
   managerDni: string = '';
 
@@ -36,7 +38,6 @@ export class EmployeeListComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarListaEmpleados();
-
     window.addEventListener('recargar-empleados', this.empleadosListener);
   }
 
@@ -47,16 +48,16 @@ export class EmployeeListComponent implements OnInit {
   cargarListaEmpleados() {
     const userJson = localStorage.getItem('user');
     if (userJson) {
-      const user = JSON.parse(userJson);
+      const user: User = JSON.parse(userJson);
       this.managerDni = user.dni;
 
       if (user.workShopId) {
         this.tallerService.getMecanicosPorTaller(user.workShopId).subscribe({
-          next: (data) => {
+          next: (data: User[]) => {
             this.empleados = data;
             this.cdr.detectChanges();
           },
-          error: (err) => console.error(err),
+          error: (err: HttpErrorResponse) => console.error(err),
         });
       }
     }
@@ -73,10 +74,10 @@ export class EmployeeListComponent implements OnInit {
   }
 
   guardarRol(emp: User) {
-    const updateUser = { ...emp, role: this.selectedRole };
+    const updateUser: User = { ...emp, role: this.selectedRole };
 
     this.userService.edit(updateUser, emp.dni).subscribe({
-      next: (res: any) => {
+      next: (res: User) => {
         const index = this.empleados.findIndex((e) => e.dni === emp.dni);
         if (index !== -1) {
           this.empleados[index] = res;
@@ -96,7 +97,7 @@ export class EmployeeListComponent implements OnInit {
           toast: true,
         });
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         console.error(err);
         Swal.fire({
           title: 'Error',
@@ -141,7 +142,7 @@ export class EmployeeListComponent implements OnInit {
               showConfirmButton: false,
             });
           },
-          error: (err) => {
+          error: (err: HttpErrorResponse) => {
             console.error('Error al despedir', err);
             Swal.fire({
               title: 'Error',

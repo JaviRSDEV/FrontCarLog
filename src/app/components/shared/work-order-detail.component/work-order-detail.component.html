@@ -7,9 +7,9 @@
         </button>
         <h2 class="mb-0">
           Orden #{{ orden.id }}
-          <small class="text-white-50 fs-6"
-            >({{ orden.createdAt | date: 'dd/MM/yyyy HH:mm' }})</small
-          >
+          <small class="text-white-50 fs-6">
+            ({{ orden.createdAt | date: 'dd/MM/yyyy HH:mm' }})
+          </small>
         </h2>
       </div>
 
@@ -82,19 +82,14 @@
               </select>
 
               <small class="text-white-50 mt-1 d-block">
-                Actual:
-                {{
-                  $any(orden).mechanicName ? ($any(orden).mechanicName | uppercase) : 'SIN ASIGNAR'
-                }}
+                Actual: {{ orden.mechanicName ? (orden.mechanicName | uppercase) : 'SIN ASIGNAR' }}
               </small>
             } @else {
               <p class="mb-0 fs-5">
                 <i class="bi bi-person-fill text-white-50 me-2"></i>
                 <span class="fw-bold">
                   {{
-                    $any(orden).mechanicName
-                      ? ($any(orden).mechanicName | uppercase)
-                      : 'MECÁNICO SIN ASIGNAR'
+                    orden.mechanicName ? (orden.mechanicName | uppercase) : 'MECÁNICO SIN ASIGNAR'
                   }}
                 </span>
               </p>

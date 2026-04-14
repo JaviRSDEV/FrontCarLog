@@ -1,22 +1,26 @@
+import { UserService } from './../../../../services/userService/user.service';
+import { TallerService } from './../../../../services/tallerService/taller.service';
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
-import { TallerService } from '../../../../services/tallerService/taller.service';
 import { FormsModule } from '@angular/forms';
-import { UserService } from '../../../../services/userService/user.service';
+import { User } from '../../../../models/user';
+import { Workshop } from '../../../../models/workshop';
+import { HttpErrorResponse } from '@angular/common/http';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-mi-perfil-card',
+  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './mi-perfil-card.component.html',
   styleUrl: './mi-perfil-card.component.css',
 })
 export class MiPerfilCardComponent implements OnInit {
-  @Input() user: any;
-  workShop: any;
+  @Input() user!: User;
+  workShop?: Workshop;
 
   isEditing: boolean = false;
-  editedUser: any = {};
+  editedUser!: User;
 
   constructor(
     private tallerService: TallerService,
@@ -25,18 +29,18 @@ export class MiPerfilCardComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    if (this.user.workShopId) {
+    if (this.user?.workShopId) {
       this.obtenerTaller(this.user.workShopId);
     }
   }
 
   obtenerTaller(tallerId: number) {
     this.tallerService.getTallerPorId(tallerId).subscribe({
-      next: (datosTaller) => {
+      next: (datosTaller: Workshop) => {
         this.workShop = datosTaller;
         this.cdr.detectChanges();
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         console.error('Error al cargar el taller:', err);
       },
     });
@@ -52,8 +56,10 @@ export class MiPerfilCardComponent implements OnInit {
   }
 
   guardarCambios() {
+    if (!this.editedUser || !this.user.dni) return;
+
     this.userService.edit(this.editedUser, this.user.dni).subscribe({
-      next: (updatedUser: any) => {
+      next: (updatedUser: User) => {
         this.user = updatedUser;
         this.isEditing = false;
 
@@ -72,7 +78,7 @@ export class MiPerfilCardComponent implements OnInit {
           toast: true,
         });
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         console.error(err);
         Swal.fire({
           title: 'Error',

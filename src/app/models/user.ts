@@ -10,8 +10,13 @@ export interface User {
   userId?: string;
   workShopId?: number;
   mustChangePsswd: boolean;
-  workShop?: string;
+
+  workShop?: string | { workshopName: string };
   vehicles: Vehicle[];
+
+  pendinWorkshop?: number;
+  pendingWorkshopName?: string | null;
+  pendingRole?: string | null;
 
   password?: string;
   accountNonExpired: boolean;

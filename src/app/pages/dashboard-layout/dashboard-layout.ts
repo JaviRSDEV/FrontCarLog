@@ -6,9 +6,17 @@ import { Footer } from '../../components/shared/footer/footer.component';
 
 import { Subscription } from 'rxjs';
 import { RxStomp } from '@stomp/rx-stomp';
+import { IMessage } from '@stomp/stompjs';
 import { myRxStompConfig } from '../../config/rx-stomp-config';
 import { Auth } from '../../services/authService/auth.service';
+import { User } from '../../models/user';
 import Swal from 'sweetalert2';
+
+interface AppNotification {
+  type: 'FIRE' | 'INVITE' | 'VEHICLE_REQUEST' | 'NEW_EMPLOYEE' | 'NEW_FLEET_VEHICLE';
+  title?: string;
+  message?: string;
+}
 
 @Component({
   selector: 'app-dashboard-layout',
@@ -35,15 +43,15 @@ export class DashboardLayout implements OnInit, OnDestroy {
     const userJson = localStorage.getItem('user');
     if (!userJson) return;
 
-    const user = JSON.parse(userJson);
-    const miDni = user.dni || user.userId || user.DNI;
+    const user: User = JSON.parse(userJson);
+    const miDni = user.dni || user.userId;
 
     if (!miDni) return;
 
     this.notificacionSubscription = this.rxStomp
       .watch(`/topic/notificaciones/${miDni}`)
-      .subscribe((message: any) => {
-        const notification = JSON.parse(message.body);
+      .subscribe((message: IMessage) => {
+        const notification: AppNotification = JSON.parse(message.body);
 
         switch (notification.type) {
           case 'FIRE':
@@ -64,36 +72,12 @@ export class DashboardLayout implements OnInit, OnDestroy {
 
           case 'INVITE':
             window.dispatchEvent(new CustomEvent('nueva-invitacion'));
-
-            Swal.fire({
-              title: notification.title,
-              text: `${notification.message} Ve a tu Dashboard para responder.`,
-              icon: 'info',
-              background: '#212529',
-              color: '#fff',
-              toast: true,
-              position: 'top-end',
-              showConfirmButton: false,
-              timer: 5000,
-              timerProgressBar: true,
-            });
+            this.mostrarToast(notification);
             break;
 
           case 'VEHICLE_REQUEST':
             window.dispatchEvent(new CustomEvent('recargar-coches'));
-
-            Swal.fire({
-              title: notification.title,
-              text: `${notification.message} Ve a 'Mis Vehículos' para autorizar el ingreso.`,
-              icon: 'info',
-              background: '#212529',
-              color: '#fff',
-              toast: true,
-              position: 'top-end',
-              showConfirmButton: false,
-              timer: 5000,
-              timerProgressBar: true,
-            });
+            this.mostrarToast(notification, "Ve a 'Mis Vehículos' para autorizar el ingreso.");
             break;
 
           case 'NEW_EMPLOYEE':
@@ -108,6 +92,21 @@ export class DashboardLayout implements OnInit, OnDestroy {
             console.log('Notificación recibida: ', notification);
         }
       });
+  }
+
+  private mostrarToast(notification: AppNotification, extraMsg: string = '') {
+    Swal.fire({
+      title: notification.title,
+      text: `${notification.message} ${extraMsg}`,
+      icon: 'info',
+      background: '#212529',
+      color: '#fff',
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 5000,
+      timerProgressBar: true,
+    });
   }
 
   ngOnDestroy(): void {
