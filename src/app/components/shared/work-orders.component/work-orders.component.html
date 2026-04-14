@@ -17,6 +17,7 @@
   @if (mostrarFormulario) {
     <app-work-order-form
       [userDni]="userDni"
+      [workshopId]="workshopId"
       (guardado)="onOrdenGuardada()"
       (cancelado)="toggleFormulario()"
     >

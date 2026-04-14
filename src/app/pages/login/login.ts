@@ -42,6 +42,7 @@ export class Login {
       phone: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(6)]],
       role: ['', Validators.required],
+      rememberMe: [false],
     });
   }
 
@@ -107,8 +108,12 @@ export class Login {
     if (this.registerForm.valid) {
       this.authService.register(this.registerForm.value).subscribe({
         next: (user: User) => {
+          const rememberMe = this.registerForm.value.rememberMe;
+          const storage = rememberMe ? localStorage : sessionStorage;
+
           localStorage.removeItem('user');
-          sessionStorage.setItem('user', JSON.stringify(user));
+          sessionStorage.removeItem('user');
+          storage.setItem('user', JSON.stringify(user));
 
           this.closeRegister();
 

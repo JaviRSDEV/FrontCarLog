@@ -1,13 +1,16 @@
 import { RxStompConfig } from '@stomp/rx-stomp';
+import { environment } from '../../environments/environment.development';
 
 export const myRxStompConfig: RxStompConfig = {
-  brokerURL: 'ws://localhost:8081/ws-carlog',
+  brokerURL: environment.wsUrl,
 
   heartbeatIncoming: 0,
   heartbeatOutgoing: 20000,
   reconnectDelay: 200,
 
   debug: (msg: string): void => {
-    console.log(new Date(), msg);
+    if (!environment.production) {
+      console.log(new Date(), msg);
+    }
   },
 };

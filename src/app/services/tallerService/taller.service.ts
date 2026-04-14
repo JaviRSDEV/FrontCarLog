@@ -3,12 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Workshop } from '../../models/workshop';
 import { User } from '../../models/user';
+import { environment } from '../../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TallerService {
-  private apiUrl = 'http://localhost:8081/api/workshop';
+  private apiUrl = `${environment.apiUrl}/workshop`;
 
   constructor(private http: HttpClient) {}
 

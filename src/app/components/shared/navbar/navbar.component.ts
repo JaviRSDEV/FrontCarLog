@@ -45,7 +45,7 @@ export class Navbar implements OnInit {
         this.isMechanic = this.role === 'MECHANIC';
         this.isClient = this.role === 'CLIENT';
 
-        console.log('Navbar - Rol detectado:', this.role);
+
       } catch (error) {
         console.error('Error al parsear el usuario:', error);
         this.resetVariables();
