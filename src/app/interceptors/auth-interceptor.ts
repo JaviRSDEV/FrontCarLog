@@ -1,10 +1,9 @@
 import { HttpInterceptorFn } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const isApiRequest = req.url.includes('http://localhost:8081');
-  console.log('🕵️ Interceptor evaluando:', req.url); // 👈 Chivato 1
+  const isApiRequest = req.url.startsWith(environment.apiUrl);
   if (isApiRequest) {
-    console.log('✅ Añadiendo credenciales a:', req.url); // 👈 Chivato 2
     const peticionClonada = req.clone({
       withCredentials: true,
     });

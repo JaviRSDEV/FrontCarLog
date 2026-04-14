@@ -25,7 +25,7 @@ export const ErrorInterceptor: HttpInterceptorFn = (req, next) => {
         localStorage.removeItem('user');
         sessionStorage.removeItem('user');
 
-        router.navigate(['/login']);
+        router.navigate(['/']);
 
         return throwError(() => error);
       }
@@ -45,7 +45,7 @@ export const ErrorInterceptor: HttpInterceptorFn = (req, next) => {
             localStorage.removeItem('user');
             sessionStorage.removeItem('user');
 
-            router.navigate(['/login']);
+            router.navigate(['/']);
           }
         });
       } else {

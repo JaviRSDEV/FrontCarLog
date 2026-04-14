@@ -14,6 +14,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 })
 export class WorkOrderFormComponent implements OnInit {
   @Input() userDni: string = '';
+  @Input() workshopId: number = 0;
   @Output() guardado = new EventEmitter<void>();
   @Output() cancelado = new EventEmitter<void>();
 
@@ -39,7 +40,8 @@ export class WorkOrderFormComponent implements OnInit {
   }
 
   cargarVehiculos(): void {
-    this.vehicleService.getAllVehicles().subscribe({
+    if (!this.workshopId) return;
+    this.vehicleService.getVehiclesByWorkshop(this.workshopId).subscribe({
       next: (data: Vehicle[]) => {
         this.vehiculosFlota = data;
         this.cdr.detectChanges();
