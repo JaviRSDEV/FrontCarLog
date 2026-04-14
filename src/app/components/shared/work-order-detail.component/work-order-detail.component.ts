@@ -35,20 +35,25 @@ export class WorkOrderDetailComponent implements OnInit {
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    const userStorage = localStorage.getItem('user');
+    const userStorage = localStorage.getItem('user') || sessionStorage.getItem('user');
 
     if (userStorage) {
       try {
         const userData: User = JSON.parse(userStorage);
 
-        this.esManager = userData.role === 'MANAGER' || userData.role === 'CO_MANAGER';
-        const miWorkshopId = userData.workShopId;
+        const role = (userData.role || '').toString().replace(/"/g, '').toUpperCase();
+        this.esManager = role === 'MANAGER' || role === 'CO_MANAGER';
+
+        const miWorkshopId =
+          userData.workShopId ||
+          (userData.workshop as any)?.workshopId ||
+          (userData.workshop as any)?.id;
 
         if (this.esManager && miWorkshopId != null) {
           this.cargarMecanicosDelTaller(miWorkshopId);
         }
       } catch (e) {
-        console.error(e);
+        console.error('Error al procesar sesión en WorkOrderDetail:', e);
         this.esManager = false;
       }
     }
@@ -79,12 +84,12 @@ export class WorkOrderDetailComponent implements OnInit {
       },
       error: (err: HttpErrorResponse) => {
         const msj = err.error?.message || err.message || 'Error desconocido';
-        console.error('Detalle completo del error:', err);
+        console.error('Error al cargar la orden:', err);
         this.cargando = false;
 
         Swal.fire({
           title: 'Error al cargar',
-          text: `Fallo al obtener la orden: ${msj}`,
+          text: `No se pudo obtener la orden: ${msj}`,
           icon: 'error',
           background: '#212529',
           color: '#fff',
@@ -202,7 +207,7 @@ export class WorkOrderDetailComponent implements OnInit {
 
         this.cdr.detectChanges();
       },
-      error: (err: HttpErrorResponse) => console.error(err),
+      error: (err: HttpErrorResponse) => console.error('Error cargando mecánicos:', err),
     });
   }
 
@@ -244,7 +249,7 @@ export class WorkOrderDetailComponent implements OnInit {
             console.error('Error al asignar', err);
             Swal.fire({
               title: 'Error',
-              text: 'No se pudo reasignar el mecánico a esta orden.',
+              text: 'No se pudo reasignar el mecánico.',
               icon: 'error',
               background: '#212529',
               color: '#fff',

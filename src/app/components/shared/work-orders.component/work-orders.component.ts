@@ -38,21 +38,27 @@ export class WorkOrdersComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const userJson = localStorage.getItem('user');
+    const userJson = localStorage.getItem('user') || sessionStorage.getItem('user');
 
     if (userJson) {
-      const user: User = JSON.parse(userJson);
-      this.role = user.role;
-      this.userDni = user.dni;
-      this.workshopId = user.workShopId || 0;
+      try {
+        const user: User = JSON.parse(userJson);
 
-      if (this.role === 'MANAGER' || this.role === 'CO_MANAGER') {
-        this.modoVista = 'todas';
-      } else if (this.role === 'MECHANIC') {
-        this.modoVista = 'asignadas';
+        this.role = (user.role || '').toString().replace(/"/g, '').toUpperCase();
+        this.userDni = user.dni;
+        this.workshopId =
+          user.workShopId || (user.workshop as any)?.workshopId || (user.workshop as any)?.id || 0;
+
+        if (this.role === 'MANAGER' || this.role === 'CO_MANAGER') {
+          this.modoVista = 'todas';
+        } else if (this.role === 'MECHANIC') {
+          this.modoVista = 'asignadas';
+        }
+
+        this.cargarDatos();
+      } catch (e) {
+        console.error('Error al parsear el usuario en WorkOrders:', e);
       }
-
-      this.cargarDatos();
     }
   }
 
@@ -69,6 +75,8 @@ export class WorkOrdersComponent implements OnInit {
   }
 
   cargarDatos(): void {
+    if (!this.userDni && !this.workshopId) return;
+
     const peticion$: Observable<Workorder[]> =
       this.modoVista === 'todas'
         ? this.workOrderService.getAllWorkOrders(this.workshopId)
@@ -82,7 +90,7 @@ export class WorkOrdersComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err: HttpErrorResponse) => {
-        console.error('Error al cargar órdenes', err);
+        console.error('Error al cargar órdenes de trabajo:', err);
       },
     });
   }

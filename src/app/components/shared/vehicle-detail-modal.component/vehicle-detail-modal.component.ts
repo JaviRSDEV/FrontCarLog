@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Vehicle } from '../../../models/vehicle';
 
@@ -9,7 +9,7 @@ import { Vehicle } from '../../../models/vehicle';
   templateUrl: './vehicle-detail-modal.component.html',
   styleUrl: './vehicle-detail-modal.component.css',
 })
-export class VehicleDetailModalComponent {
+export class VehicleDetailModalComponent implements OnInit {
   @Input() vehiculo!: Vehicle;
 
   @Output() cerrarModal = new EventEmitter<void>();
@@ -19,11 +19,15 @@ export class VehicleDetailModalComponent {
   currentUserDni: string = '';
 
   ngOnInit(): void {
-    const userJson = localStorage.getItem('user');
-    if (userJson) {
-      const user = JSON.parse(userJson);
+    const userJson = localStorage.getItem('user') || sessionStorage.getItem('user');
 
-      this.currentUserDni = user.dni;
+    if (userJson) {
+      try {
+        const user = JSON.parse(userJson);
+        this.currentUserDni = user.dni;
+      } catch (e) {
+        console.error('Error al parsear el usuario en el modal de vehículo:', e);
+      }
     }
   }
 

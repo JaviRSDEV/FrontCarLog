@@ -46,18 +46,22 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
   }
 
   cargarListaEmpleados() {
-    const userJson = localStorage.getItem('user');
+    const userJson = localStorage.getItem('user') || sessionStorage.getItem('user');
+
     if (userJson) {
       const user: User = JSON.parse(userJson);
       this.managerDni = user.dni;
 
-      if (user.workShopId) {
-        this.tallerService.getMecanicosPorTaller(user.workShopId).subscribe({
+      const workshopId =
+        user.workShopId || (user.workshop as any)?.workshopId || (user.workshop as any)?.id;
+
+      if (workshopId) {
+        this.tallerService.getMecanicosPorTaller(workshopId).subscribe({
           next: (data: User[]) => {
-            this.empleados = data;
+            this.empleados = data.filter((emp) => emp.dni !== this.managerDni);
             this.cdr.detectChanges();
           },
-          error: (err: HttpErrorResponse) => console.error(err),
+          error: (err: HttpErrorResponse) => console.error('Error cargando empleados:', err),
         });
       }
     }
@@ -127,10 +131,8 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
       if (result.isConfirmed) {
         this.userService.fireEmployee(dniEmpleado).subscribe({
           next: () => {
-            setTimeout(() => {
-              this.empleados = this.empleados.filter((emp) => emp.dni !== dniEmpleado);
-              this.cdr.detectChanges();
-            }, 0);
+            this.empleados = this.empleados.filter((emp) => emp.dni !== dniEmpleado);
+            this.cdr.detectChanges();
 
             Swal.fire({
               title: '¡Despedido!',

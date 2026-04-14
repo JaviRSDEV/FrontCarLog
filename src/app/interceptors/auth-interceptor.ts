@@ -1,19 +1,12 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-
-  let token = sessionStorage.getItem('auth_token');
-
-  if(!token){
-    const match = document.cookie.match(/(^|;)\s*auth_token\s*=\s*([^;]+)/);
-    token = match ? match[2] : null;
-  }
-
-  if(token){
+  const isApiRequest = req.url.includes('http://localhost:8081');
+  console.log('🕵️ Interceptor evaluando:', req.url); // 👈 Chivato 1
+  if (isApiRequest) {
+    console.log('✅ Añadiendo credenciales a:', req.url); // 👈 Chivato 2
     const peticionClonada = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`
-      }
+      withCredentials: true,
     });
 
     return next(peticionClonada);

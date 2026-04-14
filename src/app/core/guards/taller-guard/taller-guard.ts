@@ -4,21 +4,23 @@ import { inject } from '@angular/core';
 
 export const tallerGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
-
-  const userJson = localStorage.getItem('user');
+  const userJson = localStorage.getItem('user') || sessionStorage.getItem('user');
   const user: User | null = userJson ? JSON.parse(userJson) : null;
 
   if (!user) {
-    document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    router.navigate(['/']);
-    return false;
+    return router.createUrlTree(['/']);
   }
 
-  const tieneTaller = !!(user.workShopId || user.workShop);
+  if (state.url.includes('/alta-taller')) {
+    return true;
+  }
 
-  if ((user.role === 'MANAGER' || user.role === 'CO_MANAGER') && !tieneTaller) {
-    router.navigate(['/dashboard/alta-taller']);
-    return false;
+  const tieneTaller = !!(user.workshop || user.workShopId);
+  const role = (user.role || '').toString().toUpperCase();
+  const esJefe = role === 'MANAGER' || role === 'CO_MANAGER';
+
+  if (esJefe && !tieneTaller) {
+    return router.createUrlTree(['/dashboard/alta-taller']);
   }
 
   return true;

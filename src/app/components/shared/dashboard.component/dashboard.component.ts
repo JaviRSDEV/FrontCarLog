@@ -41,57 +41,38 @@ export class DashboardComponent implements OnInit, OnDestroy {
     window.removeEventListener('nueva-invitacion', this.invitacionListener);
   }
 
+  private getStorage() {
+    return localStorage.getItem('user') !== null ? localStorage : sessionStorage;
+  }
+
   cargarDatosUsuario() {
-    const userJson = localStorage.getItem('user');
-    if (userJson) {
-      const localUser = JSON.parse(userJson);
-      const dniBuscado = localUser.dni;
+    const userJson = localStorage.getItem('user') || sessionStorage.getItem('user');
+    if (!userJson) return;
 
-      if (dniBuscado) {
-        this.userService.getUserByDni(dniBuscado).subscribe({
-          next: (fullUser: User) => {
-            setTimeout(() => {
-              this.user = fullUser;
-              this.role = this.user.role;
+    const localUser = JSON.parse(userJson);
+    const dniBuscado = localUser.dni;
 
-              if (this.user.workShop) {
-                this.workshop =
-                  typeof this.user.workShop === 'string'
-                    ? this.user.workShop
-                    : this.user.workShop.workshopName;
-              }
+    if (dniBuscado) {
+      this.userService.getUserByDni(dniBuscado).subscribe({
+        next: (fullUser: User) => {
+          this.user = fullUser;
+          this.role = this.user.role;
+          this.userName = this.user.name || this.user.email.split('@')[0];
 
-              localStorage.setItem('user', JSON.stringify(this.user));
-              this.cdr.detectChanges();
-            }, 0);
-          },
-          error: (err: HttpErrorResponse) => console.error(err),
-        });
-      }
-    }
+          if (this.user.workshop) {
+            this.workshop =
+              typeof this.user.workshop === 'string'
+                ? this.user.workshop
+                : this.user.workshop.workshopName;
+          }
 
-    let token = sessionStorage.getItem('auth_token');
-
-    if (!token) {
-      const cookieMatch = document.cookie.match(/(^|;)\s*auth_token\s*=\s*([^;]+)/);
-      if (cookieMatch) {
-        token = cookieMatch[2];
-      }
-    }
-
-    if (token) {
-      try {
-        let base64Url = token.split('.')[1];
-        let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        let tokenPayload = JSON.parse(atob(base64));
-
-        if (tokenPayload.sub) {
-          this.userName = tokenPayload.sub.split('@')[0];
-        }
-      } catch (error) {
-        console.error(error);
-        this.userName = 'Usuario';
-      }
+          this.getStorage().setItem('user', JSON.stringify(this.user));
+          this.cdr.detectChanges();
+        },
+        error: (err: HttpErrorResponse) => {
+          console.error('Error al cargar datos del usuario:', err);
+        },
+      });
     }
   }
 
@@ -109,18 +90,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
         if (aceptar) {
           this.role = res.role;
-
-          if (res.workShop) {
+          if (res.workshop) {
             this.workshop =
-              typeof res.workShop === 'string' ? res.workShop : res.workShop.workshopName;
+              typeof res.workshop === 'string' ? res.workshop : res.workshop.workshopName;
           } else {
             this.workshop = '';
           }
         }
 
         this.user = res;
+        this.userName = this.user.name || this.user.email.split('@')[0];
 
-        localStorage.setItem('user', JSON.stringify(this.user));
+        this.getStorage().setItem('user', JSON.stringify(this.user));
         this.cdr.detectChanges();
       },
       error: (err: HttpErrorResponse) => {

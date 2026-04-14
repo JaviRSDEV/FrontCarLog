@@ -11,7 +11,7 @@ export interface User {
   workShopId?: number;
   mustChangePsswd: boolean;
 
-  workShop?: string | { workshopName: string };
+  workshop?: string | { workshopName: string };
   vehicles: Vehicle[];
 
   pendinWorkshop?: number;

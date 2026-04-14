@@ -16,7 +16,18 @@ export const ErrorInterceptor: HttpInterceptorFn = (req, next) => {
       } else if (error.status === 500) {
         mensajeParaMostrar = 'Error interno del servidor (500)';
       } else if (error.status === 0) {
-        mensajeParaMostrar = 'No hay conexión con el servidor';
+        mensajeParaMostrar = 'No hay conexión con el servidor o la petición fue cancelada';
+      }
+
+      if (error.status === 401) {
+        console.warn('401 detectado: Limpiando rastro de usuario...');
+
+        localStorage.removeItem('user');
+        sessionStorage.removeItem('user');
+
+        router.navigate(['/login']);
+
+        return throwError(() => error);
       }
 
       if (error.status === 403) {
@@ -29,12 +40,11 @@ export const ErrorInterceptor: HttpInterceptorFn = (req, next) => {
           confirmButtonColor: '#0d6efd',
           confirmButtonText: 'Entendido',
         }).then(() => {
-          if (
-            mensajeParaMostrar.toLowerCase().includes('taller') ||
-            mensajeParaMostrar.toLowerCase().includes('sesión')
-          ) {
+          const msgLower = mensajeParaMostrar.toLowerCase();
+          if (msgLower.includes('taller') || msgLower.includes('sesión')) {
             localStorage.removeItem('user');
-            sessionStorage.clear();
+            sessionStorage.removeItem('user');
+
             router.navigate(['/login']);
           }
         });

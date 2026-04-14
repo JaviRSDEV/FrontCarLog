@@ -55,15 +55,33 @@ export class MiPerfilCardComponent implements OnInit {
     this.isEditing = false;
   }
 
+  private guardarEnStorageCorrecto(usuario: User) {
+    const isLocal = localStorage.getItem('user') !== null;
+    const storage = isLocal ? localStorage : sessionStorage;
+
+    if (isLocal) {
+      sessionStorage.removeItem('user');
+    } else {
+      localStorage.removeItem('user');
+    }
+
+    storage.setItem('user', JSON.stringify(usuario));
+  }
+
   guardarCambios() {
     if (!this.editedUser || !this.user.dni) return;
 
     this.userService.edit(this.editedUser, this.user.dni).subscribe({
       next: (updatedUser: User) => {
-        this.user = updatedUser;
+        this.user = {
+          ...updatedUser,
+          workshop: this.user.workshop,
+        };
+
         this.isEditing = false;
 
-        localStorage.setItem('user', JSON.stringify(this.user));
+        this.guardarEnStorageCorrecto(this.user);
+
         this.cdr.detectChanges();
 
         Swal.fire({
@@ -79,10 +97,10 @@ export class MiPerfilCardComponent implements OnInit {
         });
       },
       error: (err: HttpErrorResponse) => {
-        console.error(err);
+        console.error('Error al guardar cambios:', err);
         Swal.fire({
           title: 'Error',
-          text: 'Hubo un error al guardar los cambios.',
+          text: err.error?.message || 'Hubo un error al guardar los cambios.',
           icon: 'error',
           background: '#212529',
           color: '#fff',

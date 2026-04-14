@@ -66,14 +66,21 @@ export class VehicleListComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    const userJson = localStorage.getItem('user');
+    const userJson = localStorage.getItem('user') || sessionStorage.getItem('user');
+
     if (userJson) {
-      const user: User = JSON.parse(userJson);
-      this.role = user.role;
-      const dniSeguro = user.dni;
-      this.userDni = dniSeguro ? String(dniSeguro) : '';
-      this.workshopId = user.workShopId || 0;
+      try {
+        const user: User = JSON.parse(userJson);
+
+        this.role = (user.role || '').toString().replace(/"/g, '').toUpperCase();
+        this.userDni = user.dni ? String(user.dni) : '';
+        this.workshopId =
+          user.workShopId || (user.workshop as any)?.workshopId || (user.workshop as any)?.id || 0;
+      } catch (e) {
+        console.error('Error al leer sesión en VehicleListComponent:', e);
+      }
     }
+
     this.cargarDatos(this.activeTab);
 
     window.addEventListener('recargar-coches', this.recargarListener);
@@ -110,6 +117,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
 
   cargarDatos(tab: TabType): void {
     if (tab === 'mis-vehiculos') {
+      if (!this.userDni) return;
       this.vehicleService.getVehiclesByOwner(this.userDni).subscribe({
         next: (data: Vehicle[]) => {
           this.misVehiculos = data;
@@ -118,6 +126,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
         error: (err: HttpErrorResponse) => console.error(err),
       });
     } else if (tab === 'asignados') {
+      if (!this.userDni) return;
       this.workOrderService.getWorkOrdersByMechanic(this.userDni).subscribe({
         next: (data: Workorder[]) => {
           this.ordenesAsignadas = data;
@@ -139,6 +148,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
         error: (err: HttpErrorResponse) => console.error(err),
       });
     } else if (tab === 'flota') {
+      if (!this.workshopId) return;
       this.vehicleService.getVehiclesByWorkshop(this.workshopId).subscribe({
         next: (data: Vehicle[]) => {
           this.flotaTaller = data;

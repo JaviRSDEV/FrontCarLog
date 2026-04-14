@@ -16,25 +16,45 @@ export class Auth {
   ) {}
 
   login(credentials: { email?: string; password?: string; dni?: string }): Observable<User> {
-    return this.http.post<User>(`${this.apiUrl}/authenticate`, credentials);
+    return this.http.post<User>(`${this.apiUrl}/authenticate`, credentials, {
+      withCredentials: true,
+    });
   }
 
   register(userData: User): Observable<User> {
-    return this.http.post<User>(`${this.apiUrl}/register`, userData);
+    return this.http.post<User>(`${this.apiUrl}/register`, userData, { withCredentials: true });
   }
 
   logout(): void {
+    this.http
+      .post(
+        `${this.apiUrl}/logout`,
+        {},
+        {
+          withCredentials: true,
+          responseType: 'text',
+        },
+      )
+      .subscribe({
+        next: () => this.limpiarSesionLocal(),
+        error: (err) => {
+          console.warn('Aviso al cerrar sesión en el backend:', err);
+          this.limpiarSesionLocal();
+        },
+      });
+  }
+
+  private limpiarSesionLocal(): void {
     localStorage.removeItem('user');
-    sessionStorage.removeItem('auth_token');
-    sessionStorage.removeItem('token');
-
-    document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-
+    sessionStorage.removeItem('user');
     this.router.navigate(['/']);
   }
 
+  getUserFromStorage(): string | null {
+    return localStorage.getItem('user') || sessionStorage.getItem('user');
+  }
+
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('user');
+    return !!this.getUserFromStorage();
   }
 }

@@ -19,7 +19,7 @@ export class Navbar implements OnInit {
   isClient = false;
 
   constructor(
-    private Auth: Auth,
+    private authService: Auth,
     private router: Router,
     private cdr: ChangeDetectorRef,
   ) {
@@ -33,31 +33,38 @@ export class Navbar implements OnInit {
   }
 
   comprobarEstado() {
-    let userJson = localStorage.getItem('user');
-
-    if (!userJson) {
-      const cookieMatch = document.cookie.match(/(^|;)\s*user_data\s*=\s*([^;]+)/);
-      if (cookieMatch) userJson = decodeURIComponent(cookieMatch[2]);
-    }
+    const userJson = localStorage.getItem('user') || sessionStorage.getItem('user');
 
     if (userJson) {
-      const user = JSON.parse(userJson);
+      try {
+        const user = JSON.parse(userJson);
 
-      this.role = user.role?.replace(/"/g, '').toUpperCase();
-      this.isManager = this.role === 'MANAGER' || this.role === 'CO_MANAGER';
-      this.isMechanic = this.role === 'MECHANIC';
-      this.isClient = this.role === 'CLIENT';
+        this.role = (user.role || '').toString().replace(/"/g, '').toUpperCase();
+
+        this.isManager = this.role === 'MANAGER' || this.role === 'CO_MANAGER';
+        this.isMechanic = this.role === 'MECHANIC';
+        this.isClient = this.role === 'CLIENT';
+
+        console.log('Navbar - Rol detectado:', this.role);
+      } catch (error) {
+        console.error('Error al parsear el usuario:', error);
+        this.resetVariables();
+      }
     } else {
-      this.role = '';
-      this.isManager = false;
-      this.isMechanic = false;
-      this.isClient = false;
+      this.resetVariables();
     }
 
     this.cdr.detectChanges();
   }
 
+  private resetVariables() {
+    this.role = '';
+    this.isManager = false;
+    this.isMechanic = false;
+    this.isClient = false;
+  }
+
   cerrarSesion(): void {
-    this.Auth.logout();
+    this.authService.logout();
   }
 }
