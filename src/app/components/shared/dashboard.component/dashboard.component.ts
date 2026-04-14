@@ -18,6 +18,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   workshop: string = '';
   user?: User;
 
+  mostrarAvisoFeedBack: boolean = false;
+  mensajeAviso: string = '';
+  tipoAviso: 'success' | 'danger' | 'info' = 'info';
+
   private invitacionListener = () => {
     this.ngZone.run(() => {
       setTimeout(() => {
@@ -85,27 +89,47 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     accion.subscribe({
       next: (res: User) => {
-        res.pendingWorkshopName = null;
-        res.pendingRole = null;
+        const updatedUser = { ...res };
+
+        (updatedUser as any).pendingWorkshop = undefined;
+        (updatedUser as any).pendingWorkshopName = undefined;
+        (updatedUser as any).pendingRole = undefined;
+
+        this.user = updatedUser;
 
         if (aceptar) {
-          this.role = res.role;
-          if (res.workshop) {
+          this.role = this.user.role;
+          if (this.user.workshop) {
             this.workshop =
-              typeof res.workshop === 'string' ? res.workshop : res.workshop.workshopName;
-          } else {
-            this.workshop = '';
+              typeof this.user.workshop === 'string'
+                ? this.user.workshop
+                : this.user.workshop.workshopName;
           }
+          this.mensajeAviso = '¡Te has unido al taller!';
+          this.tipoAviso = 'success';
+        } else {
+          this.mensajeAviso = 'Invitación rechazada.';
+          this.tipoAviso = 'info';
         }
 
-        this.user = res;
-        this.userName = this.user.name || this.user.email.split('@')[0];
-
         this.getStorage().setItem('user', JSON.stringify(this.user));
+
+        this.mostrarAvisoFeedBack = true;
+
+        this.cdr.markForCheck();
         this.cdr.detectChanges();
+
+        setTimeout(() => {
+          this.mostrarAvisoFeedBack = false;
+          this.cdr.detectChanges();
+        }, 5000);
       },
-      error: (err: HttpErrorResponse) => {
-        console.error('Error al gestionar invitación', err);
+      error: (err) => {
+        console.error(err);
+        this.mensajeAviso = 'Error al procesar la invitación.';
+        this.tipoAviso = 'danger';
+        this.mostrarAvisoFeedBack = true;
+        this.cdr.detectChanges();
       },
     });
   }

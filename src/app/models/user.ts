@@ -14,7 +14,7 @@ export interface User {
   workshop?: string | { workshopName: string };
   vehicles: Vehicle[];
 
-  pendinWorkshop?: number;
+  pendingWorkshop?: number | null;
   pendingWorkshopName?: string | null;
   pendingRole?: string | null;
 
