@@ -22,24 +22,42 @@ export class HireWorkerComponent {
   ) {}
 
   enviarInvitacion() {
-    const userJson = localStorage.getItem('user');
-    if (!userJson) return;
-    const manager = JSON.parse(userJson);
+    const userJson = localStorage.getItem('user') || sessionStorage.getItem('user');
 
-    const managerDni = manager.dni;
+    if (!userJson) {
+      this.mensaje = 'Error de sesión: No se pudo identificar al administrador.';
+      this.error = true;
+      return;
+    }
 
-    this.userService.invite(this.dniBusqueda, managerDni, this.rolElegido).subscribe({
-      next: () => {
-        this.mensaje = `Invitación enviada correctamente a ${this.dniBusqueda}`;
-        this.error = false;
-        this.dniBusqueda = '';
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        this.mensaje = err.error?.message || 'Error al enviar invitación. ¿Existe el DNI?';
+    try {
+      const manager = JSON.parse(userJson);
+      const managerDni = manager.dni;
+
+      if (!managerDni) {
+        this.mensaje = 'Error: Tus datos de administrador no incluyen DNI.';
         this.error = true;
-        this.cdr.detectChanges();
-      },
-    });
+        return;
+      }
+
+      this.userService.invite(this.dniBusqueda, managerDni, this.rolElegido).subscribe({
+        next: () => {
+          this.mensaje = `Invitación enviada correctamente a ${this.dniBusqueda}`;
+          this.error = false;
+          this.dniBusqueda = '';
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Error al invitar:', err);
+          this.mensaje = err.error?.message || 'Error al enviar invitación. ¿Existe el DNI?';
+          this.error = true;
+          this.cdr.detectChanges();
+        },
+      });
+    } catch (e) {
+      console.error('Error al procesar los datos de sesión:', e);
+      this.mensaje = 'Error crítico al procesar la sesión.';
+      this.error = true;
+    }
   }
 }

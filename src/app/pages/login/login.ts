@@ -1,3 +1,4 @@
+import { UserService } from './../../services/userService/user.service';
 import { Component } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Auth } from '../../services/authService/auth.service';
@@ -26,6 +27,7 @@ export class Login {
     private fb: FormBuilder,
     private authService: Auth,
     private router: Router,
+    private userService: UserService,
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -40,7 +42,6 @@ export class Login {
       phone: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(6)]],
       role: ['', Validators.required],
-      rememberMe: [false],
     });
   }
 
@@ -50,36 +51,47 @@ export class Login {
   closeLogin(): void {
     this.showLogin = false;
     this.loginForm.reset();
+    this.loginError = '';
   }
-
   openRegister(): void {
     this.showRegister = true;
   }
   closeRegister(): void {
     this.showRegister = false;
     this.registerForm.reset();
+    this.registerError = '';
   }
 
   onLoginSubmit(): void {
     if (this.loginForm.valid) {
       this.authService.login(this.loginForm.value).subscribe({
-        next: (backendResponse: User) => {
-          sessionStorage.setItem('token', JSON.stringify(backendResponse));
-          localStorage.setItem('user', JSON.stringify(backendResponse));
+        next: (basicUser: User) => {
+          this.userService.getUserByDni(basicUser.dni).subscribe({
+            next: (fullUser: User) => {
+              const rememberMe = this.loginForm.value.rememberMe;
+              const storage = rememberMe ? localStorage : sessionStorage;
 
-          const token = backendResponse.token;
-          const rememberMe = this.loginForm.get('rememberMe')?.value;
+              localStorage.removeItem('user');
+              sessionStorage.removeItem('user');
+              storage.setItem('user', JSON.stringify(fullUser));
 
-          if (rememberMe && token) {
-            const expirationDate = new Date();
-            expirationDate.setDate(expirationDate.getDate() + 7);
-            document.cookie = `auth_token=${token}; expires=${expirationDate.toUTCString()}; path=/; SameSite=Strict; Secure`;
-          } else if (token) {
-            sessionStorage.setItem('auth_token', token);
-          }
+              this.closeLogin();
+              this.router.navigate(['/dashboard']);
+            },
+            error: (err: HttpErrorResponse) => {
+              console.error('Error al obtener datos completos', err);
 
-          this.closeLogin();
-          this.router.navigate(['/dashboard']);
+              const rememberMe = this.loginForm.value.rememberMe;
+              const storage = rememberMe ? localStorage : sessionStorage;
+
+              localStorage.removeItem('user');
+              sessionStorage.removeItem('user');
+              storage.setItem('user', JSON.stringify(basicUser));
+
+              this.closeLogin();
+              this.router.navigate(['/dashboard']);
+            },
+          });
         },
         error: (backendError: HttpErrorResponse) => {
           console.error('Error al iniciar sesión:', backendError);
@@ -94,23 +106,13 @@ export class Login {
   onRegisterSubmit(): void {
     if (this.registerForm.valid) {
       this.authService.register(this.registerForm.value).subscribe({
-        next: (backendResponse: User) => {
-          localStorage.setItem('user', JSON.stringify(backendResponse));
-
-          const token = backendResponse.token;
-          const rememberMe = this.registerForm.get('rememberMe')?.value;
-
-          if (rememberMe && token) {
-            const expirationDate = new Date();
-            expirationDate.setDate(expirationDate.getDate() + 7);
-            document.cookie = `auth_token=${token}; expires=${expirationDate.toUTCString()}; path=/; SameSite=Strict; Secure`;
-          } else if (token) {
-            sessionStorage.setItem('auth_token', token);
-          }
+        next: (user: User) => {
+          localStorage.removeItem('user');
+          sessionStorage.setItem('user', JSON.stringify(user));
 
           this.closeRegister();
 
-          const rolElegido = backendResponse.role;
+          const rolElegido = (user.role || '').toString().toUpperCase();
           if (rolElegido === 'MANAGER') {
             this.router.navigate(['/dashboard/alta-taller']);
           } else {

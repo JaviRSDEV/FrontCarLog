@@ -29,7 +29,7 @@ export class DashboardLayout implements OnInit, OnDestroy {
   private rxStomp: RxStomp;
   private notificacionSubscription?: Subscription;
 
-  constructor(private Auth: Auth) {
+  constructor(private authService: Auth) {
     this.rxStomp = new RxStomp();
     this.rxStomp.configure(myRxStompConfig);
     this.rxStomp.activate();
@@ -40,58 +40,63 @@ export class DashboardLayout implements OnInit, OnDestroy {
   }
 
   escucharNotificaciones() {
-    const userJson = localStorage.getItem('user');
+    const userJson = localStorage.getItem('user') || sessionStorage.getItem('user');
+
     if (!userJson) return;
 
-    const user: User = JSON.parse(userJson);
-    const miDni = user.dni;
+    try {
+      const user: User = JSON.parse(userJson);
+      const miDni = user.dni;
 
-    if (!miDni) return;
+      if (!miDni) return;
 
-    this.notificacionSubscription = this.rxStomp
-      .watch(`/topic/notificaciones/${miDni}`)
-      .subscribe((message: IMessage) => {
-        const notification: AppNotification = JSON.parse(message.body);
+      this.notificacionSubscription = this.rxStomp
+        .watch(`/topic/notificaciones/${miDni}`)
+        .subscribe((message: IMessage) => {
+          const notification: AppNotification = JSON.parse(message.body);
 
-        switch (notification.type) {
-          case 'FIRE':
-            console.warn(notification.title);
-            Swal.fire({
-              title: notification.title || '¡Atención!',
-              text: 'Has sido dado de baja del taller. Vuelve a iniciar sesión.',
-              icon: 'error',
-              background: '#212529',
-              color: '#fff',
-              confirmButtonColor: '#dc3545',
-              confirmButtonText: 'Cerrar sesión',
-              allowOutsideClick: false,
-            }).then(() => {
-              this.Auth.logout();
-            });
-            break;
+          switch (notification.type) {
+            case 'FIRE':
+              console.warn(notification.title);
+              Swal.fire({
+                title: notification.title || '¡Atención!',
+                text: 'Has sido dado de baja del taller. Vuelve a iniciar sesión.',
+                icon: 'error',
+                background: '#212529',
+                color: '#fff',
+                confirmButtonColor: '#dc3545',
+                confirmButtonText: 'Cerrar sesión',
+                allowOutsideClick: false,
+              }).then(() => {
+                this.authService.logout();
+              });
+              break;
 
-          case 'INVITE':
-            window.dispatchEvent(new CustomEvent('nueva-invitacion'));
-            this.mostrarToast(notification);
-            break;
+            case 'INVITE':
+              window.dispatchEvent(new CustomEvent('nueva-invitacion'));
+              this.mostrarToast(notification);
+              break;
 
-          case 'VEHICLE_REQUEST':
-            window.dispatchEvent(new CustomEvent('recargar-coches'));
-            this.mostrarToast(notification, "Ve a 'Mis Vehículos' para autorizar el ingreso.");
-            break;
+            case 'VEHICLE_REQUEST':
+              window.dispatchEvent(new CustomEvent('recargar-coches'));
+              this.mostrarToast(notification, "Ve a 'Mis Vehículos' para autorizar el ingreso.");
+              break;
 
-          case 'NEW_EMPLOYEE':
-            window.dispatchEvent(new CustomEvent('recargar-empleados'));
-            break;
+            case 'NEW_EMPLOYEE':
+              window.dispatchEvent(new CustomEvent('recargar-empleados'));
+              break;
 
-          case 'NEW_FLEET_VEHICLE':
-            window.dispatchEvent(new CustomEvent('recargar-coches'));
-            break;
+            case 'NEW_FLEET_VEHICLE':
+              window.dispatchEvent(new CustomEvent('recargar-coches'));
+              break;
 
-          default:
-            console.log('Notificación recibida: ', notification);
-        }
-      });
+            default:
+              console.log('Notificación recibida: ', notification);
+          }
+        });
+    } catch (e) {
+      console.error('Error al iniciar suscripción de notificaciones:', e);
+    }
   }
 
   private mostrarToast(notification: AppNotification, extraMsg: string = '') {

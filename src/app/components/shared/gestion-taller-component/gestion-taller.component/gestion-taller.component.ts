@@ -28,7 +28,7 @@ export class GestionTallerComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const userJson = localStorage.getItem('user');
+    const userJson = localStorage.getItem('user') || sessionStorage.getItem('user');
 
     if (userJson) {
       try {
@@ -45,8 +45,11 @@ export class GestionTallerComponent implements OnInit {
             next: (fullUser: User) => {
               this.user = {
                 ...fullUser,
-                workShop: localUser.workShop,
+                workshop: fullUser.workshop || localUser.workshop,
               };
+
+              this.actualizarStorage(this.user);
+
               this.cdr.detectChanges();
             },
             error: (err: HttpErrorResponse) => {
@@ -55,9 +58,15 @@ export class GestionTallerComponent implements OnInit {
           });
         }
       } catch (e) {
-        console.error('Error al parsear el usuario del localStorage', e);
+        console.error('Error al parsear el usuario del storage', e);
       }
     }
+  }
+
+  private actualizarStorage(user: User): void {
+    const isLocal = localStorage.getItem('user') !== null;
+    const storage = isLocal ? localStorage : sessionStorage;
+    storage.setItem('user', JSON.stringify(user));
   }
 
   cambiarTab(tab: TabType): void {
