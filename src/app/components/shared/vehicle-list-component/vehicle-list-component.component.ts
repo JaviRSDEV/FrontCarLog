@@ -70,7 +70,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
     if (userJson) {
       const user: User = JSON.parse(userJson);
       this.role = user.role;
-      const dniSeguro = user.dni || user.userId;
+      const dniSeguro = user.dni;
       this.userDni = dniSeguro ? String(dniSeguro) : '';
       this.workshopId = user.workShopId || 0;
     }

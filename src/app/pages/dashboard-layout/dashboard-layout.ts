@@ -44,7 +44,7 @@ export class DashboardLayout implements OnInit, OnDestroy {
     if (!userJson) return;
 
     const user: User = JSON.parse(userJson);
-    const miDni = user.dni || user.userId;
+    const miDni = user.dni;
 
     if (!miDni) return;
 

@@ -45,7 +45,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const userJson = localStorage.getItem('user');
     if (userJson) {
       const localUser = JSON.parse(userJson);
-      const dniBuscado = localUser.dni || localUser.userId || localUser.DNI;
+      const dniBuscado = localUser.dni;
 
       if (dniBuscado) {
         this.userService.getUserByDni(dniBuscado).subscribe({

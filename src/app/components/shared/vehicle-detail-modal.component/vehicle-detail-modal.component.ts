@@ -7,7 +7,7 @@ import { Vehicle } from '../../../models/vehicle';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './vehicle-detail-modal.component.html',
-  styleUrl: './vehicle-detail-modal.component.css'
+  styleUrl: './vehicle-detail-modal.component.css',
 })
 export class VehicleDetailModalComponent {
   @Input() vehiculo!: Vehicle;
@@ -20,10 +20,10 @@ export class VehicleDetailModalComponent {
 
   ngOnInit(): void {
     const userJson = localStorage.getItem('user');
-    if(userJson){
+    if (userJson) {
       const user = JSON.parse(userJson);
 
-      this.currentUserDni = user.userId ? String(user.userId) : user.dni;
+      this.currentUserDni = user.dni;
     }
   }
 

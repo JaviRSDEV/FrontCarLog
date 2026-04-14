@@ -38,7 +38,7 @@ export class GestionTallerComponent implements OnInit {
         this.role = (localUser.role || '').replace(/"/g, '').toUpperCase();
         this.isManager = this.role === 'MANAGER' || this.role === 'CO_MANAGER';
 
-        const dniBuscado = localUser.dni || localUser.userId;
+        const dniBuscado = localUser.dni;
 
         if (dniBuscado) {
           this.userService.getUserByDni(dniBuscado).subscribe({
