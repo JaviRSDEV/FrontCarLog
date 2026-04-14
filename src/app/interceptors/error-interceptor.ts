@@ -2,6 +2,7 @@ import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
+import Swal from 'sweetalert2';
 
 export const ErrorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
@@ -19,18 +20,34 @@ export const ErrorInterceptor: HttpInterceptorFn = (req, next) => {
       }
 
       if (error.status === 403) {
-        alert(`🚫 Acceso denegado: ${mensajeParaMostrar}`);
-
-        if (
-          mensajeParaMostrar.toLowerCase().includes('taller') ||
-          mensajeParaMostrar.toLowerCase().includes('sesión')
-        ) {
-          localStorage.removeItem('user');
-          sessionStorage.clear();
-          router.navigate(['/login']);
-        }
+        Swal.fire({
+          title: 'Acceso Denegado',
+          text: mensajeParaMostrar,
+          icon: 'warning',
+          background: '#212529',
+          color: '#fff',
+          confirmButtonColor: '#0d6efd',
+          confirmButtonText: 'Entendido',
+        }).then(() => {
+          if (
+            mensajeParaMostrar.toLowerCase().includes('taller') ||
+            mensajeParaMostrar.toLowerCase().includes('sesión')
+          ) {
+            localStorage.removeItem('user');
+            sessionStorage.clear();
+            router.navigate(['/login']);
+          }
+        });
       } else {
-        alert(`⚠️ ${mensajeParaMostrar}`);
+        Swal.fire({
+          title: 'Atención',
+          text: mensajeParaMostrar,
+          icon: 'error',
+          background: '#212529',
+          color: '#fff',
+          confirmButtonColor: '#0d6efd',
+          confirmButtonText: 'Aceptar',
+        });
       }
 
       return throwError(() => error);

@@ -6,6 +6,7 @@ import { Workorder } from './../../../models/workorder';
 import { WorkOrderLinesComponent } from '../work-order-lines.component/work-order-lines.component';
 import { FormsModule } from '@angular/forms';
 import { TallerService } from '../../../services/tallerService/taller.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-work-order-detail',
@@ -76,9 +77,17 @@ export class WorkOrderDetailComponent implements OnInit {
       },
       error: (err: any) => {
         const msj = err.error?.message || err.message || 'Error desconocido';
-        alert('Fallo en el backend: ' + msj);
         console.error('Detalle completo del error:', err);
         this.cargando = false;
+
+        Swal.fire({
+          title: 'Error al cargar',
+          text: `Fallo al obtener la orden: ${msj}`,
+          icon: 'error',
+          background: '#212529',
+          color: '#fff',
+          confirmButtonColor: '#0d6efd',
+        });
       },
     });
   }
@@ -91,9 +100,52 @@ export class WorkOrderDetailComponent implements OnInit {
   }
 
   borrarOrden() {
-    if (!this.orden || !confirm('¿Seguro que quieres borrar esta orden?')) return;
-    this.workOrderService.deleteWorkOrder(this.orden.id).subscribe({
-      next: () => this.volver(),
+    const ordenActual = this.orden;
+    if (!ordenActual) return;
+    if (!this.orden) return;
+
+    const idOrden = ordenActual.id;
+
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: 'Vas a borrar esta orden de trabajo. Esta acción no se puede deshacer.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: '<i class="bi bi-trash"></i> Sí, borrar',
+      cancelButtonText: 'Cancelar',
+      background: '#212529',
+      color: '#fff',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.workOrderService.deleteWorkOrder(idOrden).subscribe({
+          next: () => {
+            Swal.fire({
+              title: '¡Borrada!',
+              text: 'La orden ha sido eliminada correctamente.',
+              icon: 'success',
+              background: '#212529',
+              color: '#fff',
+              timer: 1500,
+              showConfirmButton: false,
+            }).then(() => {
+              this.volver();
+            });
+          },
+          error: (err) => {
+            console.error('Error al borrar la orden', err);
+            Swal.fire({
+              title: 'Error',
+              text: 'No se pudo borrar la orden de trabajo.',
+              icon: 'error',
+              background: '#212529',
+              color: '#fff',
+              confirmButtonColor: '#0d6efd',
+            });
+          },
+        });
+      }
     });
   }
 
@@ -146,14 +198,53 @@ export class WorkOrderDetailComponent implements OnInit {
   }
 
   reasignarMecanico(nuevoMechanicId: string) {
-    if (!this.orden || !nuevoMechanicId) return;
-    if (!confirm('¿Seguro que quieres asignar esta orden a otro mecánico?')) return;
+    const ordenActual = this.orden;
+    if (!ordenActual || !nuevoMechanicId) return;
 
-    this.workOrderService.reassignWorkOrder(this.orden.id, nuevoMechanicId).subscribe({
-      next: () => {
-        this.cargarOrden(this.orden!.id);
-      },
-      error: (err) => console.error('Error al asignar', err),
+    const idOrden = ordenActual.id;
+
+    Swal.fire({
+      title: '¿Reasignar mecánico?',
+      text: 'Vas a asignar esta orden de trabajo a un nuevo mecánico.',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#0d6efd',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: '<i class="bi bi-person-lines-fill"></i> Sí, reasignar',
+      cancelButtonText: 'Cancelar',
+      background: '#212529',
+      color: '#fff',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.workOrderService.reassignWorkOrder(idOrden, nuevoMechanicId).subscribe({
+          next: () => {
+            this.cargarOrden(idOrden);
+
+            Swal.fire({
+              title: 'Mecánico reasignado',
+              text: 'La orden ha sido actualizada con éxito.',
+              icon: 'success',
+              background: '#212529',
+              color: '#fff',
+              timer: 2500,
+              showConfirmButton: false,
+              position: 'top-end',
+              toast: true,
+            });
+          },
+          error: (err) => {
+            console.error('Error al asignar', err);
+            Swal.fire({
+              title: 'Error',
+              text: 'No se pudo reasignar el mecánico a esta orden.',
+              icon: 'error',
+              background: '#212529',
+              color: '#fff',
+              confirmButtonColor: '#0d6efd',
+            });
+          },
+        });
+      }
     });
   }
 }

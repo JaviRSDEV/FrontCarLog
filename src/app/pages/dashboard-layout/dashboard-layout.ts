@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs';
 import { RxStomp } from '@stomp/rx-stomp';
 import { myRxStompConfig } from '../../config/rx-stomp-config';
 import { Auth } from '../../services/authService/auth.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-dashboard-layout',
@@ -47,44 +48,64 @@ export class DashboardLayout implements OnInit, OnDestroy {
         switch (notification.type) {
           case 'FIRE':
             console.warn(notification.title);
-            alert('Has sido despedido. Vuelve a iniciar sesión');
-            this.Auth.logout();
+            Swal.fire({
+              title: notification.title || '¡Atención!',
+              text: 'Has sido dado de baja del taller. Vuelve a iniciar sesión.',
+              icon: 'error',
+              background: '#212529',
+              color: '#fff',
+              confirmButtonColor: '#dc3545',
+              confirmButtonText: 'Cerrar sesión',
+              allowOutsideClick: false,
+            }).then(() => {
+              this.Auth.logout();
+            });
             break;
 
           case 'INVITE':
             console.log('Layout: Invitación recibida');
             window.dispatchEvent(new CustomEvent('nueva-invitacion'));
 
-            setTimeout(() => {
-              alert(
-                `${notification.title}\n${notification.message}\nVe a tu Dashboard para aceptar o rechazar.`,
-              );
-            }, 100);
-
+            Swal.fire({
+              title: notification.title,
+              text: `${notification.message} Ve a tu Dashboard para responder.`,
+              icon: 'info',
+              background: '#212529',
+              color: '#fff',
+              toast: true,
+              position: 'top-end',
+              showConfirmButton: false,
+              timer: 5000,
+              timerProgressBar: true,
+            });
             break;
 
           case 'VEHICLE_REQUEST':
             console.log('Layout: Solicitud de vehículo recibida');
             window.dispatchEvent(new CustomEvent('recargar-coches'));
 
-            setTimeout(() => {
-              alert(
-                `${notification.title}\n${notification.message}\nVe a 'Mis Vehículos' para autorizar el ingreso.`,
-              );
-            }, 100);
-
+            Swal.fire({
+              title: notification.title,
+              text: `${notification.message} Ve a 'Mis Vehículos' para autorizar el ingreso.`,
+              icon: 'info',
+              background: '#212529',
+              color: '#fff',
+              toast: true,
+              position: 'top-end',
+              showConfirmButton: false,
+              timer: 5000,
+              timerProgressBar: true,
+            });
             break;
 
           case 'NEW_EMPLOYEE':
             console.log('Layout: Nuevo empleado en el taller');
             window.dispatchEvent(new CustomEvent('recargar-empleados'));
-
             break;
 
           case 'NEW_FLEET_VEHICLE':
             console.log('Layout: Coche nuevo en el taller');
             window.dispatchEvent(new CustomEvent('recargar-coches'));
-
             break;
 
           default:

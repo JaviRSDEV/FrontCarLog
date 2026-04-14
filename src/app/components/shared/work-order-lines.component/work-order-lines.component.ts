@@ -2,6 +2,7 @@ import { Component, input, output, signal } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { WorkOrderLine } from '../../../models/workorderline';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-work-order-lines',
@@ -32,9 +33,22 @@ export class WorkOrderLinesComponent {
   }
 
   eliminarLinea(id: number) {
-    if (confirm('¿Seguro que quieres borrar esta línea?')) {
-      this.onDelete.emit(id);
-    }
+    Swal.fire({
+      title: '¿Borrar línea?',
+      text: 'Vas a eliminar esta línea de la orden. Esta acción no se puede deshacer.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: '<i class="bi bi-trash"></i> Sí, borrar',
+      cancelButtonText: 'Cancelar',
+      background: '#212529',
+      color: '#fff',
+    }).then((result: any) => {
+      if (result.isConfirmed) {
+        this.onDelete.emit(id);
+      }
+    });
   }
 
   iniciarEdicion(linea: WorkOrderLine) {

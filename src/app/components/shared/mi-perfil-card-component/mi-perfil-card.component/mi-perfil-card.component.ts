@@ -3,6 +3,7 @@ import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
 import { TallerService } from '../../../../services/tallerService/taller.service';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../../../services/userService/user.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-mi-perfil-card',
@@ -61,10 +62,29 @@ export class MiPerfilCardComponent implements OnInit {
 
         localStorage.setItem('user', JSON.stringify(this.user));
         this.cdr.detectChanges();
+
+        Swal.fire({
+          title: 'Cambios guardados',
+          text: 'Tu perfil se ha actualizado correctamente.',
+          icon: 'success',
+          background: '#212529',
+          color: '#fff',
+          timer: 2000,
+          showConfirmButton: false,
+          position: 'top-end',
+          toast: true,
+        });
       },
       error: (err) => {
         console.error(err);
-        alert('Hubo un error al guardar los cambios');
+        Swal.fire({
+          title: 'Error',
+          text: 'Hubo un error al guardar los cambios.',
+          icon: 'error',
+          background: '#212529',
+          color: '#fff',
+          confirmButtonColor: '#0d6efd',
+        });
       },
     });
   }

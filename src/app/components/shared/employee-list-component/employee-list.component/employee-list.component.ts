@@ -4,6 +4,7 @@ import { CommonModule, UpperCasePipe } from '@angular/common';
 import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
 import { User } from '../../../../models/user';
 import { FormsModule } from '@angular/forms';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-employee-list',
@@ -84,25 +85,77 @@ export class EmployeeListComponent implements OnInit {
         }
         this.cancelarEdicionRol();
         this.cdr.detectChanges();
+
+        Swal.fire({
+          title: 'Rol actualizado',
+          text: 'Los permisos del empleado han sido modificados.',
+          icon: 'success',
+          background: '#212529',
+          color: '#fff',
+          timer: 2000,
+          showConfirmButton: false,
+          position: 'top-end',
+          toast: true,
+        });
       },
       error: (err) => {
         console.error(err);
-        alert('Hubo un error al actualizar el rol del empleado');
+        Swal.fire({
+          title: 'Error',
+          text: 'Hubo un error al actualizar el rol del empleado.',
+          icon: 'error',
+          background: '#212529',
+          color: '#fff',
+          confirmButtonColor: '#0d6efd',
+        });
       },
     });
   }
 
   despedir(dniEmpleado: string) {
-    if (confirm(`¿Estás seguro de que quieres despedir al empleado con DNI ${dniEmpleado}?`)) {
-      this.userService.fireEmployee(dniEmpleado).subscribe({
-        next: () => {
-          setTimeout(() => {
-            this.empleados = this.empleados.filter((emp) => emp.dni !== dniEmpleado);
-            this.cdr.detectChanges();
-          }, 0);
-        },
-        error: (err) => console.error('Error al despedir', err),
-      });
-    }
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: `Vas a despedir al empleado con DNI ${dniEmpleado}. Esta acción no se puede deshacer.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: '<i class="bi bi-person-x-fill"></i> Sí, despedir',
+      cancelButtonText: 'Cancelar',
+      background: '#212529',
+      color: '#fff',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.userService.fireEmployee(dniEmpleado).subscribe({
+          next: () => {
+            setTimeout(() => {
+              this.empleados = this.empleados.filter((emp) => emp.dni !== dniEmpleado);
+              this.cdr.detectChanges();
+            }, 0);
+
+            Swal.fire({
+              title: '¡Despedido!',
+              text: 'El empleado ha sido dado de baja del taller.',
+              icon: 'success',
+              background: '#212529',
+              color: '#fff',
+              timer: 2000,
+              showConfirmButton: false,
+            });
+          },
+          error: (err) => {
+            console.error('Error al despedir', err);
+            Swal.fire({
+              title: 'Error',
+              text: 'Hubo un problema al intentar despedir al empleado.',
+              icon: 'error',
+              background: '#212529',
+              color: '#fff',
+              confirmButtonColor: '#0d6efd',
+            });
+          },
+        });
+      }
+    });
   }
 }

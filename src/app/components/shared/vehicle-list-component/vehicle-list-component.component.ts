@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef, OnDestroy, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Route, Router, RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { User } from '../../../models/user';
 import { Vehicle } from '../../../models/vehicle';
@@ -12,6 +12,7 @@ import { VehicleFormComponent } from '../vehicle-form.component/vehicle-form.com
 import { VehicleCardComponent } from '../vehicle-card.component/vehicle-card.component';
 import { VehicleDetailModalComponent } from '../vehicle-detail-modal.component/vehicle-detail-modal.component';
 import { SearchComponent } from '../search-component/search.component/search.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-vehicle-list-component',
@@ -172,15 +173,36 @@ export class VehicleListComponent implements OnInit, OnDestroy {
   }
 
   eliminarVehiculo(plate: string) {
-    if (confirm(`¿Estás seguro de que quieres eliminar el vehículo ${plate}?`)) {
-      this.vehicleService.deleteVehicle(plate).subscribe({
-        next: () => {
-          this.cargarDatos(this.activeTab);
-          this.vehiculoSeleccionado = null;
-        },
-        error: (err) => alert('Error al eliminar'),
-      });
-    }
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: `Vas a eliminar el vehículo ${plate}. Esta acción no se puede deshacer`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: '<i class="bi bi-trash"></i>Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      background: '#212529',
+      color: '#fff',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.vehicleService.deleteVehicle(plate).subscribe({
+          next: () => {
+            this.cargarDatos(this.activeTab);
+            this.vehiculoSeleccionado = null;
+          },
+          error: (err) => {
+            Swal.fire({
+              title: 'Error',
+              text: 'Error al eliminar el vehículo',
+              icon: 'error',
+              background: '#212529',
+              color: '#fff',
+            });
+          },
+        });
+      }
+    });
   }
 
   onVehiculoGuardado() {
@@ -189,17 +211,46 @@ export class VehicleListComponent implements OnInit, OnDestroy {
   }
 
   registerExit(plate: string) {
-    if (confirm(`¿Confirmas la SALIDA del vehículo ${plate} del taller?`)) {
-      this.vehicleService.registerExit(plate.toUpperCase(), this.workshopId).subscribe({
-        next: () => {
-          this.cargarDatos(this.activeTab);
-        },
-        error: (err) => {
-          console.error(err);
-          alert('No se pudo registrar la salida del vehículo');
-        },
-      });
-    }
+    Swal.fire({
+      title: 'Registrar Salida',
+      text: `¿Confirmas la SALIDA del vehículo ${plate} del taller?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#198754',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: '<i class="bi bi-box-arrow-right"></i> Confirmar Salida',
+      cancelButtonText: 'Cancelar',
+      background: '#212529',
+      color: '#fff',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.vehicleService.registerExit(plate.toUpperCase(), this.workshopId).subscribe({
+          next: () => {
+            this.cargarDatos(this.activeTab);
+            Swal.fire({
+              title: 'Salida Registrada',
+              text: 'El vehículo ya no está en el taller.',
+              icon: 'success',
+              background: '#212529',
+              color: '#fff',
+              timer: 2000,
+              showConfirmButton: false,
+            });
+          },
+          error: (err) => {
+            console.error(err);
+            Swal.fire({
+              title: 'Error',
+              text: 'No se pudo registrar la salida.',
+              icon: 'error',
+              background: '#212529',
+              color: '#fff',
+              confirmButtonColor: '#0d6efd',
+            });
+          },
+        });
+      }
+    });
   }
 
   solicitarIngreso() {
@@ -209,14 +260,26 @@ export class VehicleListComponent implements OnInit, OnDestroy {
       .requestEntry(this.matriculaBuscada.toUpperCase(), this.workshopId)
       .subscribe({
         next: () => {
-          alert(
-            `Solicitud enviada al propietario del vehículo ${this.matriculaBuscada.toUpperCase()}.`,
-          );
+          Swal.fire({
+            title: '¡Solicitud Enviada!',
+            text: `Se ha notificado al propietario del vehículo ${this.matriculaBuscada.toUpperCase()}.`,
+            icon: 'success',
+            background: '#212529',
+            color: '#fff',
+            confirmButtonColor: '#0d6efd',
+          });
           this.matriculaBuscada = '';
         },
         error: (err) => {
           const msg = err.error?.message || 'Error al solicitar el ingreso.';
-          alert(msg);
+          Swal.fire({
+            title: 'Atención',
+            text: msg,
+            icon: 'warning',
+            background: '#212529',
+            color: '#fff',
+            confirmButtonColor: '#0d6efd',
+          });
         },
       });
   }
@@ -225,8 +288,27 @@ export class VehicleListComponent implements OnInit, OnDestroy {
     this.vehicleService.approveEntry(plate).subscribe({
       next: () => {
         this.cargarDatos('mis-vehiculos');
+        Swal.fire({
+          title: 'Ingreso Aprobado',
+          text: 'El taller ya tiene acceso a tu vehículo.',
+          icon: 'success',
+          background: '#212529',
+          color: '#fff',
+          timer: 2000,
+          showConfirmButton: false,
+          position: 'top-end',
+          toast: true,
+        });
       },
-      error: (err) => alert('No se pudo aprobar la solicitud.'),
+      error: (err) => {
+        Swal.fire({
+          title: 'Error',
+          text: 'No se pudo aprobar la solicitud.',
+          icon: 'error',
+          background: '#212529',
+          color: '#fff',
+        });
+      },
     });
   }
 
@@ -234,8 +316,27 @@ export class VehicleListComponent implements OnInit, OnDestroy {
     this.vehicleService.rejectEntry(plate).subscribe({
       next: () => {
         this.cargarDatos('mis-vehiculos');
+        Swal.fire({
+          title: 'Ingreso Rechazado',
+          text: 'Has denegado el acceso al taller.',
+          icon: 'info',
+          background: '#212529',
+          color: '#fff',
+          timer: 2000,
+          showConfirmButton: false,
+          position: 'top-end',
+          toast: true,
+        });
       },
-      error: (err) => alert('No se pudo rechazar la solicitud.'),
+      error: (err) => {
+        Swal.fire({
+          title: 'Error',
+          text: 'No se pudo rechazar la solicitud.',
+          icon: 'error',
+          background: '#212529',
+          color: '#fff',
+        });
+      },
     });
   }
 }
