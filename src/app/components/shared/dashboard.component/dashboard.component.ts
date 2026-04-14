@@ -2,6 +2,8 @@ import { UserService } from './../../../services/userService/user.service';
 import { ChangeDetectorRef, Component, OnInit, OnDestroy, NgZone } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { User } from '../../../models/user';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-dashboard.component',
@@ -14,7 +16,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   userName: string = 'Usuario';
   role: string = '';
   workshop: string = '';
-  user: any;
+  user?: User;
 
   private invitacionListener = () => {
     this.ngZone.run(() => {
@@ -32,7 +34,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.cargarDatosUsuario();
-
     window.addEventListener('nueva-invitacion', this.invitacionListener);
   }
 
@@ -44,25 +45,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const userJson = localStorage.getItem('user');
     if (userJson) {
       const localUser = JSON.parse(userJson);
-      const dniBuscado = localUser.dni || localUser.userId || localUser.DNI;
+      const dniBuscado = localUser.dni;
 
       if (dniBuscado) {
         this.userService.getUserByDni(dniBuscado).subscribe({
-          next: (fullUser: any) => {
+          next: (fullUser: User) => {
             setTimeout(() => {
               this.user = fullUser;
               this.role = this.user.role;
 
               if (this.user.workShop) {
-                this.workshop = this.user.workShop;
+                this.workshop =
+                  typeof this.user.workShop === 'string'
+                    ? this.user.workShop
+                    : this.user.workShop.workshopName;
               }
 
               localStorage.setItem('user', JSON.stringify(this.user));
-
               this.cdr.detectChanges();
             }, 0);
           },
-          error: (err) => console.error(err),
+          error: (err: HttpErrorResponse) => console.error(err),
         });
       }
     }
@@ -93,30 +96,36 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   gestionarInvitacion(aceptar: boolean) {
+    if (!this.user || !this.user.dni) return;
+
     const accion = aceptar
       ? this.userService.acceptInvitation(this.user.dni)
       : this.userService.rejectInvitation(this.user.dni);
 
     accion.subscribe({
-      next: (res: any) => {
+      next: (res: User) => {
+        res.pendingWorkshopName = null;
+        res.pendingRole = null;
+
         if (aceptar) {
-          this.user = res;
-          this.role = this.user.role;
-          this.workshop = this.user.workShop?.workshopName || this.user.workShop;
+          this.role = res.role;
 
-          this.user.pendingWorkshopName = null;
-          this.user.pendingRole = null;
-
-          localStorage.setItem('user', JSON.stringify(this.user));
-          this.cdr.detectChanges();
-        } else {
-          this.user.pendingWorkshopName = null;
-          this.user.pendingRole = null;
-          localStorage.setItem('user', JSON.stringify(this.user));
-          this.cdr.detectChanges();
+          if (res.workShop) {
+            this.workshop =
+              typeof res.workShop === 'string' ? res.workShop : res.workShop.workshopName;
+          } else {
+            this.workshop = '';
+          }
         }
+
+        this.user = res;
+
+        localStorage.setItem('user', JSON.stringify(this.user));
+        this.cdr.detectChanges();
       },
-      error: (err: any) => console.error('Error al gestionar invitación', err),
+      error: (err: HttpErrorResponse) => {
+        console.error('Error al gestionar invitación', err);
+      },
     });
   }
 }

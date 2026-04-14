@@ -19,13 +19,14 @@ export class SearchComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscripcion = this.buscadorSubject
       .pipe(debounceTime(400), distinctUntilChanged())
-      .subscribe((texto) => {
+      .subscribe((texto: string) => {
         this.busquedaLista.emit(texto);
       });
   }
 
-  onInput(event: any) {
-    this.buscadorSubject.next(event.target.value);
+  onInput(event: Event): void {
+    const element = event.target as HTMLInputElement;
+    this.buscadorSubject.next(element.value);
   }
 
   ngOnDestroy(): void {

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { User } from '../../models/user';
 
 @Injectable({
   providedIn: 'root',
@@ -10,43 +11,42 @@ export class UserService {
 
   constructor(private http: HttpClient) {}
 
-  getUserByDni(dni: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/${dni}`);
+  getUserByDni(dni: string): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/${dni}`);
   }
 
-  edit(userData: any, dni: string): Observable<any> {
+  edit(userData: User, dni: string): Observable<User> {
     const url = `${this.apiUrl}/${dni}`;
-
-    return this.http.put<any>(url, userData);
+    return this.http.put<User>(url, userData);
   }
 
-  contratarEmpleados(managerDni: string, employeeDni: string, newRole: string): Observable<any> {
-    const params = {
-      managerDni: managerDni,
-      employeeDni: employeeDni,
-      newRole: newRole,
-    };
+  contratarEmpleados(managerDni: string, employeeDni: string, newRole: string): Observable<User> {
+    const params = new HttpParams()
+      .set('managerDni', managerDni)
+      .set('employeeDni', employeeDni)
+      .set('newRole', newRole);
 
-    return this.http.patch(`${this.apiUrl}/promote`, null, { params });
+    return this.http.patch<User>(`${this.apiUrl}/promote`, null, { params });
   }
 
-  invite(dni: string, managerDni: string, newRole: string): Observable<any> {
-    return this.http.patch(
-      `${this.apiUrl}/${dni}/invite?managerDni=${managerDni}&newRole=${newRole}`,
-      null,
-      { withCredentials: true },
-    );
+  invite(dni: string, managerDni: string, newRole: string): Observable<User> {
+    const params = new HttpParams().set('managerDni', managerDni).set('newRole', newRole);
+
+    return this.http.patch<User>(`${this.apiUrl}/${dni}/invite`, null, {
+      params,
+      withCredentials: true,
+    });
   }
 
-  acceptInvitation(dni: string): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/${dni}/accept`, {});
+  acceptInvitation(dni: string): Observable<User> {
+    return this.http.patch<User>(`${this.apiUrl}/${dni}/accept`, {});
   }
 
-  rejectInvitation(dni: string): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/${dni}/reject`, {});
+  rejectInvitation(dni: string): Observable<User> {
+    return this.http.patch<User>(`${this.apiUrl}/${dni}/reject`, {});
   }
 
-  fireEmployee(dni: string): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/${dni}/fire`, {}, { withCredentials: true });
+  fireEmployee(dni: string): Observable<void> {
+    return this.http.patch<void>(`${this.apiUrl}/${dni}/fire`, {}, { withCredentials: true });
   }
 }

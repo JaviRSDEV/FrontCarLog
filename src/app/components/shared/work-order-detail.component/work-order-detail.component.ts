@@ -3,9 +3,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe, UpperCasePipe } from '@angular/common';
 import { WorkOrderService } from './../../../services/workOrderService/work-order.service';
 import { Workorder } from './../../../models/workorder';
+import { WorkOrderLine } from './../../../models/workorderline';
+import { User } from './../../../models/user';
 import { WorkOrderLinesComponent } from '../work-order-lines.component/work-order-lines.component';
 import { FormsModule } from '@angular/forms';
 import { TallerService } from '../../../services/tallerService/taller.service';
+import { HttpErrorResponse } from '@angular/common/http';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -19,7 +22,7 @@ export class WorkOrderDetailComponent implements OnInit {
   orden?: Workorder;
   cargando: boolean = true;
   esManager: boolean = false;
-  mecanicosDisponibles: any[] = [];
+  mecanicosDisponibles: User[] = [];
   mecanicoSeleccionado: string = '';
 
   constructor(
@@ -36,9 +39,9 @@ export class WorkOrderDetailComponent implements OnInit {
 
     if (userStorage) {
       try {
-        const userData = JSON.parse(userStorage);
+        const userData: User = JSON.parse(userStorage);
 
-        this.esManager = userData.role === 'MANAGER';
+        this.esManager = userData.role === 'MANAGER' || userData.role === 'CO_MANAGER';
         const miWorkshopId = userData.workShopId;
 
         if (this.esManager && miWorkshopId != null) {
@@ -59,11 +62,12 @@ export class WorkOrderDetailComponent implements OnInit {
 
   cargarOrden(id: number) {
     this.workOrderService.getWorkOrderById(id).subscribe({
-      next: (data: any) => {
+      next: (data: Workorder) => {
         this.orden = data;
         this.cargando = false;
 
-        const nombreMecanico = (this.orden as any)?.mechanicName;
+        const nombreMecanico = this.orden.mechanicName;
+
         if (nombreMecanico && this.mecanicosDisponibles.length > 0) {
           const encontrado = this.mecanicosDisponibles.find(
             (m) => m.name.toLowerCase() === nombreMecanico.toLowerCase(),
@@ -73,7 +77,7 @@ export class WorkOrderDetailComponent implements OnInit {
 
         this.cdr.detectChanges();
       },
-      error: (err: any) => {
+      error: (err: HttpErrorResponse) => {
         const msj = err.error?.message || err.message || 'Error desconocido';
         console.error('Detalle completo del error:', err);
         this.cargando = false;
@@ -94,15 +98,13 @@ export class WorkOrderDetailComponent implements OnInit {
     if (!this.orden) return;
     this.workOrderService.updateWorkOrder(this.orden.id, { status: nuevoEstado }).subscribe({
       next: () => this.cargarOrden(this.orden!.id),
+      error: (err: HttpErrorResponse) => console.error(err),
     });
   }
 
   borrarOrden() {
-    const ordenActual = this.orden;
-    if (!ordenActual) return;
     if (!this.orden) return;
-
-    const idOrden = ordenActual.id;
+    const idOrden = this.orden.id;
 
     Swal.fire({
       title: '¿Estás seguro?',
@@ -131,7 +133,7 @@ export class WorkOrderDetailComponent implements OnInit {
               this.volver();
             });
           },
-          error: (err) => {
+          error: (err: HttpErrorResponse) => {
             console.error('Error al borrar la orden', err);
             Swal.fire({
               title: 'Error',
@@ -151,10 +153,17 @@ export class WorkOrderDetailComponent implements OnInit {
     this.router.navigate(['/dashboard/mantenimientos']);
   }
 
-  manejarNuevaLinea(lineaData: any) {
+  manejarNuevaLinea(lineaData: {
+    concept: string;
+    quantity: number;
+    pricePerUnit: number;
+    IVA: number;
+    discount: number;
+  }) {
     if (!this.orden) return;
     this.workOrderService.addWorkOrderLine(this.orden.id, lineaData).subscribe({
       next: () => this.cargarOrden(this.orden!.id),
+      error: (err: HttpErrorResponse) => console.error(err),
     });
   }
 
@@ -162,22 +171,24 @@ export class WorkOrderDetailComponent implements OnInit {
     if (!this.orden) return;
     this.workOrderService.deleteWorkOrderLine(this.orden.id, lineId).subscribe({
       next: () => this.cargarOrden(this.orden!.id),
+      error: (err: HttpErrorResponse) => console.error(err),
     });
   }
 
-  manejarActualizacionLinea(evento: { lineId: number; data: any }) {
+  manejarActualizacionLinea(evento: { lineId: number; data: Partial<WorkOrderLine> }) {
     if (!this.orden) return;
     this.workOrderService.updateWorkOrderLine(this.orden.id, evento.lineId, evento.data).subscribe({
       next: () => this.cargarOrden(this.orden!.id),
+      error: (err: HttpErrorResponse) => console.error(err),
     });
   }
 
   cargarMecanicosDelTaller(workshopId: number) {
     this.tallerService.getMecanicosPorTaller(workshopId).subscribe({
-      next: (mecanicos) => {
+      next: (mecanicos: User[]) => {
         this.mecanicosDisponibles = mecanicos;
 
-        const nombreMecanico = (this.orden as any)?.mechanicName;
+        const nombreMecanico = this.orden?.mechanicName;
 
         if (nombreMecanico) {
           const mecanicoEncontrado = this.mecanicosDisponibles.find(
@@ -191,15 +202,14 @@ export class WorkOrderDetailComponent implements OnInit {
 
         this.cdr.detectChanges();
       },
-      error: (err: any) => console.error(err),
+      error: (err: HttpErrorResponse) => console.error(err),
     });
   }
 
   reasignarMecanico(nuevoMechanicId: string) {
-    const ordenActual = this.orden;
-    if (!ordenActual || !nuevoMechanicId) return;
+    if (!this.orden || !nuevoMechanicId) return;
 
-    const idOrden = ordenActual.id;
+    const idOrden = this.orden.id;
 
     Swal.fire({
       title: '¿Reasignar mecánico?',
@@ -230,7 +240,7 @@ export class WorkOrderDetailComponent implements OnInit {
               toast: true,
             });
           },
-          error: (err) => {
+          error: (err: HttpErrorResponse) => {
             console.error('Error al asignar', err);
             Swal.fire({
               title: 'Error',

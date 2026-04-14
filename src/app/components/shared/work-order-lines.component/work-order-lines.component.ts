@@ -2,37 +2,52 @@ import { Component, input, output, signal } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { WorkOrderLine } from '../../../models/workorderline';
-import Swal from 'sweetalert2';
+import Swal, { SweetAlertResult } from 'sweetalert2';
+
+interface NewWorkOrderLine {
+  concept: string;
+  quantity: number;
+  pricePerUnit: number;
+  IVA: number;
+  discount: number;
+}
 
 @Component({
   selector: 'app-work-order-lines',
   standalone: true,
   imports: [CurrencyPipe, FormsModule, CommonModule],
   templateUrl: './work-order-lines.component.html',
-  styleUrl: './work-order-lines.component.css', // Opcional
+  styleUrl: './work-order-lines.component.css',
 })
 export class WorkOrderLinesComponent {
   lineas = input.required<WorkOrderLine[]>();
   isReadOnly = input<boolean>(false);
   totalAmount = input<number>(0);
 
-  onAdd = output<any>();
+  onAdd = output<NewWorkOrderLine>();
   onDelete = output<number>();
-  onUpdate = output<{ lineId: number; data: any }>();
+  onUpdate = output<{ lineId: number; data: Partial<WorkOrderLine> }>();
 
-  nuevaLinea = { concept: '', quantity: 1, pricePerUnit: 0, IVA: 21, discount: 0 };
+  nuevaLinea: NewWorkOrderLine = {
+    concept: '',
+    quantity: 1,
+    pricePerUnit: 0,
+    IVA: 21,
+    discount: 0,
+  };
 
   editandoId = signal<number | null>(null);
-  lineaEnEdicion: any = null;
+  lineaEnEdicion: WorkOrderLine | null = null;
 
-  agregarLinea() {
+  agregarLinea(): void {
     if (!this.nuevaLinea.concept) return;
+
     this.onAdd.emit(this.nuevaLinea);
 
     this.nuevaLinea = { concept: '', quantity: 1, pricePerUnit: 0, IVA: 21, discount: 0 };
   }
 
-  eliminarLinea(id: number) {
+  eliminarLinea(id: number): void {
     Swal.fire({
       title: '¿Borrar línea?',
       text: 'Vas a eliminar esta línea de la orden. Esta acción no se puede deshacer.',
@@ -44,7 +59,7 @@ export class WorkOrderLinesComponent {
       cancelButtonText: 'Cancelar',
       background: '#212529',
       color: '#fff',
-    }).then((result: any) => {
+    }).then((result: SweetAlertResult) => {
       if (result.isConfirmed) {
         this.onDelete.emit(id);
       }

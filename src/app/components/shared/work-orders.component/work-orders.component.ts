@@ -1,9 +1,15 @@
 import { WorkOrderService } from './../../../services/workOrderService/work-order.service';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Workorder } from '../../../models/workorder';
+import { User } from '../../../models/user';
 import { WorkOrderFormComponent } from '../work-order-form.component/work-order-form.component';
 import { CurrencyPipe } from '@angular/common';
 import { Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+type TabType = 'activas' | 'completadas';
+type VistaType = 'todas' | 'asignadas' | '';
 
 @Component({
   selector: 'app-work-orders',
@@ -17,8 +23,8 @@ export class WorkOrdersComponent implements OnInit {
   userDni: string = '';
   workshopId: number = 0;
 
-  activeTab: string = 'activas';
-  modoVista: string = '';
+  activeTab: TabType = 'activas';
+  modoVista: VistaType = '';
 
   ordenesActivas: Workorder[] = [];
   ordenesCompletadas: Workorder[] = [];
@@ -35,7 +41,7 @@ export class WorkOrdersComponent implements OnInit {
     const userJson = localStorage.getItem('user');
 
     if (userJson) {
-      const user = JSON.parse(userJson);
+      const user: User = JSON.parse(userJson);
       this.role = user.role;
       this.userDni = user.dni;
       this.workshopId = user.workShopId || 0;
@@ -50,20 +56,20 @@ export class WorkOrdersComponent implements OnInit {
     }
   }
 
-  abrirDetallesOrden(orden: Workorder) {
+  abrirDetallesOrden(orden: Workorder): void {
     if (orden.id) {
       this.router.navigate(['/dashboard/mantenimientos', orden.id]);
     } else {
-      console.error('error no tiene id');
+      console.error('La orden no tiene ID');
     }
   }
 
-  cambiarPestana(tab: string) {
+  cambiarPestana(tab: TabType): void {
     this.activeTab = tab;
   }
 
-  cargarDatos() {
-    const peticion$ =
+  cargarDatos(): void {
+    const peticion$: Observable<Workorder[]> =
       this.modoVista === 'todas'
         ? this.workOrderService.getAllWorkOrders(this.workshopId)
         : this.workOrderService.getWorkOrdersByMechanic(this.userDni);
@@ -71,21 +77,22 @@ export class WorkOrdersComponent implements OnInit {
     peticion$.subscribe({
       next: (data: Workorder[]) => {
         this.ordenesActivas = data.filter((o) => o.status !== 'COMPLETED');
-
         this.ordenesCompletadas = data.filter((o) => o.status === 'COMPLETED');
 
         this.cdr.detectChanges();
       },
-      error: (err: any) => console.error('Error al cargar órdenes', err),
+      error: (err: HttpErrorResponse) => {
+        console.error('Error al cargar órdenes', err);
+      },
     });
   }
 
-  onOrdenGuardada() {
+  onOrdenGuardada(): void {
     this.mostrarFormulario = false;
     this.cargarDatos();
   }
 
-  toggleFormulario() {
+  toggleFormulario(): void {
     this.mostrarFormulario = !this.mostrarFormulario;
   }
 }

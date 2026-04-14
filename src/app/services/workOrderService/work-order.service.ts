@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Workorder } from '../../models/workorder';
-import { HttpClient } from '@angular/common/http';
+import { WorkOrderLine } from '../../models/workorderline';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -20,8 +21,7 @@ export class WorkOrderService {
   }
 
   getWorkOrderById(id: number): Observable<Workorder> {
-    const url = `${this.apiUrl}/${id}`;
-    return this.http.get<Workorder>(url);
+    return this.http.get<Workorder>(`${this.apiUrl}/${id}`);
   }
 
   createWorkOrder(workOrderData: {
@@ -59,14 +59,17 @@ export class WorkOrderService {
     return this.http.delete<Workorder>(`${this.apiUrl}/${orderId}/lines/${lineId}`);
   }
 
-  updateWorkOrderLine(orderId: number, lineId: number, lineData: any): Observable<Workorder> {
+  updateWorkOrderLine(
+    orderId: number,
+    lineId: number,
+    lineData: Partial<WorkOrderLine>,
+  ): Observable<Workorder> {
     return this.http.put<Workorder>(`${this.apiUrl}/${orderId}/lines/${lineId}`, lineData);
   }
 
   reassignWorkOrder(orderId: number, newMechanicId: string): Observable<Workorder> {
-    return this.http.patch<Workorder>(
-      `${this.apiUrl}/${orderId}/reassign?newMechanicId=${newMechanicId}`,
-      {},
-    );
+    const params = new HttpParams().set('newMechanicId', newMechanicId);
+
+    return this.http.patch<Workorder>(`${this.apiUrl}/${orderId}/reassign`, {}, { params });
   }
 }

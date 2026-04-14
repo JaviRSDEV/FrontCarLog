@@ -3,6 +3,7 @@ import { Component, OnInit, EventEmitter, Input, Output, ChangeDetectorRef } fro
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { VehicleService } from '../../../services/vehicleService/vehicle.service';
 import { Vehicle } from '../../../models/vehicle';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-work-order-form',
@@ -11,8 +12,7 @@ import { Vehicle } from '../../../models/vehicle';
   templateUrl: './work-order-form.component.html',
   styleUrl: './work-order-form.component.css',
 })
-export class WorkOrderFormComponent implements OnInit{
-
+export class WorkOrderFormComponent implements OnInit {
   @Input() userDni: string = '';
   @Output() guardado = new EventEmitter<void>();
   @Output() cancelado = new EventEmitter<void>();
@@ -26,57 +26,59 @@ export class WorkOrderFormComponent implements OnInit{
     private fb: FormBuilder,
     private workOrderService: WorkOrderService,
     private vehicleService: VehicleService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
     this.workOrderForm = this.fb.group({
       vehiclePlate: ['', [Validators.required, Validators.pattern(/^[0-9]{4}[A-Z]{3}$/i)]],
-      description: ['', [Validators.required, Validators.minLength(10)]]
+      description: ['', [Validators.required, Validators.minLength(10)]],
     });
 
     this.cargarVehiculos();
   }
 
-  cargarVehiculos(){
+  cargarVehiculos(): void {
     this.vehicleService.getAllVehicles().subscribe({
-      next: (data: any) => {
+      next: (data: Vehicle[]) => {
         this.vehiculosFlota = data;
         this.cdr.detectChanges();
       },
-      error: (err: any) => {
+      error: (err: HttpErrorResponse) => {
         console.error(err);
-        this.mensajeError = 'No se pudieron cargar los vehiculos del taller'
-      }
-    })
+        this.mensajeError = 'No se pudieron cargar los vehículos del taller';
+      },
+    });
   }
 
-  onSubmit(){
+  onSubmit(): void {
     this.mensajeError = '';
 
-    if(this.workOrderForm.valid){
+    if (this.workOrderForm.valid) {
       const formValue = this.workOrderForm.value;
 
       const nuevaOrden = {
-        vehiclePlate: formValue.vehiclePlate.toUpperCase(),
-        description: formValue.description
+        vehiclePlate: (formValue.vehiclePlate as string).toUpperCase(),
+        description: formValue.description as string,
       };
 
       this.workOrderService.createWorkOrder(nuevaOrden).subscribe({
         next: () => {
           this.guardado.emit();
         },
-        error: (err: any) => {
+        error: (err: HttpErrorResponse) => {
           console.error(err);
-          this.mensajeError = err.error?.message || 'Error al crear la orden de trabajo. Comprueba los datos introducidos';
-        }
+          this.mensajeError =
+            err.error?.message ||
+            'Error al crear la orden de trabajo. Comprueba los datos introducidos';
+        },
       });
-    }else{
+    } else {
       this.workOrderForm.markAllAsTouched();
     }
   }
 
-  onCancelar(){
+  onCancelar(): void {
     this.cancelado.emit();
   }
 }

@@ -1,10 +1,10 @@
-@if (user && user.pendingWorkshop) {
+@if (user && user.pendingWorkshopName) {
   <div
     class="alert alert-info border-primary shadow-sm d-flex justify-content-between align-items-center mt-3"
   >
     <div>
       <i class="bi bi-briefcase-fill me-2"></i>
-      El taller con ID <strong>{{ user.pendingWorkshop }}</strong> quiere contratarte.
+      El taller con ID <strong>{{ user.pendingWorkshopName }}</strong> quiere contratarte.
     </div>
     <div class="d-flex gap-2">
       <button class="btn btn-success btn-sm px-4 fw-bold" (click)="gestionarInvitacion(true)">
