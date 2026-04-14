@@ -6,7 +6,6 @@ export const altaTallerGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
 
   let userJson = localStorage.getItem('user');
-  console.log(userJson);
   if (!userJson) {
     const cookieMatch = document.cookie.match(/(^|;)\s*user_data\s*=\s*([^;]+)/);
     if (cookieMatch) userJson = decodeURIComponent(cookieMatch[2]);
@@ -22,7 +21,6 @@ export const altaTallerGuard: CanActivateFn = (route, state) => {
   }
 
   const tieneTaller = user?.workshopId || user?.workShopId || user?.workShop;
-  console.log(user.workShopId);
   if (user.role === 'MANAGER' && tieneTaller) {
     router.navigate(['/dashboard']);
     return false;

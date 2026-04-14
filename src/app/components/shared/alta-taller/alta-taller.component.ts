@@ -13,31 +13,32 @@ import { TallerService } from '../../../services/tallerService/taller.service';
 export class AltaTaller {
   tallerForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private router: Router, private tallerService: TallerService){
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private tallerService: TallerService,
+  ) {
     this.tallerForm = this.fb.group({
       workshopName: ['', Validators.required],
       address: ['', [Validators.required]],
       workshopPhone: ['', [Validators.required]],
       workshopEmail: [''],
-      icon: ['']
+      icon: [''],
     });
   }
 
-  onSubmit(){
-    if(this.tallerForm.valid){
-      console.log("Datos introducidos:", this.tallerForm.value);
-
+  onSubmit() {
+    if (this.tallerForm.valid) {
       this.tallerService.crearTaller(this.tallerForm.value).subscribe({
         next: (newWorkshop) => {
-
           let userJson = localStorage.getItem('user');
 
-          if(userJson){
+          if (userJson) {
             let user = JSON.parse(userJson);
 
             user.workShop = this.tallerForm.get('workshopName')?.value;
 
-            if(newWorkshop && newWorkshop.workshopId){
+            if (newWorkshop && newWorkshop.workshopId) {
               user.workshopId = newWorkshop.workshopId;
             }
 
@@ -49,10 +50,9 @@ export class AltaTaller {
         },
         error: (err) => {
           console.error(err);
-        }
+        },
       });
-
-    }else{
+    } else {
       this.tallerForm.markAllAsTouched();
     }
   }

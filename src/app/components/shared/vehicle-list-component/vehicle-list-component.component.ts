@@ -48,7 +48,6 @@ export class VehicleListComponent implements OnInit, OnDestroy {
 
   private recargarListener = () => {
     this.ngZone.run(() => {
-      console.log('Aviso del Layout');
       setTimeout(() => {
         this.cargarDatos(this.activeTab);
       }, 500);
@@ -139,7 +138,6 @@ export class VehicleListComponent implements OnInit, OnDestroy {
   }
 
   irAlHistorial(plate: string) {
-    console.log('/dashboard/historial');
     this.router.navigate(['/dashboard/historial', plate]);
   }
 

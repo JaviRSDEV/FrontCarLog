@@ -18,8 +18,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private invitacionListener = () => {
     this.ngZone.run(() => {
-      console.log(' Grito de invitación recibido en el Dashboard');
-
       setTimeout(() => {
         this.cargarDatosUsuario();
       }, 500);
@@ -52,7 +50,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.userService.getUserByDni(dniBuscado).subscribe({
           next: (fullUser: any) => {
             setTimeout(() => {
-              console.log('Datos frescos recibidos del backend: ', fullUser);
               this.user = fullUser;
               this.role = this.user.role;
 

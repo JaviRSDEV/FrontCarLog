@@ -28,8 +28,6 @@ export class GestionTallerComponent implements OnInit {
     if (userJson) {
       const localUser = JSON.parse(userJson);
 
-      console.log(localUser);
-
       this.user = localUser;
       this.role = this.user.role?.replace(/"/g, '').toUpperCase();
       this.isManager = this.role === 'MANAGER' || this.role === 'CO_MANAGER';
@@ -37,10 +35,8 @@ export class GestionTallerComponent implements OnInit {
       const dniBuscado = localUser.dni || localUser.DNI || localUser.userId;
 
       if (dniBuscado) {
-        console.log(dniBuscado);
         this.userService.getUserByDni(dniBuscado).subscribe({
           next: (fullUser: any) => {
-            console.log(fullUser);
             this.user = {
               ...fullUser,
               workShop: localUser.workShop || localUser.workshop,

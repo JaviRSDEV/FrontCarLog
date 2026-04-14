@@ -12,7 +12,6 @@ export class WorkOrderService {
   constructor(private http: HttpClient) {}
 
   getWorkOrdersByMechanic(dni: string): Observable<Workorder[]> {
-    console.log(`${this.apiUrl}/mechanic/${dni}`);
     return this.http.get<Workorder[]>(`${this.apiUrl}/mechanic/${dni}`);
   }
 
@@ -22,10 +21,7 @@ export class WorkOrderService {
 
   getWorkOrderById(id: number): Observable<Workorder> {
     const url = `${this.apiUrl}/${id}`;
-    console.log('--- LLAMADA REAL A:', url);
     return this.http.get<Workorder>(url);
-    /*console.log('Intentado GET a:', this.apiUrl);
-    return this.http.get<Workorder>(`${this.apiUrl}/${id}`);*/
   }
 
   createWorkOrder(workOrderData: {

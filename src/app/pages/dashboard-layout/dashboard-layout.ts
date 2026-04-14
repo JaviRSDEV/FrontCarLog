@@ -63,7 +63,6 @@ export class DashboardLayout implements OnInit, OnDestroy {
             break;
 
           case 'INVITE':
-            console.log('Layout: Invitación recibida');
             window.dispatchEvent(new CustomEvent('nueva-invitacion'));
 
             Swal.fire({
@@ -81,7 +80,6 @@ export class DashboardLayout implements OnInit, OnDestroy {
             break;
 
           case 'VEHICLE_REQUEST':
-            console.log('Layout: Solicitud de vehículo recibida');
             window.dispatchEvent(new CustomEvent('recargar-coches'));
 
             Swal.fire({
@@ -99,12 +97,10 @@ export class DashboardLayout implements OnInit, OnDestroy {
             break;
 
           case 'NEW_EMPLOYEE':
-            console.log('Layout: Nuevo empleado en el taller');
             window.dispatchEvent(new CustomEvent('recargar-empleados'));
             break;
 
           case 'NEW_FLEET_VEHICLE':
-            console.log('Layout: Coche nuevo en el taller');
             window.dispatchEvent(new CustomEvent('recargar-coches'));
             break;
 

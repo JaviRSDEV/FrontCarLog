@@ -25,7 +25,6 @@ export class MiPerfilCardComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    console.log(this.user);
     if (this.user.workShopId) {
       this.obtenerTaller(this.user.workShopId);
     }
@@ -35,8 +34,6 @@ export class MiPerfilCardComponent implements OnInit {
     this.tallerService.getTallerPorId(tallerId).subscribe({
       next: (datosTaller) => {
         this.workShop = datosTaller;
-        console.log('Taller cargado con éxito:', this.workShop);
-        console.log('Nombre taller: ', this.workShop.workshopName);
         this.cdr.detectChanges();
       },
       error: (err) => {

@@ -22,15 +22,11 @@ export class HireWorkerComponent {
   ) {}
 
   enviarInvitacion() {
-    console.log(this.rolElegido);
-    console.log(this.dniBusqueda);
-    console.log('Enviando invitacion');
     const userJson = localStorage.getItem('user');
     if (!userJson) return;
     const manager = JSON.parse(userJson);
 
     const managerDni = manager.dni;
-    console.log(managerDni);
 
     this.userService.invite(this.dniBusqueda, managerDni, this.rolElegido).subscribe({
       next: () => {

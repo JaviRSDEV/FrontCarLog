@@ -19,11 +19,15 @@ export class Login {
   loginError: string = '';
   registerError: string = '';
 
-  constructor(private fb: FormBuilder, private authService: Auth, private router: Router){
+  constructor(
+    private fb: FormBuilder,
+    private authService: Auth,
+    private router: Router,
+  ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      rememberMe: [false]
+      rememberMe: [false],
     });
 
     this.registerForm = this.fb.group({
@@ -33,97 +37,91 @@ export class Login {
       phone: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(6)]],
       role: ['', Validators.required],
-      rememberMe: [false]
+      rememberMe: [false],
     });
   }
 
-  openLogin(){ this.showLogin = true; }
-  closeLogin(){
+  openLogin() {
+    this.showLogin = true;
+  }
+  closeLogin() {
     this.showLogin = false;
     this.loginForm.reset();
   }
 
-  openRegister(){ this.showRegister = true; }
-  closeRegister(){
+  openRegister() {
+    this.showRegister = true;
+  }
+  closeRegister() {
     this.showRegister = false;
     this.registerForm.reset();
   }
 
-  onLoginSubmit(){
-    if(this.loginForm.valid){
+  onLoginSubmit() {
+    if (this.loginForm.valid) {
       this.authService.login(this.loginForm.value).subscribe({
         next: (backendResponse: any) => {
-
           sessionStorage.setItem('token', JSON.stringify(backendResponse));
           localStorage.setItem('user', JSON.stringify(backendResponse));
 
           const token = backendResponse.token;
-          const rememberMe = this.loginForm.get('rememberMe')?.value
+          const rememberMe = this.loginForm.get('rememberMe')?.value;
 
-          if(rememberMe){
+          if (rememberMe) {
             const expirationDate = new Date();
             expirationDate.setDate(expirationDate.getDate() + 7);
             document.cookie = `auth_token=${token}; expires=${expirationDate.toUTCString()}; path=/; SameSite=Strict; Secure`;
-
-            console.log("Token almacenado en una Cookie (Recordar sesión)");
-          }else{
+          } else {
             sessionStorage.setItem('auth_token', token);
-            console.log("Token almacenado en la session storage (Sesión temporal)");
           }
 
           this.closeLogin();
-          this.router.navigate(['/dashboard'])
+          this.router.navigate(['/dashboard']);
         },
         error: (backendError) => {
-          console.error("Error al iniciar sesión:", backendError)
-          this.loginError = 'Correo o contraseña incorrectos. Inténtalo de nuevo.'
-        }
+          console.error('Error al iniciar sesión:', backendError);
+          this.loginError = 'Correo o contraseña incorrectos. Inténtalo de nuevo.';
+        },
       });
     } else {
       this.loginForm.markAllAsTouched();
     }
   }
 
-  onRegisterSubmit(){
-    if(this.registerForm.valid){
+  onRegisterSubmit() {
+    if (this.registerForm.valid) {
       this.authService.register(this.registerForm.value).subscribe({
         next: (backendResponse: any) => {
-
           localStorage.setItem('user', JSON.stringify(backendResponse));
 
-          const token =  backendResponse.token;
+          const token = backendResponse.token;
           const rememberMe = this.registerForm.get('rememberMe')?.value;
 
-          if(rememberMe){
+          if (rememberMe) {
             const expirationDate = new Date();
             expirationDate.setDate(expirationDate.getDate() + 7);
             document.cookie = `auth_token=${token}; expires=${expirationDate.toUTCString()}; path=/; SameSite=Strict; Secure`;
-
-            console.log("Auto-login: Token en cookie");
-          }else{
+          } else {
             sessionStorage.setItem('auth_token', token);
-            console.log("Auto-login: Token en SessionStorage");
           }
 
           this.closeRegister();
 
           const rolElegido = backendResponse.role;
-          console.log(rolElegido);
-          if(rolElegido === 'MANAGER'){
-            console.log("Dueño de taller, redirigiendo a la creación del taller...");
+          if (rolElegido === 'MANAGER') {
             this.router.navigate(['/dashboard/alta-taller']);
-          }else{
-            console.log("Redirigiendo al dashboard...")
+          } else {
             this.router.navigate(['/dashboard']);
           }
         },
-          error: (errorBackend) => {
-            console.error('Error al registrar usuario', errorBackend)
-            this.registerError = errorBackend.error?.message || 'Error al registrarse. Comprueba los datos o si el correo ya existe';
-        }
+        error: (errorBackend) => {
+          console.error('Error al registrar usuario', errorBackend);
+          this.registerError =
+            errorBackend.error?.message ||
+            'Error al registrarse. Comprueba los datos o si el correo ya existe';
+        },
       });
-    }else {
-      console.log("El formulario de registro contiene errores");
+    } else {
       this.registerForm.markAllAsTouched();
     }
   }

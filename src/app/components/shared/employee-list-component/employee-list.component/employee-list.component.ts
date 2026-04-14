@@ -21,8 +21,6 @@ export class EmployeeListComponent implements OnInit {
 
   private empleadosListener = () => {
     this.ngZone.run(() => {
-      console.log('Actualizando lista de empleados');
-
       setTimeout(() => {
         this.cargarListaEmpleados();
       }, 500);

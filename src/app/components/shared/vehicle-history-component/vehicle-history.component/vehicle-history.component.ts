@@ -35,7 +35,6 @@ export class VehicleHistoryComponent implements OnInit {
       next: (data: any) => {
         this.historial = data;
         this.cargando = false;
-        console.log(data);
 
         this.cdr.detectChanges();
       },

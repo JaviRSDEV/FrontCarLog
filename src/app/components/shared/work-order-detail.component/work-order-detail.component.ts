@@ -40,8 +40,6 @@ export class WorkOrderDetailComponent implements OnInit {
 
         this.esManager = userData.role === 'MANAGER';
         const miWorkshopId = userData.workShopId;
-        console.log(userData);
-        console.log(miWorkshopId);
 
         if (this.esManager && miWorkshopId != null) {
           this.cargarMecanicosDelTaller(miWorkshopId);
