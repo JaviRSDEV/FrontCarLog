@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TallerService } from '../../../../services/tallerService/taller.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-visualizar-taller',
@@ -75,6 +76,13 @@ export class VisualizarTallerComponent implements OnInit {
       this.datosEdicion.icon = compressedBase64;
     } catch (error) {
       console.error('Error al comprimir la imagen', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error de imagen',
+        text: 'No se pudo procesar el logo seleccionado.',
+        background: '#1e1e1e',
+        color: '#fff',
+      });
     }
     this.cdr.detectChanges();
   }
@@ -121,6 +129,18 @@ export class VisualizarTallerComponent implements OnInit {
   }
 
   async guardarEdicion() {
+    Swal.fire({
+      title: 'Guardando cambios...',
+      text: 'Estamos actualizando la información de tu taller.',
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      background: '#1e1e1e',
+      color: '#fff',
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
     this.guardando = true;
 
     const formData = new FormData();
@@ -140,11 +160,32 @@ export class VisualizarTallerComponent implements OnInit {
         this.modoEdicion = false;
         this.guardando = false;
         this.imagenTemporal = null;
+
+        Swal.fire({
+          icon: 'success',
+          title: '¡Actualizado!',
+          text: 'Los datos del taller se han guardado correctamente.',
+          timer: 2000,
+          showConfirmButton: false,
+          background: '#1e1e1e',
+          color: '#fff',
+        });
+
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error al guardar:', err);
         this.guardando = false;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Error al guardar',
+          text: 'No se han podido actualizar los datos. Por favor, inténtalo de nuevo.',
+          background: '#1e1e1e',
+          color: '#fff',
+          confirmButtonColor: '#00AEEF',
+        });
+
         this.cdr.detectChanges();
       },
     });
