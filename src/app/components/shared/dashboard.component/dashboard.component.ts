@@ -1,9 +1,14 @@
 import { UserService } from './../../../services/userService/user.service';
-import { ChangeDetectorRef, Component, OnInit, OnDestroy, NgZone } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { User } from '../../../models/user';
 import { HttpErrorResponse } from '@angular/common/http';
+import {
+  AppEventType,
+  NotificationBusService,
+} from '../../../services/notification-bus/notification-bus.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard.component',
@@ -22,27 +27,25 @@ export class DashboardComponent implements OnInit, OnDestroy {
   mensajeAviso: string = '';
   tipoAviso: 'success' | 'danger' | 'info' = 'info';
 
-  private invitacionListener = () => {
-    this.ngZone.run(() => {
-      setTimeout(() => {
-        this.cargarDatosUsuario();
-      }, 500);
-    });
-  };
+  private eventSub!: Subscription;
 
   constructor(
     private userService: UserService,
     private cdr: ChangeDetectorRef,
-    private ngZone: NgZone,
+    private notificationBus: NotificationBusService,
   ) {}
 
   ngOnInit(): void {
     this.cargarDatosUsuario();
-    window.addEventListener('nueva-invitacion', this.invitacionListener);
+    this.eventSub = this.notificationBus.on(AppEventType.NEW_INVITE).subscribe(() => {
+      this.cargarDatosUsuario();
+    });
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener('nueva-invitacion', this.invitacionListener);
+    if (this.eventSub) {
+      this.eventSub.unsubscribe();
+    }
   }
 
   private getStorage() {

@@ -11,6 +11,10 @@ import { myRxStompConfig } from '../../config/rx-stomp-config';
 import { Auth } from '../../services/authService/auth.service';
 import { User } from '../../models/user';
 import Swal from 'sweetalert2';
+import {
+  AppEventType,
+  NotificationBusService,
+} from '../../services/notification-bus/notification-bus.service';
 
 interface AppNotification {
   type: 'FIRE' | 'INVITE' | 'VEHICLE_REQUEST' | 'NEW_EMPLOYEE' | 'NEW_FLEET_VEHICLE';
@@ -29,7 +33,10 @@ export class DashboardLayout implements OnInit, OnDestroy {
   private rxStomp: RxStomp;
   private notificacionSubscription?: Subscription;
 
-  constructor(private authService: Auth) {
+  constructor(
+    private authService: Auth,
+    private notificationBus: NotificationBusService,
+  ) {
     this.rxStomp = new RxStomp();
     this.rxStomp.configure(myRxStompConfig);
     this.rxStomp.activate();
@@ -73,21 +80,21 @@ export class DashboardLayout implements OnInit, OnDestroy {
               break;
 
             case 'INVITE':
-              window.dispatchEvent(new CustomEvent('nueva-invitacion'));
               this.mostrarToast(notification);
+              this.notificationBus.emit(AppEventType.NEW_INVITE);
               break;
 
             case 'VEHICLE_REQUEST':
-              window.dispatchEvent(new CustomEvent('recargar-coches'));
               this.mostrarToast(notification, "Ve a 'Mis Vehículos' para autorizar el ingreso.");
+              this.notificationBus.emit(AppEventType.RELOAD_VEHICLES);
               break;
 
             case 'NEW_EMPLOYEE':
-              window.dispatchEvent(new CustomEvent('recargar-empleados'));
+              this.notificationBus.emit(AppEventType.RELOAD_EMPLOYEES);
               break;
 
             case 'NEW_FLEET_VEHICLE':
-              window.dispatchEvent(new CustomEvent('recargar-coches'));
+              this.notificationBus.emit(AppEventType.RELOAD_VEHICLES);
               break;
 
             default:

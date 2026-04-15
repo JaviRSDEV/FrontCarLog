@@ -1,11 +1,16 @@
 import { UserService } from './../../../../services/userService/user.service';
 import { TallerService } from './../../../../services/tallerService/taller.service';
 import { CommonModule, UpperCasePipe } from '@angular/common';
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { User } from '../../../../models/user';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import Swal from 'sweetalert2';
+import {
+  AppEventType,
+  NotificationBusService,
+} from '../../../../services/notification-bus/notification-bus.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-employee-list',
@@ -21,28 +26,25 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
   editingRoleDni: string | null = null;
   selectedRole: string = '';
 
-  private empleadosListener = () => {
-    this.ngZone.run(() => {
-      setTimeout(() => {
-        this.cargarListaEmpleados();
-      }, 500);
-    });
-  };
-
+  private eventSub!: Subscription;
   constructor(
     private userService: UserService,
     private tallerService: TallerService,
     private cdr: ChangeDetectorRef,
-    private ngZone: NgZone,
+    private notificationBus: NotificationBusService,
   ) {}
 
   ngOnInit(): void {
     this.cargarListaEmpleados();
-    window.addEventListener('recargar-empleados', this.empleadosListener);
+    this.eventSub = this.notificationBus.on(AppEventType.RELOAD_EMPLOYEES).subscribe(() => {
+      this.cargarListaEmpleados();
+    });
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener('recargar-empleados', this.empleadosListener);
+    if (this.eventSub) {
+      this.eventSub.unsubscribe();
+    }
   }
 
   cargarListaEmpleados() {

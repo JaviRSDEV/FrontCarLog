@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, OnDestroy, NgZone } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -14,6 +14,11 @@ import { VehicleCardComponent } from '../vehicle-card.component/vehicle-card.com
 import { VehicleDetailModalComponent } from '../vehicle-detail-modal.component/vehicle-detail-modal.component';
 import { SearchComponent } from '../search-component/search.component/search.component';
 import Swal from 'sweetalert2';
+import {
+  AppEventType,
+  NotificationBusService,
+} from '../../../services/notification-bus/notification-bus.service';
+import { Subscription } from 'rxjs';
 
 type TabType = 'mis-vehiculos' | 'asignados' | 'flota';
 
@@ -49,20 +54,14 @@ export class VehicleListComponent implements OnInit, OnDestroy {
   vehiculoSeleccionado: Vehicle | null = null;
   matriculaBuscada: string = '';
 
-  private recargarListener = () => {
-    this.ngZone.run(() => {
-      setTimeout(() => {
-        this.cargarDatos(this.activeTab);
-      }, 500);
-    });
-  };
+  private eventSub!: Subscription;
 
   constructor(
     private vehicleService: VehicleService,
     private workOrderService: WorkOrderService,
     private cdr: ChangeDetectorRef,
-    private ngZone: NgZone,
     private router: Router,
+    private notificationBus: NotificationBusService,
   ) {}
 
   ngOnInit(): void {
@@ -83,11 +82,15 @@ export class VehicleListComponent implements OnInit, OnDestroy {
 
     this.cargarDatos(this.activeTab);
 
-    window.addEventListener('recargar-coches', this.recargarListener);
+    this.eventSub = this.notificationBus.on(AppEventType.RELOAD_VEHICLES).subscribe(() => {
+      this.cargarDatos(this.activeTab);
+    });
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener('recargar-coches', this.recargarListener);
+    if (this.eventSub) {
+      this.eventSub.unsubscribe();
+    }
   }
 
   buscarVehiculos(texto: string): void {
