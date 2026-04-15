@@ -3,12 +3,13 @@ import { Workorder } from '../../models/workorder';
 import { WorkOrderLine } from '../../models/workorderline';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root',
 })
 export class WorkOrderService {
-  private apiUrl = 'http://localhost:8081/api/workorders';
+  private apiUrl = `${environment.apiUrl}/workorders`;
 
   constructor(private http: HttpClient) {}
 
