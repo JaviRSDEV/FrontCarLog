@@ -12,6 +12,7 @@ import { WorkOrdersComponent } from './components/shared/work-orders.component/w
 import { WorkOrderDetailComponent } from './components/shared/work-order-detail.component/work-order-detail.component';
 import { GestionTallerComponent } from './components/shared/gestion-taller-component/gestion-taller.component/gestion-taller.component';
 import { VehicleHistoryComponent } from './components/shared/vehicle-history-component/vehicle-history.component/vehicle-history.component';
+import { VisualizarTallerComponent } from './components/shared/visualizar-taller/visualizar-taller.component/visualizar-taller.component';
 export const routes: Routes = [
   {
     path: '',
@@ -64,6 +65,11 @@ export const routes: Routes = [
       {
         path: 'historial/:plate',
         component: VehicleHistoryComponent,
+        canActivate: [tallerGuard],
+      },
+      {
+        path: 'workShop',
+        component: VisualizarTallerComponent,
         canActivate: [tallerGuard],
       },
     ],

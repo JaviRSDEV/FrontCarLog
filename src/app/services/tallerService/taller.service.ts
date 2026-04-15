@@ -3,12 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Workshop } from '../../models/workshop';
 import { User } from '../../models/user';
+import { environment } from '../../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TallerService {
-  private apiUrl = 'http://localhost:8081/api/workshop';
+  private apiUrl = `${environment.apiUrl}/workshop`;
 
   constructor(private http: HttpClient) {}
 
@@ -22,5 +23,13 @@ export class TallerService {
 
   getTallerPorId(workshopId: number): Observable<Workshop> {
     return this.http.get<Workshop>(`${this.apiUrl}/details/${workshopId}`);
+  }
+
+  actualizarTaller(workshopId: number, datosTaller: Workshop): Observable<Workshop> {
+    return this.http.put<Workshop>(`${this.apiUrl}/details/${workshopId}`, datosTaller);
+  }
+
+  actualizarTallerConFoto(workshopId: number, formData: FormData): Observable<any> {
+    return this.http.put(`${this.apiUrl}/details/${workshopId}`, formData);
   }
 }

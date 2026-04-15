@@ -1,53 +1,110 @@
 <div class="container d-flex justify-content-center align-items-center h-100 mt-4">
-  <div class="card card-taller shadow-lg p-5 border-0">
-
+  <div class="card card-taller shadow-lg p-5 border-0 rounded-4" style="max-width: 600px">
     <div class="text-center mb-4">
-      <h2 class="fw-bold" style="color: #004E7C">Configura tu <span style="color: #00AEEF">Taller</span></h2>
+      <h2 class="fw-bold" style="color: #004e7c">
+        Configura tu <span style="color: #00aeef">Taller</span>
+      </h2>
       <p class="text-muted">Completa todos los datos de tu negocio para poder darlo de alta</p>
     </div>
 
     <form [formGroup]="tallerForm" (ngSubmit)="onSubmit()">
-
       <div class="mb-3 text-start">
         <label class="fw-bold mb-1 text-secondary">Nombre del taller</label>
-        <input type="text" class="form-control form-control-lg rounded-4" formControlName="workshopName" placeholder="Nombre del taller">
-        @if (tallerForm.get('workshopName')?.invalid && tallerForm.get('workshopName')?.touched){
+        <input
+          type="text"
+          class="form-control form-control-lg rounded-4"
+          formControlName="workshopName"
+          placeholder="Nombre del taller"
+        />
+        @if (tallerForm.get('workshopName')?.invalid && tallerForm.get('workshopName')?.touched) {
           <small class="text-danger fw-semibold">El nombre es obligatorio</small>
         }
       </div>
 
-      <div class="row">
-        <div class="col-md-12 mb-3 text-start">
-          <label class="fw-bold mb-1 text-secondary">Correo electrónico del taller</label>
-          <input type="email" class="form-control form-control-lg rounded-4" formControlName="workshopEmail" placeholder="taller@ejemplo.com">
-          @if (tallerForm.get('workshopEmail')?.invalid && tallerForm.get('workshopEmail')?.touched){
-            <small class="text-danger fw-semibold">Introduce un email válido</small>
-          }
-        </div>
+      <div class="mb-3 text-start">
+        <label class="fw-bold mb-1 text-secondary">Correo electrónico del taller</label>
+        <input
+          type="email"
+          class="form-control form-control-lg rounded-4"
+          formControlName="workshopEmail"
+          placeholder="taller@ejemplo.com"
+        />
+        @if (tallerForm.get('workshopEmail')?.invalid && tallerForm.get('workshopEmail')?.touched) {
+          <small class="text-danger fw-semibold">Introduce un email válido</small>
+        }
       </div>
 
       <div class="row">
-        <div class="col-md-6 mb-4 text-start">
-          <label class="fw-bold mb-1 text-secondary">Dirección del taller</label>
-          <input type="text" class="form-control form-control-lg rounded-4" formControlName="address" placeholder="Calle Ejemplo, 123. Madrid">
-          @if(tallerForm.get('address')?.invalid && tallerForm.get('address')?.touched){
+        <div class="col-md-6 mb-3 text-start">
+          <label class="fw-bold mb-1 text-secondary">Dirección</label>
+          <input
+            type="text"
+            class="form-control form-control-lg rounded-4"
+            formControlName="address"
+            placeholder="Calle Ejemplo, 123"
+          />
+          @if (tallerForm.get('address')?.invalid && tallerForm.get('address')?.touched) {
             <small class="text-danger fw-semibold">La dirección es obligatoria</small>
           }
         </div>
 
-        <div class="col-md-6 mb-4 text-start">
-          <label class="fw-bold mb-1 text-secondary">Teléfono del taller</label>
-          <input type="text" class="form-control form-control-lg rounded-4" formControlName="workshopPhone" placeholder="600 000 000">
-          @if(tallerForm.get('workshopPhone')?.invalid && tallerForm.get('workshopPhone')?.touched){
+        <div class="col-md-6 mb-3 text-start">
+          <label class="fw-bold mb-1 text-secondary">Teléfono</label>
+          <input
+            type="text"
+            class="form-control form-control-lg rounded-4"
+            formControlName="workshopPhone"
+            placeholder="600 000 000"
+          />
+          @if (
+            tallerForm.get('workshopPhone')?.invalid && tallerForm.get('workshopPhone')?.touched
+          ) {
             <small class="text-danger fw-semibold">El teléfono es obligatorio</small>
           }
         </div>
       </div>
 
-      <button type="submit" class="btn w-100 btn-lg rounded-pill text-white fw-bold shadow-sm" style="background-color: #00AEEF;" [disabled]="tallerForm.invalid">
+      <div class="mb-4 text-start">
+        <label class="fw-bold mb-1 text-secondary">Logo o Imagen del taller</label>
+        <input
+          type="file"
+          class="form-control rounded-4"
+          accept="image/*"
+          (change)="onFileSelected($event)"
+        />
+
+        @if (imagenTemporal) {
+          <div class="mt-3 position-relative d-inline-block">
+            <img
+              [src]="imagenTemporal"
+              class="rounded shadow-sm border"
+              style="width: 120px; height: 120px; object-fit: cover"
+            />
+            <button
+              type="button"
+              class="btn btn-danger btn-sm position-absolute top-0 end-0 translate-middle rounded-circle shadow"
+              style="width: 25px; height: 25px; padding: 0"
+              (click)="eliminarImagen()"
+              title="Quitar logo"
+            >
+              <i class="bi bi-x"></i>
+            </button>
+          </div>
+        } @else {
+          <div class="form-text mt-2">
+            Sube una imagen para que tus clientes reconozcan tu marca.
+          </div>
+        }
+      </div>
+
+      <button
+        type="submit"
+        class="btn w-100 btn-lg rounded-pill text-white fw-bold shadow-sm mt-2"
+        style="background-color: #00aeef"
+        [disabled]="tallerForm.invalid"
+      >
         Crear taller
       </button>
-
     </form>
   </div>
 </div>
