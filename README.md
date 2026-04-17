@@ -1,5 +1,7 @@
-# CarLog — Plataforma de Gestión de Taller Mecánico
-
+# CarLog(FrontEnd) — Plataforma de Gestión de Taller Mecánico
+![Angular](https://img.shields.io/badge/Angular-v21-DD0031?style=flat&logo=angular)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat&logo=typescript)
+![RxJS](https://img.shields.io/badge/RxJS-Reactive-B7178C?style=flat&logo=reactivex)
 
 
 CarLog es una aplicación web que digitaliza el ciclo de vida completo del mantenimiento vehicular: desde el alta del taller hasta la facturación detallada por órdenes de trabajo. Ofrece interfaces especializadas y adaptadas para tres roles de usuario: **Gerentes**, **Mecánicos** y **Clientes**.
