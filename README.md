@@ -1,5 +1,3 @@
-```markdown
-
 # CarLog — Plataforma de Gestión de Taller Mecánico
 
 
