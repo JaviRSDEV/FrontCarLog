@@ -63,7 +63,7 @@ CarLog es una aplicación web que digitaliza el ciclo de vida completo del mante
 | Bootstrap       | 5.3     |
 | Bootstrap Icons | 1.13    |
 | Tailwind CSS    | 4.1     |
-| Vitest          | 40      |
+| Vitest          | 4.0+    |
 | Node.js         | 20+     |
 | npm             | 11+     |
 | RxStomp         | 1.2     |
