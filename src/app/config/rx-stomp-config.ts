@@ -1,8 +1,10 @@
 import { RxStompConfig } from '@stomp/rx-stomp';
+import SockJS from 'sockjs-client';
 
 export const myRxStompConfig: RxStompConfig = {
-  brokerURL: 'ws://localhost:8081/ws-carlog',
-
+  webSocketFactory: () => {
+    return new SockJS('http://localhost:8081/ws-carlog');
+  },
   heartbeatIncoming: 0,
   heartbeatOutgoing: 20000,
   reconnectDelay: 200,
