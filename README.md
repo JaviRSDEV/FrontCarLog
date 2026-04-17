@@ -270,34 +270,20 @@ graph TD
 
 
 
-| Ruta                          | Componente                  | Guard(s)                        |
-
-|-------------------------------|-----------------------------|---------------------------------|
-
-| `/`                           | `Login`                     | `loginGuard`                    |
-
-| `/dashboard`                  | `DashboardLayout`           | `authguardGuard`                |
-
-| `/dashboard` (home)           | `DashboardComponent`        | `tallerGuard`                   |
-
-| `/dashboard/vehiculos`        | `VehicleListComponent`      | `tallerGuard`                   |
-
-| `/dashboard/mantenimientos`   | `WorkOrdersComponent`       | `tallerGuard`                   |
-
-| `/dashboard/mantenimientos/:id` | `WorkOrderDetailComponent` | `tallerGuard`                   |
-
-| `/dashboard/taller`           | `GestionTallerComponent`    | `tallerGuard`                   |
-
-| `/dashboard/perfil`           | `GestionTallerComponent`    | `tallerGuard`                   |
-
-| `/dashboard/historial/:plate` | `VehicleHistoryComponent`   | `tallerGuard`                   |
-
-| `/dashboard/workShop`         | `VisualizarTallerComponent` | `tallerGuard`                   |
-
-| `/dashboard/alta-taller`      | `AltaTaller`                | `altaTallerGuard`               |
-
-| `**`                          | Redirect → `/dashboard`     | —                               |
-
+| Ruta                          | Componente                | Guard(s)        |
+|-------------------------------|---------------------------|-----------------|
+| /                             | Login                     | loginGuard      |
+| /dashboard                    | DashboardLayout           | authguardGuard  |
+| /dashboard (home)             | DashboardComponent        | tallerGuard     |
+| /dashboard/vehiculos          | VehicleListComponent      | tallerGuard     |
+| /dashboard/mantenimientos     | WorkOrdersComponent       | tallerGuard     |
+| /dashboard/mantenimientos/:id | WorkOrderDetailComponent  | tallerGuard     |
+| /dashboard/taller             | GestionTallerComponent    | tallerGuard     |
+| /dashboard/perfil             | GestionTallerComponent    | tallerGuard     |
+| /dashboard/historial/:plate   | VehicleHistoryComponent   | tallerGuard     |
+| /dashboard/workShop           | VisualizarTallerComponent | tallerGuard     |
+| /dashboard/alta-taller        | AltaTaller                | altaTallerGuard |
+| **                            | Redirige a /dashboard     |                 |
 
 
 ### Guards de seguridad
@@ -338,17 +324,12 @@ flowchart TD
 
 
 
-| Guard             | Función                                                                 |
-
-|-------------------|-------------------------------------------------------------------------|
-
-| `loginGuard`      | Redirige al dashboard si el usuario ya está autenticado                 |
-
-| `authguardGuard`  | Protege todas las rutas del dashboard; requiere sesión activa           |
-
-| `tallerGuard`     | Verifica que el gerente tenga un taller registrado                      |
-
-| `altaTallerGuard` | Controla el acceso al formulario de alta de taller                      |
+| Guard           | Función                                                           |
+|-----------------|-------------------------------------------------------------------|
+| loginGuard      | Redirige al dashboard si el usuario ya está autenticado           |
+| authguardGuard  | Protege todas las rutas del dashboard; requiere una sesión activa |
+| tallerGuard     | Verifica que el gerente tenga un taller registrado                |
+| altatallerGuard | Controla el acceso al formulario de alta de taller                |
 
 
 
@@ -401,13 +382,9 @@ Sistema completo de ciclo de vida vehicular con flujo de solicitud/aprobación:
 
 
 | Acción              | Endpoint                        | Actor    |
-
 |---------------------|---------------------------------|----------|
-
 | Solicitar entrada   | `PUT /request-entry/{id}`       | Cliente  |
-
 | Aprobar entrada     | `PUT /approve-entry`            | Gerente  |
-
 | Registrar salida    | `POST /exit/{id}`               | Gerente  |
 
 
@@ -435,17 +412,11 @@ Control de acceso por rol:
 
 
 | Acción                  | Gerente/Co-Gerente | Mecánico | Cliente |
-
 |-------------------------|--------------------|----------|---------|
-
 | Ver lista               | Todas del taller   | Solo asignadas | No |
-
 | Crear orden             | Sí                 | Sí       | No      |
-
 | Reasignar mecánico      | Sí                 | No       | No      |
-
 | Eliminar orden          | Sí                 | Sí       | No      |
-
 | Editar líneas de facturación | Sí           | Sí       | No      |
 
 
@@ -481,109 +452,57 @@ Visualización y edición del perfil personal, incluyendo datos del taller asoci
 src/
 
 ├── app/
-
 │   ├── components/shared/
-
 │   │   ├── alta-taller/                    # Registro de nuevo taller
-
 │   │   ├── dashboard.component/            # Vista principal del dashboard
-
 │   │   ├── gestion-taller-component/       # Gestión de taller y empleados
-
 │   │   ├── header/                         # Cabecera
-
 │   │   ├── navbar/                         # Barra de navegación lateral
-
 │   │   ├── footer/                         # Pie de página
-
 │   │   ├── profile-card/                   # Tarjeta de perfil de usuario
-
 │   │   ├── search/                         # Componente de búsqueda
-
 │   │   ├── vehicle-card.component/         # Tarjeta de vehículo
-
 │   │   ├── vehicle-detail-modal.component/ # Modal de detalle de vehículo
-
 │   │   ├── vehicle-form.component/         # Formulario de vehículo
-
 │   │   ├── vehicle-history-component/      # Historial de mantenimientos
-
 │   │   ├── vehicle-list-component/         # Listado de vehículos
-
 │   │   ├── visualizar-taller/              # Perfil público del taller
-
 │   │   ├── work-order-detail.component/    # Detalle de orden de trabajo
-
 │   │   ├── work-order-form.component/      # Formulario de orden de trabajo
-
 │   │   ├── work-order-lines.component/     # Líneas de facturación
-
 │   │   └── work-orders.component/          # Listado de órdenes de trabajo
-
 │   ├── config/
-
 │   │   └── rx-stomp-config.ts              # Configuración WebSocket STOMP
-
 │   ├── core/guards/
-
 │   │   ├── auth-guard/                     # authguardGuard
-
 │   │   ├── login-guard/                    # loginGuard
-
 │   │   ├── taller-guard/                   # tallerGuard
-
 │   │   └── alta-taller-guard/              # altaTallerGuard
-
 │   ├── interceptors/
-
 │   │   ├── auth-interceptor.ts             # Adjunta credenciales JWT
-
 │   │   └── error-interceptor.ts            # Manejo global de errores HTTP
-
 │   ├── models/
-
 │   │   ├── auth.ts                         # Respuesta de autenticación
-
 │   │   ├── user.ts                         # Usuario y roles
-
 │   │   ├── vehicle.ts                      # Vehículo
-
 │   │   ├── workorder.ts                    # Orden de trabajo
-
 │   │   ├── workorderline.ts                # Línea de facturación
-
 │   │   └── workshop.ts                     # Taller
-
 │   ├── pages/
-
 │   │   ├── login/                          # Página de inicio de sesión
-
 │   │   └── dashboard-layout/               # Layout protegido del dashboard
-
 │   ├── services/
-
 │   │   ├── authService/                    # Login, registro, logout
-
 │   │   ├── tallerService/                  # CRUD de taller
-
 │   │   ├── userService/                    # Perfil e invitaciones
-
 │   │   ├── vehicleService/                 # CRUD y flujo de vehículos
-
 │   │   ├── workOrderService/               # CRUD de órdenes y líneas
-
 │   │   └── shared-notification/            # Bus interno de eventos
-
 │   ├── app.config.ts                       # Providers globales
-
 │   ├── app.routes.ts                       # Definición de rutas
-
 │   ├── app.html                            # Template raíz
-
 │   └── app.ts                              # Componente raíz
-
 └── environments/
-
     └── enviroment.example.ts               # Plantilla de configuración
 
 ```
@@ -599,19 +518,12 @@ src/
 
 
 | Interfaz         | Clave primaria | Relaciones principales                                    |
-
 |------------------|----------------|-----------------------------------------------------------|
-
 | `User`           | `dni`          | Tiene muchos `Vehicle`, pertenece a `Workshop`            |
-
 | `Vehicle`        | `plate`        | Propiedad de `User`, asociado a `Workshop`                |
-
 | `Workshop`       | `workshopId`   | Contiene muchos `Vehicle` y `User` (empleados)            |
-
 | `Workorder`      | `id`           | Referencia `Vehicle`, `User` (mecánico) y `Workshop`      |
-
-| `WorkOrderLine`  | —              | Pertenece a `Workorder`, calcula subtotal con IVA         |
-
+| `WorkOrderLine`  | `id`           | Pertenece a `Workorder`, calcula subtotal con IVA         |
 | `Auth`           | —              | Respuesta de autenticación con token JWT y rol            |
 
 
@@ -659,17 +571,11 @@ graph TD
 
 
 | Tipo               | Efecto                                                        |
-
 |--------------------|---------------------------------------------------------------|
-
 | `FIRE`             | Cierra sesión del empleado despedido inmediatamente           |
-
 | `INVITE`           | Notifica al usuario de una invitación a un taller             |
-
 | `VEHICLE_REQUEST`  | Recarga la lista de vehículos del taller                      |
-
 | `NEW_EMPLOYEE`     | Recarga la lista de empleados                                 |
-
 | `NEW_FLEET_VEHICLE`| Recarga la flota del taller                                   |
 
 
@@ -699,15 +605,10 @@ npm test
 
 
 | Categoría   | Ficheros spec                                                  |
-
 |-------------|----------------------------------------------------------------|
-
 | Guards      | `authguard.spec.ts`, `login-guard.spec.ts`, `taller-guard.spec.ts`, `alta-taller-guard.spec.ts` |
-
 | Servicios   | `authService.spec.ts`, `TallerService.spec.ts`, `user.service.spec.ts`, `vehicle.spec.ts` |
-
 | Componentes | `app.spec.ts`, `navbar.spec.ts`, `dashboard-layout.spec.ts`, `login.spec.ts` |
-
 | Interceptores | `auth-interceptor.spec.ts`                                  |
 
 
@@ -729,17 +630,11 @@ La aplicación se conecta a una API REST Spring Boot. Todos los servicios usan `
 
 
 | Servicio           | Base URL                  |
-
 |--------------------|---------------------------|
-
 | Auth               | `/auth`                   |
-
 | Vehículos          | `/api/vehicles`           |
-
 | Órdenes de trabajo | `/workorders`             |
-
 | Taller             | *(configurado en TallerService)* |
-
 | WebSocket          | `ws://localhost:8081/ws-carlog` |
 
 
@@ -759,33 +654,3 @@ La URL base de la API se configura mediante el fichero de entorno (`environment.
 Este proyecto es privado. Consulta con el propietario del repositorio para más información.
 
 ```
-
-
-
----
-
-
-
-Este README cubre:
-
-
-
-- **Instalación y configuración** completa incluyendo los ficheros de entorno
-
-- **Arquitectura** con diagrama del flujo de componentes
-
-- **Tabla de rutas** completa con guards asociados
-
-- **Diagramas de flujo** de seguridad y navegación
-
-- **Todas las funcionalidades** documentadas con tablas de control de acceso por rol
-
-- **Estructura de directorios** anotada
-
-- **Modelos de datos** y sus relaciones
-
-- **Sistema WebSocket** con tipos de notificaciones
-
-- **Testing** con cobertura por categorías
-
-- **Referencia de endpoints** del backend
