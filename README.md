@@ -200,18 +200,12 @@ ws://localhost:8081/ws-carlog
 
 
 
-| Comando            | Descripción                                              |
-
-|--------------------|----------------------------------------------------------|
-
-| `npm start`        | Inicia el servidor de desarrollo en `http://localhost:4200` |
-
-| `npm run build`    | Compila el proyecto para producción en `dist/`           |
-
-| `npm run watch`    | Compila en modo watch (recarga automática)               |
-
-| `npm test`         | Ejecuta los tests unitarios con Vitest                   |
-
+| Comando       | Descripción                                        |
+|---------------|----------------------------------------------------|
+| npm start     | Inicia el servidor de desarrollo en el puerto 4200 |
+| npm run build | Compila el proyecto para producción en dist/       |
+| npm run watch | Compila en modo watch (recarga automática)         |
+| npm test      | Ejecuta los tests unitarios con vitest             |
 
 
 ---
