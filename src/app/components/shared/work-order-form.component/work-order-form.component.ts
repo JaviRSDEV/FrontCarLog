@@ -3,6 +3,7 @@ import { Component, OnInit, EventEmitter, Input, Output, ChangeDetectorRef } fro
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { VehicleService } from '../../../services/vehicleService/vehicle.service';
 import { Vehicle } from '../../../models/vehicle';
+import { Page } from '../../../models/page.model';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
@@ -40,8 +41,8 @@ export class WorkOrderFormComponent implements OnInit {
 
   cargarVehiculos(): void {
     this.vehicleService.getAllVehicles().subscribe({
-      next: (data: Vehicle[]) => {
-        this.vehiculosFlota = data;
+      next: (data: Page<Vehicle>) => {
+        this.vehiculosFlota = data.content;
         this.cdr.detectChanges();
       },
       error: (err: HttpErrorResponse) => {

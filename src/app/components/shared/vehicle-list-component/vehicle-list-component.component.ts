@@ -1,3 +1,4 @@
+import { Page } from './../../../models/page.model';
 import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
@@ -54,6 +55,11 @@ export class VehicleListComponent implements OnInit, OnDestroy {
   vehiculoSeleccionado: Vehicle | null = null;
   matriculaBuscada: string = '';
 
+  // Variables de paginación
+  currentPage: number = 0;
+  pageSize: number = 10;
+  totalElements: number = 0;
+
   private eventSub!: Subscription;
 
   constructor(
@@ -93,9 +99,9 @@ export class VehicleListComponent implements OnInit, OnDestroy {
     }
   }
 
-  buscarVehiculos(texto: string): void {
+  buscarVehiculos(texto: string, page: number = 0): void {
     if (!texto.trim()) {
-      this.cargarDatos(this.activeTab);
+      this.cargarDatos(this.activeTab, page);
       return;
     }
 
@@ -103,39 +109,56 @@ export class VehicleListComponent implements OnInit, OnDestroy {
     if (this.activeTab === 'flota') searchType = 'WORKSHOP';
     else if (this.activeTab === 'asignados') searchType = 'ASSIGNED';
 
-    this.vehicleService.searchVehicles(texto, this.workshopId, searchType).subscribe({
-      next: (data: Vehicle[]) => {
-        if (this.activeTab === 'flota') {
-          this.flotaTaller = data;
-        } else if (this.activeTab === 'asignados') {
-          this.vehiculosAsignados = data;
-        } else {
-          this.misVehiculos = data;
-        }
-        this.cdr.detectChanges();
-      },
-      error: (err: HttpErrorResponse) => console.error('Error en la búsqueda', err),
-    });
+    this.vehicleService
+      .searchVehicles(texto, this.workshopId, searchType, page, this.pageSize)
+      .subscribe({
+        next: (data: Page<Vehicle>) => {
+          // 🚨 AQUÍ EXTRAEMOS EL .content
+          if (this.activeTab === 'flota') {
+            this.flotaTaller = data.content;
+          } else if (this.activeTab === 'asignados') {
+            this.vehiculosAsignados = data.content;
+          } else {
+            this.misVehiculos = data.content;
+          }
+
+          // Guardamos los datos de paginación
+          this.totalElements = data.totalElements;
+          this.currentPage = data.number;
+
+          this.cdr.detectChanges();
+        },
+        error: (err: HttpErrorResponse) => console.error('Error en la búsqueda', err),
+      });
   }
 
-  cargarDatos(tab: TabType): void {
+  cargarDatos(tab: TabType, page: number = 0): void {
+    this.currentPage = page;
+
     if (tab === 'mis-vehiculos') {
       if (!this.userDni) return;
-      this.vehicleService.getVehiclesByOwner(this.userDni).subscribe({
-        next: (data: Vehicle[]) => {
-          this.misVehiculos = data;
+      this.vehicleService.getVehiclesByOwner(this.userDni, page, this.pageSize).subscribe({
+        next: (data: Page<Vehicle>) => {
+          this.misVehiculos = data.content; // 🚨 EXTRAEMOS .content
+          this.totalElements = data.totalElements;
           this.cdr.detectChanges();
         },
         error: (err: HttpErrorResponse) => console.error(err),
       });
     } else if (tab === 'asignados') {
       if (!this.userDni) return;
+
+      // Asumo que WorkOrderService AÚN devuelve un array normal (no paginado en Angular).
+      // Si también lo paginaste, aquí tendrías que poner data.content
       this.workOrderService.getWorkOrdersByMechanic(this.userDni).subscribe({
-        next: (data: Workorder[]) => {
-          this.ordenesAsignadas = data;
+        next: (data: Workorder[] | any) => {
+          // Parche temporal: si 'data' viene paginado, usamos data.content. Si no, usamos data.
+          const arrayDatos = data.content ? data.content : data;
+
+          this.ordenesAsignadas = arrayDatos;
 
           const cochesUnicos = new Map<string, Vehicle>();
-          data.forEach((orden) => {
+          arrayDatos.forEach((orden: any) => {
             if (
               orden.vehicle &&
               orden.status !== 'COMPLETED' &&
@@ -152,15 +175,18 @@ export class VehicleListComponent implements OnInit, OnDestroy {
       });
     } else if (tab === 'flota') {
       if (!this.workshopId) return;
-      this.vehicleService.getVehiclesByWorkshop(this.workshopId).subscribe({
-        next: (data: Vehicle[]) => {
-          this.flotaTaller = data;
+      this.vehicleService.getVehiclesByWorkshop(this.workshopId, page, this.pageSize).subscribe({
+        next: (data: Page<Vehicle>) => {
+          this.flotaTaller = data.content; // 🚨 EXTRAEMOS .content
+          this.totalElements = data.totalElements;
           this.cdr.detectChanges();
         },
         error: (err: HttpErrorResponse) => console.error(err),
       });
     }
   }
+
+  // ... (El resto de tus métodos como irAlHistorial, cambiarPestana, eliminarVehiculo, etc., se quedan EXACTAMENTE igual)
 
   irAlHistorial(plate: string): void {
     this.router.navigate(['/dashboard/historial', plate]);
@@ -169,7 +195,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
   cambiarPestana(pestana: TabType): void {
     this.activeTab = pestana;
     this.mostrarFormulario = false;
-    this.cargarDatos(pestana);
+    this.cargarDatos(pestana, 0); // Cargamos la página 0 al cambiar de pestaña
   }
 
   toggleFormulario(): void {
@@ -211,7 +237,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
       if (result.isConfirmed) {
         this.vehicleService.deleteVehicle(plate).subscribe({
           next: () => {
-            this.cargarDatos(this.activeTab);
+            this.cargarDatos(this.activeTab, this.currentPage);
             this.vehiculoSeleccionado = null;
           },
           error: (err: HttpErrorResponse) => {
@@ -229,7 +255,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
   }
 
   onVehiculoGuardado(): void {
-    this.cargarDatos(this.activeTab);
+    this.cargarDatos(this.activeTab, this.currentPage);
     this.toggleFormulario();
   }
 
@@ -249,7 +275,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
       if (result.isConfirmed) {
         this.vehicleService.registerExit(plate.toUpperCase(), this.workshopId).subscribe({
           next: () => {
-            this.cargarDatos(this.activeTab);
+            this.cargarDatos(this.activeTab, this.currentPage);
             Swal.fire({
               title: 'Salida Registrada',
               text: 'El vehículo ya no está en el taller.',
@@ -310,7 +336,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
   aprobarSolicitud(plate: string): void {
     this.vehicleService.approveEntry(plate).subscribe({
       next: () => {
-        this.cargarDatos('mis-vehiculos');
+        this.cargarDatos('mis-vehiculos', this.currentPage);
         Swal.fire({
           title: 'Ingreso Aprobado',
           text: 'El taller ya tiene acceso a tu vehículo.',
@@ -338,7 +364,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
   rechazarSolicitud(plate: string): void {
     this.vehicleService.rejectEntry(plate).subscribe({
       next: () => {
-        this.cargarDatos('mis-vehiculos');
+        this.cargarDatos('mis-vehiculos', this.currentPage);
         Swal.fire({
           title: 'Ingreso Rechazado',
           text: 'Has denegado el acceso al taller.',

@@ -1,3 +1,4 @@
+import { Page } from './../../models/page.model';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -13,27 +14,49 @@ export class VehicleService {
 
   constructor(private http: HttpClient) {}
 
-  getVehiclesByWorkshop(workshopId: number): Observable<Vehicle[]> {
-    const params = new HttpParams().set('workshopId', workshopId.toString());
-    return this.http.get<Vehicle[]>(this.apiUrl, { params });
+  getVehiclesByWorkshop(
+    workshopId: number,
+    page: number = 0,
+    size: number = 10,
+  ): Observable<Page<Vehicle>> {
+    const params = new HttpParams()
+      .set('workshopId', workshopId.toString())
+      .set('page', page.toString())
+      .set('size', size.toString());
+    return this.http.get<Page<Vehicle>>(this.apiUrl, { params });
   }
 
-  getVehiclesByOwner(ownerId: string): Observable<Vehicle[]> {
-    const params = new HttpParams().set('ownerId', ownerId);
-    return this.http.get<Vehicle[]>(this.apiUrl, { params });
+  getVehiclesByOwner(
+    ownerId: string,
+    page: number = 0,
+    size: number = 10,
+  ): Observable<Page<Vehicle>> {
+    const params = new HttpParams()
+      .set('ownerId', ownerId)
+      .set('page', page.toString())
+      .set('size', size.toString());
+    return this.http.get<Page<Vehicle>>(this.apiUrl, { params });
   }
 
-  getAllVehicles(): Observable<Vehicle[]> {
-    return this.http.get<Vehicle[]>(this.apiUrl);
+  getAllVehicles(page: number = 0, size: number = 10): Observable<Page<Vehicle>> {
+    const params = new HttpParams().set('page', page.toString()).set('size', size.toString());
+    return this.http.get<Page<Vehicle>>(this.apiUrl, { params });
   }
 
   createVehicle(vehicle: Vehicle): Observable<Vehicle> {
     return this.http.post<Vehicle>(this.apiUrl, vehicle);
   }
 
-  getVehicleInRepair(mechanicId: string): Observable<Vehicle[]> {
-    const params = new HttpParams().set('mechanicId', mechanicId);
-    return this.http.get<Vehicle[]>(`${this.apiUrl}/repairing`, { params });
+  getVehicleInRepair(
+    mechanicId: string,
+    page: number = 0,
+    size: number = 10,
+  ): Observable<Page<Vehicle>> {
+    const params = new HttpParams()
+      .set('mechanicId', mechanicId)
+      .set('page', page.toString())
+      .set('size', size.toString());
+    return this.http.get<Page<Vehicle>>(`${this.apiUrl}/repairing`, { params });
   }
 
   deleteVehicle(plate: string): Observable<string> {
@@ -62,16 +85,26 @@ export class VehicleService {
     return this.http.put<Vehicle>(`${this.apiUrl}/${plate}/reject-entry`, {});
   }
 
+  // OJO: Si paginaste el historial en el backend, esto también devolvería Page<Workorder>
+  // Lo dejo como estaba (Workorder[]) asumiendo que aún no lo has tocado en tu WorkOrderService de Angular
   getHistoryByPlate(plate: string): Observable<Workorder[]> {
     return this.http.get<Workorder[]>(`${this.apiUrl}/${plate}/history`);
   }
 
-  searchVehicles(q: string, workshopId: number, type: string): Observable<Vehicle[]> {
+  searchVehicles(
+    q: string,
+    workshopId: number,
+    type: string,
+    page: number = 0,
+    size: number = 10,
+  ): Observable<Page<Vehicle>> {
     const params = new HttpParams()
       .set('q', q)
       .set('workshopId', workshopId.toString())
-      .set('type', type);
+      .set('type', type)
+      .set('page', page.toString())
+      .set('size', size.toString());
 
-    return this.http.get<Vehicle[]>(`${this.apiUrl}/search`, { params });
+    return this.http.get<Page<Vehicle>>(`${this.apiUrl}/search`, { params });
   }
 }
