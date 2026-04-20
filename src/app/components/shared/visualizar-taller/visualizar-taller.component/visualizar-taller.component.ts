@@ -146,12 +146,17 @@ export class VisualizarTallerComponent implements OnInit {
     const formData = new FormData();
     const { icon, ...datosSinIcono } = this.datosEdicion;
 
-    formData.append('workshopData', JSON.stringify(datosSinIcono));
+    const jsonBlob = new Blob([JSON.stringify(datosSinIcono)], {
+      type: 'application/json',
+    });
+    formData.append('workshopData', jsonBlob);
 
     if (this.imagenTemporal && this.imagenTemporal.startsWith('data:image')) {
       const blob = await (await fetch(this.imagenTemporal)).blob();
       const fileName = `${this.workshopData.workshopName.replace(/\s+/g, '_')}_icon.webp`;
       formData.append('file', blob, fileName);
+    } else if (this.imagenTemporal === null) {
+      formData.append('deleteIcon', 'true');
     }
 
     this.tallerService.actualizarTallerConFoto(this.workshopData.workshopId, formData).subscribe({
