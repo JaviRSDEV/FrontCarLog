@@ -66,7 +66,7 @@ export class Login {
     if (this.loginForm.valid) {
       this.authService.login(this.loginForm.value).subscribe({
         next: (basicUser: User) => {
-          this.userService.getUserByDni(basicUser.dni).subscribe({
+          this.userService.getUserByDni().subscribe({
             next: (fullUser: User) => {
               const rememberMe = this.loginForm.value.rememberMe;
               const storage = rememberMe ? localStorage : sessionStorage;

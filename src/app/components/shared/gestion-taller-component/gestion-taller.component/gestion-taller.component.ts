@@ -38,25 +38,21 @@ export class GestionTallerComponent implements OnInit {
         this.role = (localUser.role || '').replace(/"/g, '').toUpperCase();
         this.isManager = this.role === 'MANAGER' || this.role === 'CO_MANAGER';
 
-        const dniBuscado = localUser.dni;
+        this.userService.getUserByDni().subscribe({
+          next: (fullUser: User) => {
+            this.user = {
+              ...fullUser,
+              workshop: fullUser.workshop || localUser.workshop,
+            };
 
-        if (dniBuscado) {
-          this.userService.getUserByDni(dniBuscado).subscribe({
-            next: (fullUser: User) => {
-              this.user = {
-                ...fullUser,
-                workshop: fullUser.workshop || localUser.workshop,
-              };
+            this.actualizarStorage(this.user);
 
-              this.actualizarStorage(this.user);
-
-              this.cdr.detectChanges();
-            },
-            error: (err: HttpErrorResponse) => {
-              console.error('Error al traer los datos completos del usuario', err);
-            },
-          });
-        }
+            this.cdr.detectChanges();
+          },
+          error: (err: HttpErrorResponse) => {
+            console.error('Error al traer los datos completos del usuario', err);
+          },
+        });
       } catch (e) {
         console.error('Error al parsear el usuario del storage', e);
       }

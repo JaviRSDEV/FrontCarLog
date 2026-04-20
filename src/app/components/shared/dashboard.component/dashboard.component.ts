@@ -57,30 +57,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (!userJson) return;
 
     const localUser = JSON.parse(userJson);
-    const dniBuscado = localUser.dni;
 
-    if (dniBuscado) {
-      this.userService.getUserByDni(dniBuscado).subscribe({
-        next: (fullUser: User) => {
-          this.user = fullUser;
-          this.role = this.user.role;
-          this.userName = this.user.name || this.user.email.split('@')[0];
+    this.userService.getUserByDni().subscribe({
+      next: (fullUser: User) => {
+        this.user = fullUser;
+        this.role = this.user.role;
+        this.userName = this.user.name || this.user.email.split('@')[0];
 
-          if (this.user.workshop) {
-            this.workshop =
-              typeof this.user.workshop === 'string'
-                ? this.user.workshop
-                : this.user.workshop.workshopName;
-          }
+        if (this.user.workshop) {
+          this.workshop =
+            typeof this.user.workshop === 'string'
+              ? this.user.workshop
+              : this.user.workshop.workshopName;
+        }
 
-          this.getStorage().setItem('user', JSON.stringify(this.user));
-          this.cdr.detectChanges();
-        },
-        error: (err: HttpErrorResponse) => {
-          console.error('Error al cargar datos del usuario:', err);
-        },
-      });
-    }
+        this.getStorage().setItem('user', JSON.stringify(this.user));
+        this.cdr.detectChanges();
+      },
+      error: (err: HttpErrorResponse) => {
+        console.error('Error al cargar datos del usuario:', err);
+      },
+    });
   }
 
   gestionarInvitacion(aceptar: boolean) {

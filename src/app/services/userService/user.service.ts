@@ -12,8 +12,8 @@ export class UserService {
 
   constructor(private http: HttpClient) {}
 
-  getUserByDni(dni: string): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/${dni}`);
+  getUserByDni(): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/me`);
   }
 
   edit(userData: User, dni: string): Observable<User> {
