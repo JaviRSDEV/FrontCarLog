@@ -67,6 +67,25 @@
                     <option [ngValue]="0">0%</option>
                   </select>
                 </td>
+                <td class="text-end align-middle text-muted">
+                  <small>Calculando...</small>
+                </td>
+                <td class="text-center align-middle">
+                  <button
+                    class="btn btn-link text-success btn-sm p-0 me-2"
+                    (click)="guardarEdicion()"
+                    title="Guardar cambios"
+                  >
+                    <i class="bi bi-check-lg fs-5"></i>
+                  </button>
+                  <button
+                    class="btn btn-link text-danger btn-sm p-0"
+                    (click)="cancelarEdicion()"
+                    title="Cancelar"
+                  >
+                    <i class="bi bi-x-lg fs-5"></i>
+                  </button>
+                </td>
               </tr>
             } @else {
               <tr>

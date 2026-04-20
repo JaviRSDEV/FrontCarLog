@@ -19,18 +19,31 @@ export const ErrorInterceptor: HttpInterceptorFn = (req, next) => {
         mensajeParaMostrar = 'No hay conexión con el servidor o la petición fue cancelada';
       }
 
-      if (error.status === 401) {
-        console.warn('401 detectado: Limpiando rastro de usuario...');
+      if (error.status === 401 || error.error?.message === 'Bad credentials') {
+        console.warn('401/Login fallido detectado: Limpiando rastro de usuario...');
 
         localStorage.removeItem('user');
         sessionStorage.removeItem('user');
-
         router.navigate(['/login']);
 
-        return throwError(() => error);
-      }
-
-      if (error.status === 403) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Acceso denegado',
+          text: 'Correo o contraseña incorrectos, o sesión caducada.',
+          background: '#212529',
+          color: '#fff',
+          confirmButtonColor: '#dc3545',
+        });
+      } else if (error.status === 429) {
+        Swal.fire({
+          icon: 'warning',
+          title: '¡Demasiados intentos!',
+          text: error.error?.message || 'Por favor, espera 1 minuto antes de volver a intentarlo.',
+          background: '#212529',
+          color: '#fff',
+          confirmButtonColor: '#0d6efd',
+        });
+      } else if (error.status === 403) {
         Swal.fire({
           title: 'Acceso Denegado',
           text: mensajeParaMostrar,
@@ -44,7 +57,6 @@ export const ErrorInterceptor: HttpInterceptorFn = (req, next) => {
           if (msgLower.includes('taller') || msgLower.includes('sesión')) {
             localStorage.removeItem('user');
             sessionStorage.removeItem('user');
-
             router.navigate(['/login']);
           }
         });

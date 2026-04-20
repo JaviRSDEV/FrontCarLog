@@ -95,7 +95,23 @@ export class Login {
         },
         error: (backendError: HttpErrorResponse) => {
           console.error('Error al iniciar sesión:', backendError);
-          this.loginError = 'Correo o contraseña incorrectos. Inténtalo de nuevo.';
+
+          if (backendError.status === 429) {
+            this.loginError =
+              backendError.error?.message || 'Demasiados intentos. Por favor, espera 1 minuto.';
+          } else if (
+            backendError.error?.message === 'Bad credentials' ||
+            backendError.status === 403 ||
+            backendError.status === 401
+          ) {
+            this.loginError = 'Correo o contraseña incorrectos. Inténtalo de nuevo.';
+          } else {
+            this.loginError = 'Ha ocurrido un error al conectar con el servidor.';
+          }
+
+          // 💡 IMPORTANTE: Si estás usando una librería como SweetAlert o Toastr para mostrar el aviso,
+          // lanza el Toast justo aquí usando la variable this.loginError.
+          // Ejemplo: this.toastr.error(this.loginError);
         },
       });
     } else {
@@ -121,9 +137,14 @@ export class Login {
         },
         error: (errorBackend: HttpErrorResponse) => {
           console.error('Error al registrar usuario', errorBackend);
-          this.registerError =
-            errorBackend.error?.message ||
-            'Error al registrarse. Comprueba los datos o si el correo ya existe';
+          if (errorBackend.status === 429) {
+            this.registerError =
+              errorBackend.error?.message || 'Demasiados intentos. Por favor, espera 1 minuto.';
+          } else {
+            this.registerError =
+              errorBackend.error?.message ||
+              'Error al registrarse. Comprueba los datos o si el correo ya existe';
+          }
         },
       });
     } else {
