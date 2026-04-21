@@ -4,6 +4,7 @@ import { DatePipe, DecimalPipe, UpperCasePipe } from '@angular/common';
 import { VehicleService } from '../../../../services/vehicleService/vehicle.service';
 import { Workorder } from '../../../../models/workorder';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Page } from '../../../../models/page.model';
 
 @Component({
   selector: 'app-vehicle-history.component',
@@ -34,8 +35,8 @@ export class VehicleHistoryComponent implements OnInit {
 
   cargarHistorial() {
     this.vehicleService.getHistoryByPlate(this.matricula).subscribe({
-      next: (data: Workorder[]) => {
-        this.historial = data;
+      next: (data: Page<Workorder>) => {
+        this.historial = data.content;
         this.cargando = false;
 
         this.cdr.detectChanges();

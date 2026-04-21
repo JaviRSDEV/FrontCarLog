@@ -85,10 +85,14 @@ export class VehicleService {
     return this.http.put<Vehicle>(`${this.apiUrl}/${plate}/reject-entry`, {});
   }
 
-  // OJO: Si paginaste el historial en el backend, esto también devolvería Page<Workorder>
-  // Lo dejo como estaba (Workorder[]) asumiendo que aún no lo has tocado en tu WorkOrderService de Angular
-  getHistoryByPlate(plate: string): Observable<Workorder[]> {
-    return this.http.get<Workorder[]>(`${this.apiUrl}/${plate}/history`);
+  getHistoryByPlate(
+    plate: string,
+    page: number = 0,
+    size: number = 10,
+  ): Observable<Page<Workorder>> {
+    const params = new HttpParams().set('page', page.toString()).set('size', size.toString());
+
+    return this.http.get<Page<Workorder>>(`${this.apiUrl}/${plate}/history`, { params });
   }
 
   searchVehicles(
