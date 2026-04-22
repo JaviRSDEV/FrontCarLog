@@ -84,5 +84,5 @@ export const ErrorInterceptor: HttpInterceptorFn = (req, next) => {
 function limpiarSesionLocal(router: Router) {
   localStorage.removeItem('user');
   sessionStorage.removeItem('user');
-  router.navigate(['/login']);
+  router.navigate(['/']);
 }
