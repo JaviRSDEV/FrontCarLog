@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 
 import { TallerService } from '../../../../services/tallerService/taller.service';
 import { Auth } from '../../../../services/authService/auth.service';
+import { Workshop } from '../../../../models/workshop';
 
 @Component({
   selector: 'app-visualizar-taller',
@@ -49,8 +50,7 @@ export class VisualizarTallerComponent implements OnInit {
 
     try {
       const user = JSON.parse(userJson);
-      const idTaller =
-        user.workShopId || (user.workshop as any)?.workshopId || (user.workshop as any)?.id;
+      const idTaller = user.workShopId || (user.workshop as Workshop)?.workshopId;
 
       if (idTaller) {
         this.tallerService
@@ -196,7 +196,7 @@ export class VisualizarTallerComponent implements OnInit {
       .actualizarTallerConFoto(currentData.workshopId, formData)
       .pipe(takeUntilDestroyed(this.destroy$))
       .subscribe({
-        next: (res: any) => {
+        next: (res: Workshop) => {
           this.workshopData.set(res);
           this.modoEdicion.set(false);
           this.guardando.set(false);

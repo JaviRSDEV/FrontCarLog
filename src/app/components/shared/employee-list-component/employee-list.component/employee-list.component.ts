@@ -13,6 +13,7 @@ import {
   NotificationBusService,
 } from '../../../../services/notification-bus/notification-bus.service';
 import { User } from '../../../../models/user';
+import { Workshop } from '../../../../models/workshop';
 
 @Component({
   selector: 'app-employee-list',
@@ -49,8 +50,7 @@ export class EmployeeListComponent implements OnInit {
         const user: User = JSON.parse(userJson);
         this.managerDni.set(user.dni);
 
-        const workshopId =
-          user.workShopId || (user.workshop as any)?.workshopId || (user.workshop as any)?.id;
+        const workshopId = user.workShopId || (user.workshop as Workshop)?.workshopId;
 
         if (workshopId) {
           this.tallerService

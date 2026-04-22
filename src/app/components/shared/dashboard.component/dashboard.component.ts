@@ -73,9 +73,9 @@ export class DashboardComponent implements OnInit {
     accion.pipe(takeUntilDestroyed(this.destroy$)).subscribe({
       next: (res: User) => {
         const updatedUser = { ...res };
-        delete (updatedUser as any).pendingWorkshop;
-        delete (updatedUser as any).pendingWorkshopName;
-        delete (updatedUser as any).pendingRole;
+        delete (updatedUser as User).pendingWorkshop;
+        delete (updatedUser as User).pendingWorkshopName;
+        delete (updatedUser as User).pendingRole;
 
         this.user.set(updatedUser);
         this.authService.saveUserToStorage(updatedUser);

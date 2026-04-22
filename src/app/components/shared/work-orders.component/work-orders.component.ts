@@ -10,6 +10,7 @@ import { Auth } from '../../../services/authService/auth.service';
 import { Workorder } from '../../../models/workorder';
 import { User } from '../../../models/user';
 import { WorkOrderFormComponent } from '../work-order-form.component/work-order-form.component';
+import { Workshop } from '../../../models/workshop';
 
 type TabType = 'activas' | 'completadas';
 type VistaType = 'todas' | 'asignadas' | '';
@@ -51,8 +52,7 @@ export class WorkOrdersComponent implements OnInit {
 
         this.role = (user.role || '').toString().replace(/"/g, '').toUpperCase();
         this.userDni = user.dni;
-        this.workshopId =
-          user.workShopId || (user.workshop as any)?.workshopId || (user.workshop as any)?.id || 0;
+        this.workshopId = user.workShopId || (user.workshop as Workshop)?.workshopId;
 
         if (this.role === 'MANAGER' || this.role === 'CO_MANAGER') {
           this.modoVista.set('todas');

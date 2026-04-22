@@ -13,6 +13,7 @@ import { Workorder } from './../../../models/workorder';
 import { WorkOrderLine } from './../../../models/workorderline';
 import { User } from './../../../models/user';
 import { WorkOrderLinesComponent } from '../work-order-lines.component/work-order-lines.component';
+import { Workshop } from '../../../models/workshop';
 
 @Component({
   selector: 'app-work-order-detail',
@@ -46,10 +47,7 @@ export class WorkOrderDetailComponent implements OnInit {
 
         this.esManager.set(role === 'MANAGER' || role === 'CO_MANAGER');
 
-        const miWorkshopId =
-          userData.workShopId ||
-          (userData.workshop as any)?.workshopId ||
-          (userData.workshop as any)?.id;
+        const miWorkshopId = userData.workShopId || (userData.workshop as Workshop)?.workshopId;
 
         if (this.esManager() && miWorkshopId != null) {
           this.cargarMecanicosDelTaller(miWorkshopId);
