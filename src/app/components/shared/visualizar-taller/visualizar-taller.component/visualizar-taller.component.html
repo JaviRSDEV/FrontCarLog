@@ -1,8 +1,8 @@
 <div class="container mt-4 text-white">
   <div class="d-flex align-items-center mb-4">
-    @if (workshopData?.icon) {
+    @if (workshopData()?.icon) {
       <img
-        [src]="workshopData.icon"
+        [src]="workshopData().icon"
         class="rounded-circle shadow me-3 border border-2 border-primary"
         style="width: 80px; height: 80px; object-fit: cover"
       />
@@ -11,8 +11,8 @@
     }
     <div>
       <h2 class="mb-0">
-        @if (workshopData) {
-          {{ workshopData.workshopName }}
+        @if (workshopData()) {
+          {{ workshopData().workshopName }}
         } @else {
           Gestión del taller
         }
@@ -21,20 +21,20 @@
     </div>
   </div>
 
-  @if (cargando) {
+  @if (cargando()) {
     <div class="text-center mt-5">
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Cargando...</span>
       </div>
       <p class="mt-2 text-white">Obteniendo información del taller...</p>
     </div>
-  } @else if (mensajeError) {
+  } @else if (mensajeError()) {
     <div class="alert alert-danger shadow-sm border-0 d-flex align-items-center">
       <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
-      <div>{{ mensajeError }}</div>
+      <div>{{ mensajeError() }}</div>
     </div>
-  } @else if (workshopData) {
-    <div class="row g-4">
+  } @else if (workshopData()) {
+    <div class="row g-4" [formGroup]="tallerForm">
       <div class="col-md-6">
         <div class="card shadow-sm h-100 bg-dark text-light border-secondary">
           <div
@@ -42,7 +42,7 @@
           >
             <h5 class="mb-0 fw-bold"><i class="bi bi-info-circle me-2"></i>Datos Generales</h5>
 
-            @if (!modoEdicion) {
+            @if (!modoEdicion()) {
               <button
                 class="btn btn-sm btn-outline-warning rounded-pill px-3"
                 (click)="activarEdicion()"
@@ -60,9 +60,9 @@
                 <button
                   class="btn btn-sm btn-success rounded-pill px-3"
                   (click)="guardarEdicion()"
-                  [disabled]="guardando"
+                  [disabled]="guardando() || tallerForm.invalid"
                 >
-                  @if (guardando) {
+                  @if (guardando()) {
                     <span class="spinner-border spinner-border-sm" role="status"></span>
                   } @else {
                     <i class="bi bi-check2 me-1"></i>Guardar
@@ -73,7 +73,7 @@
           </div>
 
           <div class="card-body fs-5">
-            @if (modoEdicion) {
+            @if (modoEdicion()) {
               <div class="mb-4 pb-3 border-bottom border-secondary">
                 <label class="form-label fs-6 text-muted">Logo del Taller</label>
                 <input
@@ -83,10 +83,10 @@
                   (change)="onFileSelected($event)"
                 />
 
-                @if (datosEdicion.icon) {
+                @if (imagenTemporal()) {
                   <div class="mt-3 position-relative d-inline-block">
                     <img
-                      [src]="datosEdicion.icon"
+                      [src]="imagenTemporal()"
                       class="rounded shadow border border-secondary"
                       style="width: 120px; height: 120px; object-fit: cover"
                     />
@@ -104,25 +104,25 @@
 
             <div class="mb-3">
               <span class="text-muted fs-6 d-block mb-1">Nombre Comercial</span>
-              @if (!modoEdicion) {
-                <i class="bi bi-building me-2 text-primary"></i> {{ workshopData.workshopName }}
+              @if (!modoEdicion()) {
+                <i class="bi bi-building me-2 text-primary"></i> {{ workshopData().workshopName }}
               } @else {
                 <input
                   type="text"
                   class="form-control bg-secondary text-white border-secondary"
-                  [(ngModel)]="datosEdicion.workshopName"
+                  formControlName="workshopName"
                 />
               }
             </div>
             <div>
               <span class="text-muted fs-6 d-block mb-1">Dirección Física</span>
-              @if (!modoEdicion) {
-                <i class="bi bi-geo-alt me-2 text-danger"></i> {{ workshopData.address }}
+              @if (!modoEdicion()) {
+                <i class="bi bi-geo-alt me-2 text-danger"></i> {{ workshopData().address }}
               } @else {
                 <input
                   type="text"
                   class="form-control bg-secondary text-white border-secondary"
-                  [(ngModel)]="datosEdicion.address"
+                  formControlName="address"
                 />
               }
             </div>
@@ -138,25 +138,25 @@
           <div class="card-body fs-5">
             <div class="mb-3">
               <span class="text-muted fs-6 d-block mb-1">Teléfono Principal</span>
-              @if (!modoEdicion) {
-                <i class="bi bi-telephone me-2 text-success"></i> {{ workshopData.workshopPhone }}
+              @if (!modoEdicion()) {
+                <i class="bi bi-telephone me-2 text-success"></i> {{ workshopData().workshopPhone }}
               } @else {
                 <input
                   type="text"
                   class="form-control bg-secondary text-white border-secondary"
-                  [(ngModel)]="datosEdicion.workshopPhone"
+                  formControlName="workshopPhone"
                 />
               }
             </div>
             <div>
               <span class="text-muted fs-6 d-block mb-1">Correo Electrónico</span>
-              @if (!modoEdicion) {
-                <i class="bi bi-envelope me-2 text-info"></i> {{ workshopData.workshopEmail }}
+              @if (!modoEdicion()) {
+                <i class="bi bi-envelope me-2 text-info"></i> {{ workshopData().workshopEmail }}
               } @else {
                 <input
                   type="email"
                   class="form-control bg-secondary text-white border-secondary"
-                  [(ngModel)]="datosEdicion.workshopEmail"
+                  formControlName="workshopEmail"
                 />
               }
             </div>

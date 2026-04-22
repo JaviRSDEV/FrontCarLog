@@ -23,3 +23,13 @@ export interface Workorder {
   totalAmount: number;
   lines: WorkOrderLine[];
 }
+
+export interface CreateWorkOrderDto {
+  description: string;
+  vehiclePlate: string;
+}
+
+export interface UpdateWorkOrderDto {
+  mechanicNotes?: string;
+  status?: string;
+}

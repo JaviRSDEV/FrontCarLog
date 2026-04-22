@@ -1,12 +1,15 @@
-import { UserService } from './../../../../services/userService/user.service';
-import { TallerService } from './../../../../services/tallerService/taller.service';
+import { Component, OnInit, inject, input, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { User } from '../../../../models/user';
-import { Workshop } from '../../../../models/workshop';
 import { HttpErrorResponse } from '@angular/common/http';
 import Swal from 'sweetalert2';
+
+import { User } from '../../../../models/user';
+import { Workshop } from '../../../../models/workshop';
+import { UserService } from './../../../../services/userService/user.service';
+import { TallerService } from './../../../../services/tallerService/taller.service';
+import { Auth } from '../../../../services/authService/auth.service';
 
 @Component({
   selector: 'app-mi-perfil-card',
@@ -16,97 +19,99 @@ import Swal from 'sweetalert2';
   styleUrl: './mi-perfil-card.component.css',
 })
 export class MiPerfilCardComponent implements OnInit {
-  @Input() user!: User;
-  workShop?: Workshop;
+  userInitial = input.required<User>({ alias: 'user' });
 
-  isEditing: boolean = false;
-  editedUser!: User;
+  private tallerService = inject(TallerService);
+  private userService = inject(UserService);
+  private authService = inject(Auth);
+  private destroy$ = inject(DestroyRef);
 
-  constructor(
-    private tallerService: TallerService,
-    private cdr: ChangeDetectorRef,
-    private userService: UserService,
-  ) {}
+  user = signal<User | null>(null);
+  workShop = signal<Workshop | undefined>(undefined);
+  isEditing = signal(false);
+  editedUser = signal<User | null>(null);
 
   ngOnInit() {
-    if (this.user?.workShopId) {
-      this.obtenerTaller(this.user.workShopId);
+    const initial = this.userInitial();
+    this.user.set(initial);
+
+    if (initial?.workShopId) {
+      this.obtenerTaller(initial.workShopId);
     }
   }
 
   obtenerTaller(tallerId: number) {
-    this.tallerService.getTallerPorId(tallerId).subscribe({
-      next: (datosTaller: Workshop) => {
-        this.workShop = datosTaller;
-        this.cdr.detectChanges();
-      },
-      error: (err: HttpErrorResponse) => {
-        console.error('Error al cargar el taller:', err);
-      },
-    });
+    this.tallerService
+      .getTallerPorId(tallerId)
+      .pipe(takeUntilDestroyed(this.destroy$))
+      .subscribe({
+        next: (datosTaller: Workshop) => this.workShop.set(datosTaller),
+        error: (err: HttpErrorResponse) => console.error('Error al cargar el taller:', err),
+      });
   }
 
   activarEdicion() {
-    this.editedUser = { ...this.user };
-    this.isEditing = true;
+    const currentUser = this.user();
+    if (currentUser) {
+      this.editedUser.set({ ...currentUser });
+      this.isEditing.set(true);
+    }
   }
 
   cancelarEdicion() {
-    this.isEditing = false;
-  }
-
-  private guardarEnStorageCorrecto(usuario: User) {
-    const isLocal = localStorage.getItem('user') !== null;
-    const storage = isLocal ? localStorage : sessionStorage;
-
-    if (isLocal) {
-      sessionStorage.removeItem('user');
-    } else {
-      localStorage.removeItem('user');
-    }
-
-    storage.setItem('user', JSON.stringify(usuario));
+    this.isEditing.set(false);
+    this.editedUser.set(null);
   }
 
   guardarCambios() {
-    if (!this.editedUser || !this.user.dni) return;
+    const userToEdit = this.editedUser();
+    const currentUser = this.user();
 
-    this.userService.edit(this.editedUser, this.user.dni).subscribe({
-      next: (updatedUser: User) => {
-        this.user = {
-          ...updatedUser,
-          workshop: this.user.workshop,
-        };
+    if (!userToEdit || !currentUser?.dni) return;
 
-        this.isEditing = false;
+    this.userService
+      .edit(userToEdit, currentUser.dni)
+      .pipe(takeUntilDestroyed(this.destroy$))
+      .subscribe({
+        next: (updatedUser: User) => {
+          const finalUser = {
+            ...updatedUser,
+            workshop: currentUser.workshop,
+          };
 
-        this.guardarEnStorageCorrecto(this.user);
+          this.user.set(finalUser);
+          this.isEditing.set(false);
+          this.actualizarStorage(finalUser);
 
-        this.cdr.detectChanges();
+          Swal.fire({
+            title: 'Cambios guardados',
+            text: 'Tu perfil se ha actualizado correctamente.',
+            icon: 'success',
+            background: '#212529',
+            color: '#fff',
+            timer: 2000,
+            showConfirmButton: false,
+            position: 'top-end',
+            toast: true,
+          });
+        },
+        error: (err: HttpErrorResponse) => {
+          console.error('Error al guardar cambios:', err);
+          Swal.fire({
+            title: 'Error',
+            text: err.error?.message || 'Hubo un error al guardar los cambios.',
+            icon: 'error',
+            background: '#212529',
+            color: '#fff',
+            confirmButtonColor: '#0d6efd',
+          });
+        },
+      });
+  }
 
-        Swal.fire({
-          title: 'Cambios guardados',
-          text: 'Tu perfil se ha actualizado correctamente.',
-          icon: 'success',
-          background: '#212529',
-          color: '#fff',
-          timer: 2000,
-          showConfirmButton: false,
-          position: 'top-end',
-          toast: true,
-        });
-      },
-      error: (err: HttpErrorResponse) => {
-        console.error('Error al guardar cambios:', err);
-        Swal.fire({
-          title: 'Error',
-          text: err.error?.message || 'Hubo un error al guardar los cambios.',
-          icon: 'error',
-          background: '#212529',
-          color: '#fff',
-          confirmButtonColor: '#0d6efd',
-        });
-      },
-    });
+  private actualizarStorage(usuario: User) {
+    const isLocal = localStorage.getItem('user') !== null;
+    const storage = isLocal ? localStorage : sessionStorage;
+    storage.setItem('user', JSON.stringify(usuario));
   }
 }

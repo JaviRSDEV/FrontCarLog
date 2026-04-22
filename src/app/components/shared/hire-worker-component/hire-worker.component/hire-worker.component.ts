@@ -1,7 +1,10 @@
-import { UserService } from './../../../../services/userService/user.service';
+import { Component, inject, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { Component, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+
+import { UserService } from './../../../../services/userService/user.service';
+import { Auth } from '../../../../services/authService/auth.service';
 
 @Component({
   selector: 'app-hire-worker',
@@ -11,22 +14,20 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './hire-worker.component.css',
 })
 export class HireWorkerComponent {
-  dniBusqueda: string = '';
-  rolElegido: string = 'MECHANIC';
-  mensaje: string = '';
-  error: boolean = false;
+  private userService = inject(UserService);
+  private authService = inject(Auth);
+  private destroy$ = inject(DestroyRef);
 
-  constructor(
-    private userService: UserService,
-    private cdr: ChangeDetectorRef,
-  ) {}
+  dniBusqueda = signal<string>('');
+  rolElegido = signal<string>('MECHANIC');
+  mensaje = signal<string>('');
+  error = signal<boolean>(false);
 
   enviarInvitacion() {
-    const userJson = localStorage.getItem('user') || sessionStorage.getItem('user');
+    const userJson = this.authService.getUserFromStorage();
 
     if (!userJson) {
-      this.mensaje = 'Error de sesión: No se pudo identificar al administrador.';
-      this.error = true;
+      this.setMensaje('Error de sesión: No se pudo identificar al administrador.', true);
       return;
     }
 
@@ -35,29 +36,32 @@ export class HireWorkerComponent {
       const managerDni = manager.dni;
 
       if (!managerDni) {
-        this.mensaje = 'Error: Tus datos de administrador no incluyen DNI.';
-        this.error = true;
+        this.setMensaje('Error: Tus datos de administrador no incluyen DNI.', true);
         return;
       }
 
-      this.userService.invite(this.dniBusqueda, managerDni, this.rolElegido).subscribe({
-        next: () => {
-          this.mensaje = `Invitación enviada correctamente a ${this.dniBusqueda}`;
-          this.error = false;
-          this.dniBusqueda = '';
-          this.cdr.detectChanges();
-        },
-        error: (err) => {
-          console.error('Error al invitar:', err);
-          this.mensaje = err.error?.message || 'Error al enviar invitación. ¿Existe el DNI?';
-          this.error = true;
-          this.cdr.detectChanges();
-        },
-      });
+      this.userService
+        .invite(this.dniBusqueda(), managerDni, this.rolElegido())
+        .pipe(takeUntilDestroyed(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.setMensaje(`Invitación enviada correctamente a ${this.dniBusqueda()}`, false);
+            this.dniBusqueda.set('');
+          },
+          error: (err) => {
+            console.error('Error al invitar:', err);
+            const msg = err.error?.message || 'Error al enviar invitación. ¿Existe el DNI?';
+            this.setMensaje(msg, true);
+          },
+        });
     } catch (e) {
       console.error('Error al procesar los datos de sesión:', e);
-      this.mensaje = 'Error crítico al procesar la sesión.';
-      this.error = true;
+      this.setMensaje('Error crítico al procesar la sesión.', true);
     }
+  }
+
+  private setMensaje(texto: string, esError: boolean) {
+    this.mensaje.set(texto);
+    this.error.set(esError);
   }
 }

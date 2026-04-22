@@ -1,9 +1,10 @@
-import { NavigationEnd, Router } from '@angular/router';
-import { Auth } from '../../../services/authService/auth.service';
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
-import { filter } from 'rxjs';
+import { Component, OnInit, inject, signal, computed, DestroyRef } from '@angular/core';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { filter } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+import { Auth } from '../../../services/authService/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -13,58 +14,56 @@ import { CommonModule } from '@angular/common';
   styleUrl: './navbar.css',
 })
 export class Navbar implements OnInit {
-  role: string = '';
-  isManager = false;
-  isMechanic = false;
-  isClient = false;
+  private authService = inject(Auth);
+  private router = inject(Router);
+  private destroy$ = inject(DestroyRef);
 
-  constructor(
-    private authService: Auth,
-    private router: Router,
-    private cdr: ChangeDetectorRef,
-  ) {
-    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
-      this.comprobarEstado();
-    });
-  }
+  role = signal<string>('');
+
+  isManager = computed(() => this.role() === 'MANAGER' || this.role() === 'CO_MANAGER');
+  isMechanic = computed(() => this.role() === 'MECHANIC');
+  isClient = computed(() => this.role() === 'CLIENT');
+
+  isLoggedIn = computed(() => this.role() !== '');
 
   ngOnInit() {
     this.comprobarEstado();
+    this.router.events
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroy$),
+      )
+      .subscribe(() => {
+        this.comprobarEstado();
+      });
   }
 
   comprobarEstado() {
-    const userJson = localStorage.getItem('user') || sessionStorage.getItem('user');
+    const userJson = this.authService.getUserFromStorage();
 
     if (userJson) {
       try {
         const user = JSON.parse(userJson);
+        const roleParsed = (user.role || '').toString().replace(/"/g, '').toUpperCase();
 
-        this.role = (user.role || '').toString().replace(/"/g, '').toUpperCase();
-
-        this.isManager = this.role === 'MANAGER' || this.role === 'CO_MANAGER';
-        this.isMechanic = this.role === 'MECHANIC';
-        this.isClient = this.role === 'CLIENT';
-
-        console.log('Navbar - Rol detectado:', this.role);
+        if (this.role() !== roleParsed) {
+          this.role.set(roleParsed);
+        }
       } catch (error) {
-        console.error('Error al parsear el usuario:', error);
+        console.error('Error al parsear el usuario en Navbar:', error);
         this.resetVariables();
       }
     } else {
       this.resetVariables();
     }
-
-    this.cdr.detectChanges();
   }
 
   private resetVariables() {
-    this.role = '';
-    this.isManager = false;
-    this.isMechanic = false;
-    this.isClient = false;
+    this.role.set('');
   }
 
   cerrarSesion(): void {
     this.authService.logout();
+    this.resetVariables();
   }
 }

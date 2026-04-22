@@ -1,7 +1,8 @@
-import { Page } from './../../models/page.model';
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+
+import { Page } from '../../models/page.model';
 import { Vehicle } from '../../models/vehicle';
 import { Workorder } from '../../models/workorder';
 import { environment } from '../../../environments/environment.development';
@@ -10,20 +11,18 @@ import { environment } from '../../../environments/environment.development';
   providedIn: 'root',
 })
 export class VehicleService {
-  private apiUrl = `${environment.apiUrl}/vehicles`;
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {}
+  private apiUrl = `${environment.apiUrl}/vehicles`;
 
   getVehiclesByWorkshop(
     workshopId: number,
     page: number = 0,
     size: number = 10,
   ): Observable<Page<Vehicle>> {
-    const params = new HttpParams()
-      .set('workshopId', workshopId.toString())
-      .set('page', page.toString())
-      .set('size', size.toString());
-    return this.http.get<Page<Vehicle>>(this.apiUrl, { params });
+    return this.http.get<Page<Vehicle>>(this.apiUrl, {
+      params: { workshopId, page, size },
+    });
   }
 
   getVehiclesByOwner(
@@ -31,16 +30,15 @@ export class VehicleService {
     page: number = 0,
     size: number = 10,
   ): Observable<Page<Vehicle>> {
-    const params = new HttpParams()
-      .set('ownerId', ownerId)
-      .set('page', page.toString())
-      .set('size', size.toString());
-    return this.http.get<Page<Vehicle>>(this.apiUrl, { params });
+    return this.http.get<Page<Vehicle>>(this.apiUrl, {
+      params: { ownerId, page, size },
+    });
   }
 
   getAllVehicles(page: number = 0, size: number = 10): Observable<Page<Vehicle>> {
-    const params = new HttpParams().set('page', page.toString()).set('size', size.toString());
-    return this.http.get<Page<Vehicle>>(this.apiUrl, { params });
+    return this.http.get<Page<Vehicle>>(this.apiUrl, {
+      params: { page, size },
+    });
   }
 
   createVehicle(vehicle: Vehicle): Observable<Vehicle> {
@@ -52,11 +50,9 @@ export class VehicleService {
     page: number = 0,
     size: number = 10,
   ): Observable<Page<Vehicle>> {
-    const params = new HttpParams()
-      .set('mechanicId', mechanicId)
-      .set('page', page.toString())
-      .set('size', size.toString());
-    return this.http.get<Page<Vehicle>>(`${this.apiUrl}/repairing`, { params });
+    return this.http.get<Page<Vehicle>>(`${this.apiUrl}/repairing`, {
+      params: { mechanicId, page, size },
+    });
   }
 
   deleteVehicle(plate: string): Observable<string> {
@@ -90,9 +86,9 @@ export class VehicleService {
     page: number = 0,
     size: number = 10,
   ): Observable<Page<Workorder>> {
-    const params = new HttpParams().set('page', page.toString()).set('size', size.toString());
-
-    return this.http.get<Page<Workorder>>(`${this.apiUrl}/${plate}/history`, { params });
+    return this.http.get<Page<Workorder>>(`${this.apiUrl}/${plate}/history`, {
+      params: { page, size },
+    });
   }
 
   searchVehicles(
@@ -102,13 +98,8 @@ export class VehicleService {
     page: number = 0,
     size: number = 10,
   ): Observable<Page<Vehicle>> {
-    const params = new HttpParams()
-      .set('q', q)
-      .set('workshopId', workshopId.toString())
-      .set('type', type)
-      .set('page', page.toString())
-      .set('size', size.toString());
-
-    return this.http.get<Page<Vehicle>>(`${this.apiUrl}/search`, { params });
+    return this.http.get<Page<Vehicle>>(`${this.apiUrl}/search`, {
+      params: { q, workshopId, type, page, size },
+    });
   }
 }

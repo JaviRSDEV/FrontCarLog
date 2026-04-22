@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+
 import { Workshop } from '../../models/workshop';
 import { User } from '../../models/user';
 import { environment } from '../../../environments/environment.development';
@@ -9,12 +10,14 @@ import { environment } from '../../../environments/environment.development';
   providedIn: 'root',
 })
 export class TallerService {
+  private http = inject(HttpClient);
+
   private apiUrl = `${environment.apiUrl}/workshop`;
 
-  constructor(private http: HttpClient) {}
-
-  crearTaller(datosTaller: Workshop): Observable<Workshop> {
-    return this.http.post<Workshop>(this.apiUrl, datosTaller);
+  crearTaller(taller: Partial<Workshop>): Observable<Workshop> {
+    return this.http.post<Workshop>(`${this.apiUrl}/create`, taller, {
+      withCredentials: true,
+    });
   }
 
   getMecanicosPorTaller(workshopId: number): Observable<User[]> {
@@ -29,7 +32,7 @@ export class TallerService {
     return this.http.put<Workshop>(`${this.apiUrl}/details/${workshopId}`, datosTaller);
   }
 
-  actualizarTallerConFoto(workshopId: number, formData: FormData): Observable<any> {
-    return this.http.put(`${this.apiUrl}/details/${workshopId}`, formData);
+  actualizarTallerConFoto(workshopId: number, formData: FormData): Observable<Workshop> {
+    return this.http.put<Workshop>(`${this.apiUrl}/details/${workshopId}`, formData);
   }
 }

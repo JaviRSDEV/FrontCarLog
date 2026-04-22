@@ -26,41 +26,37 @@
         <tbody>
           @for (linea of lineas(); track linea.id) {
             @if (editandoId() === linea.id) {
-              <tr class="table-active">
+              <tr class="table-active" [formGroup]="formEdicion">
                 <td class="ps-3">
                   <input
                     type="text"
                     class="form-control form-control-sm"
-                    [(ngModel)]="lineaEnEdicion!.concept"
+                    formControlName="concept"
                   />
                 </td>
                 <td style="width: 70px">
                   <input
                     type="number"
                     class="form-control form-control-sm text-center"
-                    [(ngModel)]="lineaEnEdicion!.quantity"
-                    min="1"
+                    formControlName="quantity"
                   />
                 </td>
                 <td style="width: 100px">
                   <input
                     type="number"
                     class="form-control form-control-sm text-end"
-                    [(ngModel)]="lineaEnEdicion!.pricePerUnit"
+                    formControlName="pricePerUnit"
                   />
                 </td>
                 <td style="width: 80px">
                   <input
                     type="number"
                     class="form-control form-control-sm text-center"
-                    [(ngModel)]="lineaEnEdicion!.discount"
+                    formControlName="discount"
                   />
                 </td>
                 <td style="width: 90px">
-                  <select
-                    class="form-select form-select-sm text-center"
-                    [(ngModel)]="lineaEnEdicion!.IVA"
-                  >
+                  <select class="form-select form-select-sm text-center" formControlName="IVA">
                     <option [ngValue]="21">21%</option>
                     <option [ngValue]="10">10%</option>
                     <option [ngValue]="4">4%</option>
@@ -75,6 +71,7 @@
                     class="btn btn-link text-success btn-sm p-0 me-2"
                     (click)="guardarEdicion()"
                     title="Guardar cambios"
+                    [disabled]="formEdicion.invalid"
                   >
                     <i class="bi bi-check-lg fs-5"></i>
                   </button>
@@ -128,21 +125,20 @@
           }
 
           @if (!isReadOnly()) {
-            <tr class="table-active">
+            <tr class="table-active" [formGroup]="formNuevaLinea">
               <td class="ps-3">
                 <input
                   type="text"
                   class="form-control form-control-sm bg-secondary text-white border-0"
                   placeholder="Concepto"
-                  [(ngModel)]="nuevaLinea.concept"
+                  formControlName="concept"
                 />
               </td>
               <td style="width: 70px">
                 <input
                   type="number"
                   class="form-control form-control-sm bg-secondary text-white border-0 text-center"
-                  [(ngModel)]="nuevaLinea.quantity"
-                  min="1"
+                  formControlName="quantity"
                 />
               </td>
               <td style="width: 100px">
@@ -150,7 +146,7 @@
                   type="number"
                   class="form-control form-control-sm bg-secondary text-white border-0 text-end"
                   placeholder="0.00"
-                  [(ngModel)]="nuevaLinea.pricePerUnit"
+                  formControlName="pricePerUnit"
                 />
               </td>
               <td style="width: 80px">
@@ -158,13 +154,13 @@
                   type="number"
                   class="form-control form-control-sm bg-secondary text-white border-0 text-center text-warning"
                   placeholder="0"
-                  [(ngModel)]="nuevaLinea.discount"
+                  formControlName="discount"
                 />
               </td>
               <td style="width: 90px">
                 <select
                   class="form-select form-select-sm bg-secondary text-white border-0 text-center text-info"
-                  [(ngModel)]="nuevaLinea.IVA"
+                  formControlName="IVA"
                 >
                   <option [ngValue]="21">21%</option>
                   <option [ngValue]="10">10%</option>
@@ -176,7 +172,7 @@
                 <button
                   class="btn btn-sm btn-primary w-100"
                   (click)="agregarLinea()"
-                  [disabled]="!nuevaLinea.concept"
+                  [disabled]="formNuevaLinea.invalid"
                 >
                   <i class="bi bi-plus-lg"></i>
                 </button>

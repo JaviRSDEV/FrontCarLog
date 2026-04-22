@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, input, output, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Vehicle } from '../../../models/vehicle';
 
@@ -10,34 +10,40 @@ import { Vehicle } from '../../../models/vehicle';
   styleUrl: './vehicle-card.component.css',
 })
 export class VehicleCardComponent {
-  @Input() vehiculo!: Vehicle;
-  @Input() modoFlota: boolean = false;
-
-  @Output() verDetalles = new EventEmitter<Vehicle>();
-  @Output() salida = new EventEmitter<string>();
-
-  @Output() aprobar = new EventEmitter<string>();
-  @Output() rechazar = new EventEmitter<string>();
-
-  @Output() historial = new EventEmitter<string>();
+  vehiculo = input.required<Vehicle>();
+  modoFlota = input<boolean>(false);
+  verDetalles = output<Vehicle>();
+  salida = output<string>();
+  aprobar = output<string>();
+  rechazar = output<string>();
+  historial = output<string>();
+  imagenPortada = computed(() => {
+    const v = this.vehiculo();
+    if (v.images && v.images.length > 0) {
+      return v.images[0];
+    }
+    return this.modoFlota()
+      ? 'https://placehold.co/600x400?text=Flota'
+      : 'https://placehold.co/600x400?text=Coche';
+  });
 
   onDetalles() {
-    this.verDetalles.emit(this.vehiculo);
+    this.verDetalles.emit(this.vehiculo());
   }
 
   onSalida() {
-    this.salida.emit(this.vehiculo.plate);
+    this.salida.emit(this.vehiculo().plate);
   }
 
   onAprobar() {
-    this.aprobar.emit(this.vehiculo.plate);
+    this.aprobar.emit(this.vehiculo().plate);
   }
 
   onRechazar() {
-    this.rechazar.emit(this.vehiculo.plate);
+    this.rechazar.emit(this.vehiculo().plate);
   }
 
   onHistorial() {
-    this.historial.emit(this.vehiculo.plate);
+    this.historial.emit(this.vehiculo().plate);
   }
 }

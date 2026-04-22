@@ -1,8 +1,11 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, inject, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { TallerService } from '../../../services/tallerService/taller.service';
 import { CommonModule } from '@angular/common';
+
+import { TallerService } from '../../../services/tallerService/taller.service';
+import { Auth } from '../../../services/authService/auth.service';
 
 @Component({
   selector: 'app-alta-taller',
@@ -12,23 +15,21 @@ import { CommonModule } from '@angular/common';
   styleUrl: './alta-taller.css',
 })
 export class AltaTaller {
-  tallerForm: FormGroup;
-  imagenTemporal: string | null = null;
+  private fb = inject(FormBuilder);
+  private router = inject(Router);
+  private tallerService = inject(TallerService);
+  private authService = inject(Auth);
+  private destroy$ = inject(DestroyRef);
 
-  constructor(
-    private fb: FormBuilder,
-    private router: Router,
-    private tallerService: TallerService,
-    private cdr: ChangeDetectorRef,
-  ) {
-    this.tallerForm = this.fb.group({
-      workshopName: ['', Validators.required],
-      address: ['', [Validators.required]],
-      workshopPhone: ['', [Validators.required]],
-      workshopEmail: ['', [Validators.email]],
-      icon: [''],
-    });
-  }
+  imagenTemporal = signal<string | null>(null);
+
+  tallerForm = this.fb.nonNullable.group({
+    workshopName: ['', Validators.required],
+    address: ['', [Validators.required]],
+    workshopPhone: ['', [Validators.required]],
+    workshopEmail: ['', [Validators.email]],
+    icon: [''],
+  });
 
   async onFileSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
@@ -37,12 +38,11 @@ export class AltaTaller {
     const file = input.files[0];
     try {
       const compressedBase64 = await this.compressImage(file, 800, 600, 0.7);
-      this.imagenTemporal = compressedBase64;
+      this.imagenTemporal.set(compressedBase64);
       this.tallerForm.patchValue({ icon: compressedBase64 });
     } catch (error) {
       console.error('Error al procesar la imagen:', error);
     }
-    this.cdr.detectChanges();
   }
 
   compressImage(file: File, maxWidth: number, maxHeight: number, quality: number): Promise<string> {
@@ -84,39 +84,37 @@ export class AltaTaller {
   }
 
   eliminarImagen(): void {
-    this.imagenTemporal = null;
+    this.imagenTemporal.set(null);
     this.tallerForm.patchValue({ icon: '' });
-    this.cdr.detectChanges();
   }
 
   onSubmit() {
-    if (this.tallerForm.valid) {
-      this.tallerService.crearTaller(this.tallerForm.value).subscribe({
+    if (this.tallerForm.invalid) {
+      this.tallerForm.markAllAsTouched();
+      return;
+    }
+
+    this.tallerService
+      .crearTaller(this.tallerForm.getRawValue())
+      .pipe(takeUntilDestroyed(this.destroy$))
+      .subscribe({
         next: (newWorkshop) => {
-          const isLocal = localStorage.getItem('user') !== null;
-          const userJson = isLocal ? localStorage.getItem('user') : sessionStorage.getItem('user');
+          const userJson = this.authService.getUserFromStorage();
 
           if (userJson) {
-            let user = JSON.parse(userJson);
+            const user = JSON.parse(userJson);
+
             user.workshop = newWorkshop;
-            if (newWorkshop && newWorkshop.workshopId) {
+            if (newWorkshop?.workshopId) {
               user.workShopId = newWorkshop.workshopId;
             }
 
-            if (isLocal) {
-              localStorage.setItem('user', JSON.stringify(user));
-            } else {
-              sessionStorage.setItem('user', JSON.stringify(user));
-            }
+            this.authService.saveUserToStorage(user);
           }
+
           this.router.navigate(['/dashboard']);
         },
-        error: (err) => {
-          console.error('Error al crear el taller:', err);
-        },
+        error: (err) => console.error('Error al crear el taller:', err),
       });
-    } else {
-      this.tallerForm.markAllAsTouched();
-    }
   }
 }

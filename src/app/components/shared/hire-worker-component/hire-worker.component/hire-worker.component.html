@@ -1,12 +1,13 @@
 <div class="card bg-dark border-secondary text-white shadow-sm mb-4">
   <div class="card-body">
     <h5 class="text-primary mb-3">
-      <i class="bi bi-person-plus-fill me-2"></i>Contratar Nuevo Empleado.
+      <i class="bi bi-person-plus-fill me-2"></i>Contratar Nuevo Empleado
     </h5>
 
-    @if (mensaje) {
-      <div class="alert shadow-sm py-2" [ngClass]="error ? 'alert-danger' : 'alert-success'">
-        {{ mensaje }}
+    @if (mensaje()) {
+      <div class="alert shadow-sm py-2" [ngClass]="error() ? 'alert-danger' : 'alert-success'">
+        <i class="bi" [ngClass]="error() ? 'bi-exclamation-octagon' : 'bi-check-circle'"></i>
+        {{ mensaje() }}
       </div>
     }
 
@@ -14,14 +15,19 @@
       <div class="col-md-5">
         <input
           type="text"
-          [(ngModel)]="dniBusqueda"
+          [ngModel]="dniBusqueda()"
+          (ngModelChange)="dniBusqueda.set($event)"
           name="dniBusqueda"
           class="form-control bg-dark text-white border-secondary"
           placeholder="Introduce DNI del usuario..."
         />
       </div>
       <div class="col-md-4">
-        <select [(ngModel)]="rolElegido" class="form-select bg-dark text-white border-secondary">
+        <select
+          [ngModel]="rolElegido()"
+          (ngModelChange)="rolElegido.set($event)"
+          class="form-select bg-dark text-white border-secondary"
+        >
           <option value="MECHANIC">Mecánico</option>
           <option value="CO_MANAGER">Encargado</option>
         </select>
@@ -30,9 +36,9 @@
         <button
           class="btn btn-primary w-100 fw-bold"
           (click)="enviarInvitacion()"
-          [disabled]="!dniBusqueda"
+          [disabled]="!dniBusqueda()"
         >
-          Enviar Respuesta
+          <i class="bi bi-send-fill me-2"></i>Enviar Invitación
         </button>
       </div>
     </div>

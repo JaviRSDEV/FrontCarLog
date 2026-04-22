@@ -1,11 +1,14 @@
+import { Component, OnInit, inject, signal, computed, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+
 import { MiPerfilCardComponent } from '../../mi-perfil-card-component/mi-perfil-card.component/mi-perfil-card.component';
 import { EmployeeListComponent } from '../../employee-list-component/employee-list.component/employee-list.component';
 import { HireWorkerComponent } from '../../hire-worker-component/hire-worker.component/hire-worker.component';
 import { UserService } from '../../../../services/userService/user.service';
+import { Auth } from '../../../../services/authService/auth.service';
 import { User } from '../../../../models/user';
-import { HttpErrorResponse } from '@angular/common/http';
 
 type TabType = 'perfil' | 'plantilla';
 
@@ -17,42 +20,46 @@ type TabType = 'perfil' | 'plantilla';
   styleUrl: './gestion-taller.component.css',
 })
 export class GestionTallerComponent implements OnInit {
-  user?: User;
-  role: string = '';
-  isManager: boolean = false;
-  tabActiva: TabType = 'perfil';
+  private userService = inject(UserService);
+  private authService = inject(Auth);
+  private destroy$ = inject(DestroyRef);
 
-  constructor(
-    private userService: UserService,
-    private cdr: ChangeDetectorRef,
-  ) {}
+  user = signal<User | undefined>(undefined);
+  tabActiva = signal<TabType>('perfil');
+  role = computed(() => {
+    const r = this.user()?.role || '';
+    return r.toString().replace(/"/g, '').toUpperCase();
+  });
+
+  isManager = computed(() => {
+    const r = this.role();
+    return r === 'MANAGER' || r === 'CO_MANAGER';
+  });
 
   ngOnInit(): void {
-    const userJson = localStorage.getItem('user') || sessionStorage.getItem('user');
+    const userJson = this.authService.getUserFromStorage();
 
     if (userJson) {
       try {
         const localUser: User = JSON.parse(userJson);
-        this.user = localUser;
+        this.user.set(localUser);
+        this.userService
+          .getUserByDni()
+          .pipe(takeUntilDestroyed(this.destroy$))
+          .subscribe({
+            next: (fullUser: User) => {
+              const updatedUser = {
+                ...fullUser,
+                workshop: fullUser.workshop || localUser.workshop,
+              };
 
-        this.role = (localUser.role || '').replace(/"/g, '').toUpperCase();
-        this.isManager = this.role === 'MANAGER' || this.role === 'CO_MANAGER';
-
-        this.userService.getUserByDni().subscribe({
-          next: (fullUser: User) => {
-            this.user = {
-              ...fullUser,
-              workshop: fullUser.workshop || localUser.workshop,
-            };
-
-            this.actualizarStorage(this.user);
-
-            this.cdr.detectChanges();
-          },
-          error: (err: HttpErrorResponse) => {
-            console.error('Error al traer los datos completos del usuario', err);
-          },
-        });
+              this.user.set(updatedUser);
+              this.actualizarStorage(updatedUser);
+            },
+            error: (err: HttpErrorResponse) => {
+              console.error('Error al traer los datos completos del usuario', err);
+            },
+          });
       } catch (e) {
         console.error('Error al parsear el usuario del storage', e);
       }
@@ -66,6 +73,6 @@ export class GestionTallerComponent implements OnInit {
   }
 
   cambiarTab(tab: TabType): void {
-    this.tabActiva = tab;
+    this.tabActiva.set(tab);
   }
 }

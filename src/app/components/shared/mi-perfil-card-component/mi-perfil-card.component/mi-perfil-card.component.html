@@ -4,60 +4,71 @@
       <i class="bi bi-person-circle text-primary" style="font-size: 3rem"></i>
     </div>
 
-    @if (!isEditing) {
-      <h3 class="mb-1">{{ user.name }}</h3>
-      <p class="badge bg-primary fs-6 mb-4">{{ user.role }}</p>
+    @if (!isEditing()) {
+      <h3 class="mb-1">{{ user()?.name }}</h3>
+      <p class="badge bg-primary fs-6 mb-4">{{ user()?.role }}</p>
 
       <div class="text-start border-top border-secondary pt-3">
-        <p class="mb-2"><strong class="text-primary">DNI:</strong> {{ user.dni }}</p>
-        <p class="mb-2"><strong class="text-primary">Email:</strong> {{ user.email }}</p>
+        <p class="mb-2"><strong class="text-primary">DNI:</strong> {{ user()?.dni }}</p>
+        <p class="mb-2"><strong class="text-primary">Email:</strong> {{ user()?.email }}</p>
         <p class="mb-2">
-          <strong class="text-primary">Teléfono:</strong> {{ user.phone || 'No disponible' }}
+          <strong class="text-primary">Teléfono:</strong> {{ user()?.phone || 'No disponible' }}
         </p>
         <p class="mb-3">
           <strong class="text-primary">Taller:</strong>
-          {{ workShop?.workshopName || 'Sin taller asignado' }}
+          {{ workShop()?.workshopName || 'Sin taller asignado' }}
         </p>
 
-        <button class="btn btn-primary w-100 mt-2" (click)="activarEdicion()">Editar Perfil</button>
+        <button
+          class="btn btn-primary w-100 mt-2 rounded-pill shadow-sm"
+          (click)="activarEdicion()"
+        >
+          <i class="bi bi-pencil-square me-2"></i>Editar Perfil
+        </button>
       </div>
     } @else {
       <h4 class="mb-1">Editar Perfil</h4>
-      <p class="badge bg-secondary fs-6 mb-4">{{ user.dni }}</p>
+      <p class="badge bg-secondary fs-6 mb-4">{{ user()?.dni }}</p>
 
-      <div class="text-start border-top border-secondary pt-3">
-        <div class="mb-3">
-          <label class="form-label text-primary fw-bold mb-1">Nombre:</label>
-          <input
-            type="text"
-            class="form-control bg-dark text-white border-secondary"
-            [(ngModel)]="editedUser.name"
-          />
-        </div>
+      @if (editedUser(); as formUser) {
+        <div class="text-start border-top border-secondary pt-3">
+          <div class="mb-3">
+            <label class="form-label text-primary fw-bold mb-1">Nombre:</label>
+            <input
+              type="text"
+              class="form-control bg-dark text-white border-secondary"
+              [(ngModel)]="formUser.name"
+            />
+          </div>
 
-        <div class="mb-3">
-          <label class="form-label text-primary fw-bold mb-1">Email:</label>
-          <input
-            type="email"
-            class="form-control bg-dark text-white border-secondary"
-            [(ngModel)]="editedUser.email"
-          />
-        </div>
+          <div class="mb-3">
+            <label class="form-label text-primary fw-bold mb-1">Email:</label>
+            <input
+              type="email"
+              class="form-control bg-dark text-white border-secondary"
+              [(ngModel)]="formUser.email"
+            />
+          </div>
 
-        <div class="mb-4">
-          <label class="form-label text-primary fw-bold mb-1">Teléfono:</label>
-          <input
-            type="text"
-            class="form-control bg-dark text-white border-secondary"
-            [(ngModel)]="editedUser.phone"
-          />
-        </div>
+          <div class="mb-4">
+            <label class="form-label text-primary fw-bold mb-1">Teléfono:</label>
+            <input
+              type="text"
+              class="form-control bg-dark text-white border-secondary"
+              [(ngModel)]="formUser.phone"
+            />
+          </div>
 
-        <div class="d-flex gap-2 mt-2">
-          <button class="btn btn-success w-50" (click)="guardarCambios()">Guardar</button>
-          <button class="btn btn-outline-danger w-50" (click)="cancelarEdicion()">Cancelar</button>
+          <div class="d-flex gap-2 mt-2">
+            <button class="btn btn-success w-50 rounded-pill" (click)="guardarCambios()">
+              <i class="bi bi-save me-1"></i>Guardar
+            </button>
+            <button class="btn btn-outline-danger w-50 rounded-pill" (click)="cancelarEdicion()">
+              Cancelar
+            </button>
+          </div>
         </div>
-      </div>
+      }
     }
   </div>
 </div>

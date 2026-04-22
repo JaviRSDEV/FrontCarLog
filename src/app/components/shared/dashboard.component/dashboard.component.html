@@ -1,10 +1,12 @@
-@if (user && user.pendingWorkshopName) {
+@if (user()?.pendingWorkshopName) {
   <div
-    class="alert alert-info border-primary shadow-sm d-flex justify-content-between align-items-center mt-3"
+    class="alert alert-info border-primary shadow-sm d-flex justify-content-between align-items-center mt-3 animate-fade-in"
   >
     <div>
       <i class="bi bi-briefcase-fill me-2"></i>
-      El taller con ID <strong>{{ user.pendingWorkshopName }}</strong> quiere contratarte.
+      El taller <strong>{{ user()?.pendingWorkshopName }}</strong> quiere contratarte como
+      <strong>{{ user()?.pendingRole }}</strong
+      >.
     </div>
     <div class="d-flex gap-2">
       <button class="btn btn-success btn-sm px-4 fw-bold" (click)="gestionarInvitacion(true)">
@@ -17,31 +19,41 @@
   </div>
 }
 
+@if (aviso().visible) {
+  <div class="alert shadow-sm mt-3 animate-fade-in" [ngClass]="'alert-' + aviso().tipo">
+    <i class="bi bi-info-circle me-2"></i> {{ aviso().mensaje }}
+  </div>
+}
+
 <div class="container mt-5 text-white">
   <div class="row mb-4">
     <div class="col-12">
-      <h2>¡Hola, {{ userName | titlecase }}!</h2>
-      @if (role === 'MANAGER' && workshop) {
-        <p class="text-light">
-          Gestionando el taller: <strong>{{ workshop }}</strong>
+      <h2 class="display-5 fw-bold">¡Hola, {{ userName() | titlecase }}!</h2>
+
+      @if (role() === 'MANAGER' && workshopName()) {
+        <p class="text-white-50 fs-5">
+          Gestionando el taller: <span class="text-primary fw-bold">{{ workshopName() }}</span>
         </p>
       } @else {
-        <p class="text-light">Bienvenido al panel de control</p>
+        <p class="text-white-50 fs-5">Bienvenido a tu panel de control de CarLog.</p>
       }
     </div>
   </div>
 
-  <div class="row g-4">
+  <div class="row g-4 mt-2">
     <div class="col-md-6 col-lg-4">
-      <div class="card h-100 shadow-sm panel-card" [routerLink]="['/dashboard/vehiculos']">
+      <div
+        class="card h-100 shadow panel-card bg-dark border-secondary"
+        [routerLink]="['/dashboard/vehiculos']"
+      >
         <div
           class="card-body text-center d-flex flex-column justify-content-center align-items-center py-5"
         >
           <i class="bi bi-car-front-fill display-4 text-primary mb-3"></i>
-          <h4 class="card-title">Mis Vehículos</h4>
+          <h4 class="card-title text-white">Mis Vehículos</h4>
           <p class="card-text text-muted">
-            @if (role === 'MANAGER') {
-              Gestiona la flota actual de tu taller
+            @if (role() === 'MANAGER' || role() === 'CO_MANAGER') {
+              Gestiona la flota actual del taller
             } @else {
               Consulta el estado de tus coches
             }
@@ -51,13 +63,31 @@
     </div>
 
     <div class="col-md-6 col-lg-4">
-      <div class="card h-100 shadow-sm panel-card" [routerLink]="['/dashboard/mantenimientos']">
+      <div
+        class="card h-100 shadow panel-card bg-dark border-secondary"
+        [routerLink]="['/dashboard/mantenimientos']"
+      >
         <div
           class="card-body text-center d-flex flex-column justify-content-center align-items-center py-5"
         >
           <i class="bi bi-tools display-4 text-success mb-3"></i>
-          <h4 class="card-title">Mantenimientos</h4>
-          <p class="card-text text-muted">Revisa el historial y las próximas revisiones</p>
+          <h4 class="card-title text-white">Mantenimientos</h4>
+          <p class="card-text text-muted">Revisa el historial y las reparaciones en curso</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+      <div
+        class="card h-100 shadow panel-card bg-dark border-secondary"
+        [routerLink]="['/dashboard/taller']"
+      >
+        <div
+          class="card-body text-center d-flex flex-column justify-content-center align-items-center py-5"
+        >
+          <i class="bi bi-person-badge-fill display-4 text-info mb-3"></i>
+          <h4 class="card-title text-white">Mi Cuenta</h4>
+          <p class="card-text text-muted">Actualiza tus datos y preferencias</p>
         </div>
       </div>
     </div>

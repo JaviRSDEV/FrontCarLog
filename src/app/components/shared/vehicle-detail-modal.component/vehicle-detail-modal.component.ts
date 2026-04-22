@@ -1,6 +1,7 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, OnInit, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Vehicle } from '../../../models/vehicle';
+import { Auth } from '../../../services/authService/auth.service';
 
 @Component({
   selector: 'app-vehicle-detail-modal',
@@ -10,21 +11,21 @@ import { Vehicle } from '../../../models/vehicle';
   styleUrl: './vehicle-detail-modal.component.css',
 })
 export class VehicleDetailModalComponent implements OnInit {
-  @Input() vehiculo!: Vehicle;
+  vehiculo = input.required<Vehicle>();
+  cerrarModal = output<void>();
+  editar = output<Vehicle>();
+  eliminar = output<string>();
 
-  @Output() cerrarModal = new EventEmitter<void>();
-  @Output() editar = new EventEmitter<Vehicle>();
-  @Output() eliminar = new EventEmitter<string>();
-
-  currentUserDni: string = '';
+  private authService = inject(Auth);
+  currentUserDni = signal<string>('');
 
   ngOnInit(): void {
-    const userJson = localStorage.getItem('user') || sessionStorage.getItem('user');
+    const userJson = this.authService.getUserFromStorage();
 
     if (userJson) {
       try {
         const user = JSON.parse(userJson);
-        this.currentUserDni = user.dni;
+        this.currentUserDni.set(user.dni || '');
       } catch (e) {
         console.error('Error al parsear el usuario en el modal de vehículo:', e);
       }
@@ -36,10 +37,10 @@ export class VehicleDetailModalComponent implements OnInit {
   }
 
   onEditar() {
-    this.editar.emit(this.vehiculo);
+    this.editar.emit(this.vehiculo());
   }
 
   onEliminar() {
-    this.eliminar.emit(this.vehiculo.plate);
+    this.eliminar.emit(this.vehiculo().plate);
   }
 }

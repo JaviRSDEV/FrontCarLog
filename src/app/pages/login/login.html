@@ -1,10 +1,10 @@
 <div class="login-layout d-flex flex-column min-vh-100">
+  <img class="fondo-difuminado" src="assets/fondoPrincipal.jpg" alt="Fondo taller" />
 
-  <img class="fondo-difuminado" src="assets/fondoPrincipal.jpg" alt="Fondo taller">
-
-  <div class="content-wrapper container-fluid text-center d-flex flex-column justify-content-center align-items-center flex-grow-1 py-5">
-
-    <img id="logo" src="assets/logo.png" alt="Logo CarLog">
+  <div
+    class="content-wrapper container-fluid text-center d-flex flex-column justify-content-center align-items-center flex-grow-1 py-5"
+  >
+    <img id="logo" src="assets/logo.png" alt="Logo CarLog" />
 
     <h1 class="titulo display-1 text-primary fw-bold">
       <span id="car">CAR</span><span id="log">LOG</span>
@@ -13,42 +13,68 @@
     <h4 id="subtitulo" class="text-info fw-bold">Tu taller digital</h4>
 
     <p class="info mt-3 fw-semibold text-center">
-      Registra tus vehículos y sus mantenimientos y olvídate de papeles.<br>
+      Registra tus vehículos y sus mantenimientos y olvídate de papeles.<br />
       Lleva el control total en tu ordenador y evita imprevistos.
     </p>
 
     <div class="container mt-4">
       <div class="row row-cols-1 row-cols-md-2 g-4 justify-content-center align-items-stretch">
-
         <div class="col">
-          <div class="h-100 text-white card rounded-5 p-4 d-flex flex-row align-items-center shadow caja">
-            <img src="../../../assets/coche_caja.webp" class="me-4 rounded imagen_tarjeta" width="80">
-            <span class="text-start fs-6 fw-semibold">Registra tu vehículo de manera fácil y sencilla</span>
+          <div
+            class="h-100 text-white card rounded-5 p-4 d-flex flex-row align-items-center shadow caja"
+          >
+            <img
+              src="../../../assets/coche_caja.webp"
+              class="me-4 rounded imagen_tarjeta"
+              width="80"
+              alt="Icono coche"
+            />
+            <span class="text-start fs-6 fw-semibold"
+              >Registra tu vehículo de manera fácil y sencilla</span
+            >
           </div>
         </div>
 
         <div class="col">
-          <div class="h-100 text-white card rounded-5 p-4 d-flex flex-row align-items-center shadow caja">
-            <img src="../../../assets/piezas_caja.jpg" class="me-4 rounded imagen_tarjeta" width="80">
-            <span class="text-start fs-6 fw-semibold">Registra las piezas que desees para tener seguimiento</span>
+          <div
+            class="h-100 text-white card rounded-5 p-4 d-flex flex-row align-items-center shadow caja"
+          >
+            <img
+              src="../../../assets/piezas_caja.jpg"
+              class="me-4 rounded imagen_tarjeta"
+              width="80"
+              alt="Icono piezas"
+            />
+            <span class="text-start fs-6 fw-semibold"
+              >Registra las piezas que desees para tener seguimiento</span
+            >
           </div>
         </div>
 
         <div class="col-md-8 mt-4 mx-auto">
-          <div class="h-100 text-white card rounded-5 p-4 d-flex flex-row align-items-center shadow justify-content-center caja">
-            <img src="../../../assets/alerta_caja.webp" class="me-4 rounded imagen_tarjeta" width="80">
+          <div
+            class="h-100 text-white card rounded-5 p-4 d-flex flex-row align-items-center shadow justify-content-center caja"
+          >
+            <img
+              src="../../../assets/alerta_caja.webp"
+              class="me-4 rounded imagen_tarjeta"
+              width="80"
+              alt="Icono alerta"
+            />
             <span class="fs-6 fw-semibold">Automatiza alertas a tu preferencia</span>
           </div>
         </div>
-
       </div>
     </div>
 
     <div id="btn-container" class="mt-5">
-      <button id="login" class="btn btn-primary me-2 px-4 boton" (click)="openLogin()">Iniciar sesión</button>
-      <button id="register" class="btn btn-secondary px-4 boton" (click)="openRegister()">Regístrate</button>
+      <button id="login" class="btn btn-primary me-2 px-4 boton" (click)="openLogin()">
+        Iniciar sesión
+      </button>
+      <button id="register" class="btn btn-secondary px-4 boton" (click)="openRegister()">
+        Regístrate
+      </button>
     </div>
-
   </div>
 
   <footer id="pie_pagina" class="py-2 border-top mt-auto">
@@ -56,7 +82,7 @@
       <div class="row text-center text-md-start">
         <div class="col-md-8 col-12 mb-3 mb-md-0">
           <h5 class="text-uppercase fw-bold text-white">Sobre nosotros</h5>
-          <p class="small text-white">Texto de ejemplo</p>
+          <p class="small text-white">Tu plataforma de gestión mecánica integral.</p>
         </div>
         <div class="col-md-4 col-12 text-center text-md-end">
           <h5 class="text-uppercase fw-bold text-white">Nuestras redes</h5>
@@ -70,169 +96,263 @@
     </div>
   </footer>
 
-@if(showLogin){
-  <div class="modal fade show modal-animado" tabindex="-1" style="display: block;">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content rounded-5 shadow-lg p-4 border-0">
-        <div class="modal-body text-center">
+  @if (showLogin()) {
+    <div class="modal fade show modal-animado" tabindex="-1" style="display: block">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-5 shadow-lg p-4 border-0">
+          <div class="modal-body text-center">
+            <h2 class="display-5 fw-bold mb-1">
+              <span style="color: #004e7c">CAR</span><span style="color: #00aeef">LOG</span>
+            </h2>
+            <h4 class="fw-bold mb-4" style="color: #333">
+              Iniciar <span style="color: #00aeef">Sesión</span>
+            </h4>
 
-          <h2 class="display-5 fw-bold mb-1">
-            <span style="color: #004E7C;">CAR</span><span style="color: #00AEEF;">LOG</span>
-          </h2>
-          <h4 class="fw-bold mb-4" style="color: #333;">Iniciar <span style="color: #00AEEF;">Sesión</span></h4>
+            @if (loginError()) {
+              <div
+                class="alert alert-danger p-2 text-center rounded-3 mb-4 text-danger border border-danger"
+              >
+                <small class="fw-bold"
+                  ><i class="bi bi-exclamation-triangle-fill me-1"></i> {{ loginError() }}</small
+                >
+              </div>
+            }
 
-          @if (loginError) {
-            <div class="alert alert-danger p-2 text-center rounded-3 mb-4 text-danger border border-danger">
-              <small class="fw-bold"><i class="bi bi-exclamation-triangle-fill me-1"></i> {{ loginError }}</small>
-            </div>
-          }
-
-          <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
-
-            <div class="text-start mb-3">
-              <label class="fw-bold mb-1" style="color: #0066FF;">Correo electrónico</label>
-              <input type="email" class="form-control form-control-lg rounded-4" formControlName="email">
-              @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched){
-                @if(loginForm.get('email')?.hasError('required')){
-                  <small class="text-danger fw-semibold">El correo es obligatorio</small>
+            <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
+              <div class="text-start mb-3">
+                <label class="fw-bold mb-1" style="color: #0066ff">Correo electrónico</label>
+                <input
+                  type="email"
+                  class="form-control form-control-lg rounded-4"
+                  formControlName="email"
+                />
+                @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+                  @if (loginForm.get('email')?.hasError('required')) {
+                    <small class="text-danger fw-semibold">El correo es obligatorio</small>
+                  }
+                  @if (loginForm.get('email')?.hasError('email')) {
+                    <small class="text-danger fw-semibold">El correo no es válido</small>
+                  }
                 }
-                @if(loginForm.get('email')?.hasError('email')){
-                  <small class="text-danger fw-semibold">El correo no es válido</small>
-                }
-              }
-            </div>
+              </div>
 
-            <div class="text-start mb-4">
-              <label class="fw-bold mb-1" style="color: #0066FF;">Contraseña</label>
-              <input type="password" class="form-control form-control-lg rounded-4" formControlName="password">
-              @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched){
-                @if(loginForm.get('password')?.hasError('required')){
-                  <small class="text-danger fw-semibold">La contraseña es obligatoria</small>
+              <div class="text-start mb-4">
+                <label class="fw-bold mb-1" style="color: #0066ff">Contraseña</label>
+                <input
+                  type="password"
+                  class="form-control form-control-lg rounded-4"
+                  formControlName="password"
+                />
+                @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+                  @if (loginForm.get('password')?.hasError('required')) {
+                    <small class="text-danger fw-semibold">La contraseña es obligatoria</small>
+                  }
+                  @if (loginForm.get('password')?.hasError('minlength')) {
+                    <small class="text-danger fw-semibold">Debe tener al menos 6 caracteres</small>
+                  }
                 }
-                @if(loginForm.get('password')?.hasError('minlength')){
-                  <small class="text-danger fw-semibold">Debe tener al menos 6 caracteres</small>
-                }
-              }
-            </div>
-            <div class="form-check text-start mb-4">
-              <input class="form-check-input border-secondary" type="checkbox" id="rememberMe" formControlName="rememberMe">
-              <label class="form-check-label text-muted fw-semibold" for="rememberMe">
-                Mantener la sesión iniciada
-              </label>
-            </div>
-            <p class="mb-4 text-muted small">¿No tienes cuenta? <a href="#" (click)="closeLogin(); openRegister(); $event.preventDefault()" class="fw-bold text-decoration-underline" style="color: #00AEEF;">Regístrate.</a></p>
+              </div>
 
-            <button type="submit" class="btn w-100 btn-lg rounded-pill text-white mb-3 fw-bold shadow-sm" style="background-color: #00D4FF;" [disabled]="loginForm.invalid">Acceder</button>
-            <button type="button" class="btn w-100 btn-lg rounded-pill text-white fw-bold shadow-sm" style="background-color: #0066FF;" (click)="closeLogin()">Volver</button>
-          </form>
+              <div class="form-check text-start mb-4">
+                <input
+                  class="form-check-input border-secondary"
+                  type="checkbox"
+                  id="rememberMe"
+                  formControlName="rememberMe"
+                />
+                <label class="form-check-label text-muted fw-semibold" for="rememberMe">
+                  Mantener la sesión iniciada
+                </label>
+              </div>
+
+              <p class="mb-4 text-muted small">
+                ¿No tienes cuenta?
+                <a
+                  href="#"
+                  (click)="closeLogin(); openRegister(); $event.preventDefault()"
+                  class="fw-bold text-decoration-underline"
+                  style="color: #00aeef"
+                  >Regístrate.</a
+                >
+              </p>
+
+              <button
+                type="submit"
+                class="btn w-100 btn-lg rounded-pill text-white mb-3 fw-bold shadow-sm"
+                style="background-color: #00d4ff"
+                [disabled]="loginForm.invalid || isLoggingIn()"
+              >
+                {{ isLoggingIn() ? 'Accediendo...' : 'Acceder' }}
+              </button>
+
+              <button
+                type="button"
+                class="btn w-100 btn-lg rounded-pill text-white fw-bold shadow-sm"
+                style="background-color: #0066ff"
+                (click)="closeLogin()"
+                [disabled]="isLoggingIn()"
+              >
+                Volver
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-}
+  }
 
-@if (showRegister) {
-  <div class="modal fade show modal-animado" tabindex="-1" style="display: block;">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content rounded-4 shadow-lg">
-        <div class="modal-header border-0 pb-0">
-          <button type="button" class="btn-close" (click)="closeRegister()"></button>
-        </div>
-        <div class="modal-body text-center">
+  @if (showRegister()) {
+    <div class="modal fade show modal-animado" tabindex="-1" style="display: block">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow-lg">
+          <div class="modal-header border-0 pb-0">
+            <button
+              type="button"
+              class="btn-close"
+              (click)="closeRegister()"
+              [disabled]="isRegistering()"
+            ></button>
+          </div>
+          <div class="modal-body text-center">
+            <h2 class="display-5 fw-bold mb-1">
+              <span style="color: #004e7c">CAR</span><span style="color: #00aeef">LOG</span>
+            </h2>
+            <h4 class="fw-bold mb-4" style="color: #333">
+              Reg<span style="color: #00aeef">ístrate</span>
+            </h4>
 
-          <h2 class="display-5 fw-bold mb-1">
-            <span style="color: #004E7C;">CAR</span><span style="color: #00AEEF;">LOG</span>
-          </h2>
-          <h4 class="fw-bold mb-4" style="color: #333;">Reg<span style="color: #00AEEF;">istrate</span></h4>
+            @if (registerError()) {
+              <div
+                class="alert alert-danger p-2 text-center rounded-3 mb-4 text-danger border border-danger"
+              >
+                <small class="fw-bold"
+                  ><i class="bi bi-exclamation-triangle-fill me-1"></i> {{ registerError() }}</small
+                >
+              </div>
+            }
 
-          @if (registerError) {
-            <div class="alert alert-danger p-2 text-center rounded-3 mb-4 text-danger border border-danger">
-              <small class="fw-bold"><i class="bi bi-exclamation-triangle-fill me-1"></i> {{ registerError }}</small>
-            </div>
-          }
-
-          <form [formGroup]="registerForm" (ngSubmit)="onRegisterSubmit()">
-
-            <div class="text-start mb-3">
-              <input type="text" class="form-control form-control-lg rounded-4" formControlName="dni" placeholder="DNI (Ej: 12345678A)">
-              @if (registerForm.get('dni')?.invalid && registerForm.get('dni')?.touched) {
-                @if (registerForm.get('dni')?.hasError('required')) {
-                  <small class="text-danger fw-semibold">El DNI es obligatorio</small>
+            <form [formGroup]="registerForm" (ngSubmit)="onRegisterSubmit()">
+              <div class="text-start mb-3">
+                <input
+                  type="text"
+                  class="form-control form-control-lg rounded-4"
+                  formControlName="dni"
+                  placeholder="DNI (Ej: 12345678A)"
+                />
+                @if (registerForm.get('dni')?.invalid && registerForm.get('dni')?.touched) {
+                  @if (registerForm.get('dni')?.hasError('required')) {
+                    <small class="text-danger fw-semibold">El DNI es obligatorio</small>
+                  }
+                  @if (registerForm.get('dni')?.hasError('pattern')) {
+                    <small class="text-danger fw-semibold">Debe tener 8 números y 1 letra</small>
+                  }
                 }
-                @if (registerForm.get('dni')?.hasError('pattern')) {
-                  <small class="text-danger fw-semibold">Debe tener 8 números y 1 letra</small>
+              </div>
+
+              <div class="text-start mb-3">
+                <input
+                  type="text"
+                  class="form-control form-control-lg rounded-4"
+                  formControlName="name"
+                  placeholder="Nombre completo"
+                />
+                @if (registerForm.get('name')?.invalid && registerForm.get('name')?.touched) {
+                  <small class="text-danger fw-semibold">El nombre es obligatorio</small>
                 }
-              }
-            </div>
+              </div>
 
-            <div class="text-start mb-3">
-              <input type="text" class="form-control form-control-lg rounded-4" formControlName="name" placeholder="Nombre completo">
-              @if (registerForm.get('name')?.invalid && registerForm.get('name')?.touched) {
-                <small class="text-danger fw-semibold">El nombre es obligatorio</small>
-              }
-            </div>
-
-            <div class="text-start mb-3">
-              <input type="email" class="form-control form-control-lg rounded-4" formControlName="email" placeholder="Correo electrónico">
-              @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
-                @if (registerForm.get('email')?.hasError('required')) {
-                  <small class="text-danger fw-semibold">El correo es obligatorio</small>
+              <div class="text-start mb-3">
+                <input
+                  type="email"
+                  class="form-control form-control-lg rounded-4"
+                  formControlName="email"
+                  placeholder="Correo electrónico"
+                />
+                @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+                  @if (registerForm.get('email')?.hasError('required')) {
+                    <small class="text-danger fw-semibold">El correo es obligatorio</small>
+                  }
+                  @if (registerForm.get('email')?.hasError('email')) {
+                    <small class="text-danger fw-semibold">El formato no es válido</small>
+                  }
                 }
-                @if (registerForm.get('email')?.hasError('email')) {
-                  <small class="text-danger fw-semibold">El formato no es válido</small>
+              </div>
+
+              <div class="text-start mb-3">
+                <input
+                  type="text"
+                  class="form-control form-control-lg rounded-4"
+                  formControlName="phone"
+                  placeholder="Teléfono"
+                />
+                @if (registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched) {
+                  <small class="text-danger fw-semibold">El teléfono es obligatorio</small>
                 }
-              }
-            </div>
+              </div>
 
-            <div class="text-start mb-3">
-              <input type="text" class="form-control form-control-lg rounded-4" formControlName="phone" placeholder="Teléfono">
-              @if (registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched) {
-                <small class="text-danger fw-semibold">El teléfono es obligatorio</small>
-              }
-            </div>
-
-            <div class="text-start mb-3">
-              <input type="password" class="form-control form-control-lg rounded-4" formControlName="password" placeholder="Contraseña">
-              @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
-                @if (registerForm.get('password')?.hasError('required')) {
-                  <small class="text-danger fw-semibold">La contraseña es obligatoria</small>
+              <div class="text-start mb-3">
+                <input
+                  type="password"
+                  class="form-control form-control-lg rounded-4"
+                  formControlName="password"
+                  placeholder="Contraseña"
+                />
+                @if (
+                  registerForm.get('password')?.invalid && registerForm.get('password')?.touched
+                ) {
+                  @if (registerForm.get('password')?.hasError('required')) {
+                    <small class="text-danger fw-semibold">La contraseña es obligatoria</small>
+                  }
+                  @if (registerForm.get('password')?.hasError('minlength')) {
+                    <small class="text-danger fw-semibold">Debe tener al menos 6 caracteres</small>
+                  }
                 }
-                @if (registerForm.get('password')?.hasError('minlength')) {
-                  <small class="text-danger fw-semibold">Debe tener al menos 6 caracteres</small>
+              </div>
+
+              <div class="text-start mb-4">
+                <select
+                  id="role"
+                  formControlName="role"
+                  class="form-control form-control-lg rounded-4 text-muted"
+                >
+                  <option value="" disabled selected>Selecciona tu rol...</option>
+                  <option value="MANAGER">Dueño de taller</option>
+                  <option value="CLIENT">Cliente</option>
+                </select>
+                @if (registerForm.get('role')?.invalid && registerForm.get('role')?.touched) {
+                  <small class="text-danger fw-semibold">Debes seleccionar un tipo de cuenta</small>
                 }
-              }
-            </div>
+              </div>
 
-            <div class="text-start mb-4">
-              <select id="role" formControlName="role" class="form-control form-control-lg rounded-4 text-muted">
-                <option value="" disabled selected>Selecciona tu rol...</option>
-                <option value="MANAGER">Dueño de taller</option>
-                <option value="CLIENT">Cliente</option>
-                <option value="DIY">Mecánico por cuenta propia</option>
-              </select>
-              @if (registerForm.get('role')?.invalid && registerForm.get('role')?.touched) {
-                <small class="text-danger fw-semibold">Debes seleccionar un tipo de cuenta</small>
-              }
-            </div>
-            <div class="form-check text-start mb-4">
-              <input class="form-check-input border-secondary" type="checkbox" id="rememberMeReg" formControlName="rememberMe">
-              <label class="form-check-label text-muted fw-semibold" for="rememberMeReg">
-                Mantener la sesión iniciada
-              </label>
-            </div>
+              <button
+                type="submit"
+                class="btn w-100 btn-lg rounded-pill text-white mb-3 fw-bold shadow-sm"
+                style="background-color: #00d4ff"
+                [disabled]="registerForm.invalid || isRegistering()"
+              >
+                {{ isRegistering() ? 'Registrando...' : 'Comenzar ahora' }}
+              </button>
 
-            <button type="submit" class="btn w-100 btn-lg rounded-pill text-white mb-3 fw-bold shadow-sm" style="background-color: #00D4FF;" [disabled]="registerForm.invalid">Comenzar ahora</button>
-            <button type="button" class="btn w-100 btn-lg rounded-pill text-white fw-bold shadow-sm" style="background-color: #0066FF;" (click)="closeRegister()">Volver</button>
-
-          </form>
+              <button
+                type="button"
+                class="btn w-100 btn-lg rounded-pill text-white fw-bold shadow-sm"
+                style="background-color: #0066ff"
+                (click)="closeRegister()"
+                [disabled]="isRegistering()"
+              >
+                Volver
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-}
+  }
 
-@if (showLogin || showRegister) {
-  <div class="modal-backdrop fade show backdrop-animado" (click)="closeLogin(); closeRegister()"></div>
-}
-
+  @if (showLogin() || showRegister()) {
+    <div
+      class="modal-backdrop fade show backdrop-animado"
+      (click)="closeLogin(); closeRegister()"
+    ></div>
+  }
 </div>

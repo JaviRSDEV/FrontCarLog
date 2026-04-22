@@ -1,26 +1,18 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpInterceptorFn, HttpXsrfTokenExtractor } from '@angular/common/http';
+import { inject } from '@angular/core';
 import { environment } from '../../environments/environment';
-
-function getCookie(name: string): string | null {
-  const matches = document.cookie.match(
-    new RegExp('(?:^|; )' + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + '=([^;]*)'),
-  );
-  return matches ? decodeURIComponent(matches[1]) : null;
-}
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const isApiRequest = req.url.startsWith(environment.apiUrl);
 
   if (isApiRequest) {
-    const xsrfToken = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('XSRF-TOKEN='))
-      ?.split('=')[1];
+    const xsrfTokenExtractor = inject(HttpXsrfTokenExtractor);
+    const xsrfToken = xsrfTokenExtractor.getToken();
 
     let headers = req.headers;
 
     if (xsrfToken) {
-      headers = headers.set('X-XSRF-TOKEN', decodeURIComponent(xsrfToken));
+      headers = headers.set('X-XSRF-TOKEN', xsrfToken);
     }
 
     const peticionClonada = req.clone({

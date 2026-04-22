@@ -1,136 +1,102 @@
-import { UserService } from './../../../services/userService/user.service';
-import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { User } from '../../../models/user';
+import { CommonModule, TitleCasePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
+
+import { UserService } from '../../../services/userService/user.service';
+import { Auth } from '../../../services/authService/auth.service';
 import {
   AppEventType,
   NotificationBusService,
 } from '../../../services/notification-bus/notification-bus.service';
-import { Subscription } from 'rxjs';
+import { User } from '../../../models/user';
 
 @Component({
-  selector: 'app-dashboard.component',
+  selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink, CommonModule],
+  imports: [RouterLink, CommonModule, TitleCasePipe],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })
-export class DashboardComponent implements OnInit, OnDestroy {
-  userName: string = 'Usuario';
-  role: string = '';
-  workshop: string = '';
-  user?: User;
+export class DashboardComponent implements OnInit {
+  private userService = inject(UserService);
+  private authService = inject(Auth);
+  private notificationBus = inject(NotificationBusService);
+  private destroy$ = inject(DestroyRef);
 
-  mostrarAvisoFeedBack: boolean = false;
-  mensajeAviso: string = '';
-  tipoAviso: 'success' | 'danger' | 'info' = 'info';
+  user = signal<User | undefined>(undefined);
+  userName = computed(() => this.user()?.name || this.user()?.email.split('@')[0] || 'Usuario');
+  role = computed(() => this.user()?.role || '');
 
-  private eventSub!: Subscription;
+  workshopName = computed(() => {
+    const ws = this.user()?.workshop;
+    if (!ws) return '';
+    return typeof ws === 'string' ? ws : ws.workshopName;
+  });
 
-  constructor(
-    private userService: UserService,
-    private cdr: ChangeDetectorRef,
-    private notificationBus: NotificationBusService,
-  ) {}
+  aviso = signal<{ mensaje: string; tipo: 'success' | 'danger' | 'info'; visible: boolean }>({
+    mensaje: '',
+    tipo: 'info',
+    visible: false,
+  });
 
   ngOnInit(): void {
     this.cargarDatosUsuario();
-    this.eventSub = this.notificationBus.on(AppEventType.NEW_INVITE).subscribe(() => {
-      this.cargarDatosUsuario();
-    });
-  }
-
-  ngOnDestroy(): void {
-    if (this.eventSub) {
-      this.eventSub.unsubscribe();
-    }
-  }
-
-  private getStorage() {
-    return localStorage.getItem('user') !== null ? localStorage : sessionStorage;
+    this.notificationBus
+      .on(AppEventType.NEW_INVITE)
+      .pipe(takeUntilDestroyed(this.destroy$))
+      .subscribe(() => this.cargarDatosUsuario());
   }
 
   cargarDatosUsuario() {
-    const userJson = localStorage.getItem('user') || sessionStorage.getItem('user');
-    if (!userJson) return;
+    this.userService
+      .getUserByDni()
+      .pipe(takeUntilDestroyed(this.destroy$))
+      .subscribe({
+        next: (fullUser: User) => {
+          this.user.set(fullUser);
+          this.authService.saveUserToStorage(fullUser);
+        },
+        error: (err: HttpErrorResponse) => console.error('Error al cargar datos del usuario:', err),
+      });
+  }
 
-    const localUser = JSON.parse(userJson);
+  gestionarInvitacion(aceptar: boolean) {
+    const currentUser = this.user();
+    if (!currentUser?.dni) return;
 
-    this.userService.getUserByDni().subscribe({
-      next: (fullUser: User) => {
-        this.user = fullUser;
-        this.role = this.user.role;
-        this.userName = this.user.name || this.user.email.split('@')[0];
+    const accion = aceptar
+      ? this.userService.acceptInvitation(currentUser.dni)
+      : this.userService.rejectInvitation(currentUser.dni);
 
-        if (this.user.workshop) {
-          this.workshop =
-            typeof this.user.workshop === 'string'
-              ? this.user.workshop
-              : this.user.workshop.workshopName;
-        }
+    accion.pipe(takeUntilDestroyed(this.destroy$)).subscribe({
+      next: (res: User) => {
+        const updatedUser = { ...res };
+        delete (updatedUser as any).pendingWorkshop;
+        delete (updatedUser as any).pendingWorkshopName;
+        delete (updatedUser as any).pendingRole;
 
-        this.getStorage().setItem('user', JSON.stringify(this.user));
-        this.cdr.detectChanges();
+        this.user.set(updatedUser);
+        this.authService.saveUserToStorage(updatedUser);
+
+        this.mostrarFeedback(
+          aceptar ? '¡Te has unido al taller!' : 'Invitación rechazada.',
+          aceptar ? 'success' : 'info',
+        );
       },
       error: (err: HttpErrorResponse) => {
-        console.error('Error al cargar datos del usuario:', err);
+        console.error(err);
+        this.mostrarFeedback('Error al procesar la invitación.', 'danger');
       },
     });
   }
 
-  gestionarInvitacion(aceptar: boolean) {
-    if (!this.user || !this.user.dni) return;
+  private mostrarFeedback(mensaje: string, tipo: 'success' | 'danger' | 'info') {
+    this.aviso.set({ mensaje, tipo, visible: true });
 
-    const accion = aceptar
-      ? this.userService.acceptInvitation(this.user.dni)
-      : this.userService.rejectInvitation(this.user.dni);
-
-    accion.subscribe({
-      next: (res: User) => {
-        const updatedUser = { ...res };
-
-        (updatedUser as any).pendingWorkshop = undefined;
-        (updatedUser as any).pendingWorkshopName = undefined;
-        (updatedUser as any).pendingRole = undefined;
-
-        this.user = updatedUser;
-
-        if (aceptar) {
-          this.role = this.user.role;
-          if (this.user.workshop) {
-            this.workshop =
-              typeof this.user.workshop === 'string'
-                ? this.user.workshop
-                : this.user.workshop.workshopName;
-          }
-          this.mensajeAviso = '¡Te has unido al taller!';
-          this.tipoAviso = 'success';
-        } else {
-          this.mensajeAviso = 'Invitación rechazada.';
-          this.tipoAviso = 'info';
-        }
-
-        this.getStorage().setItem('user', JSON.stringify(this.user));
-
-        this.mostrarAvisoFeedBack = true;
-
-        this.cdr.markForCheck();
-        this.cdr.detectChanges();
-
-        setTimeout(() => {
-          this.mostrarAvisoFeedBack = false;
-          this.cdr.detectChanges();
-        }, 5000);
-      },
-      error: (err) => {
-        console.error(err);
-        this.mensajeAviso = 'Error al procesar la invitación.';
-        this.tipoAviso = 'danger';
-        this.mostrarAvisoFeedBack = true;
-        this.cdr.detectChanges();
-      },
-    });
+    setTimeout(() => {
+      this.aviso.update((state) => ({ ...state, visible: false }));
+    }, 5000);
   }
 }

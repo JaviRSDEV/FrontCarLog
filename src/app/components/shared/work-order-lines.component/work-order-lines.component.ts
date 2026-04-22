@@ -1,6 +1,6 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, input, output, signal, inject } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms'; // <-- Adiós FormsModule
 import { WorkOrderLine } from '../../../models/workorderline';
 import Swal, { SweetAlertResult } from 'sweetalert2';
 
@@ -15,7 +15,7 @@ interface NewWorkOrderLine {
 @Component({
   selector: 'app-work-order-lines',
   standalone: true,
-  imports: [CurrencyPipe, FormsModule, CommonModule],
+  imports: [CurrencyPipe, ReactiveFormsModule, CommonModule],
   templateUrl: './work-order-lines.component.html',
   styleUrl: './work-order-lines.component.css',
 })
@@ -28,23 +28,30 @@ export class WorkOrderLinesComponent {
   onDelete = output<number>();
   onUpdate = output<{ lineId: number; data: Partial<WorkOrderLine> }>();
 
-  nuevaLinea: NewWorkOrderLine = {
-    concept: '',
-    quantity: 1,
-    pricePerUnit: 0,
-    IVA: 21,
-    discount: 0,
-  };
+  private fb = inject(FormBuilder);
+
+  formNuevaLinea = this.fb.nonNullable.group({
+    concept: ['', Validators.required],
+    quantity: [1, [Validators.required, Validators.min(1)]],
+    pricePerUnit: [0, [Validators.required, Validators.min(0)]],
+    IVA: [21, [Validators.required, Validators.min(0)]],
+    discount: [0, [Validators.min(0)]],
+  });
+
+  formEdicion = this.fb.nonNullable.group({
+    concept: ['', Validators.required],
+    quantity: [1, [Validators.required, Validators.min(1)]],
+    pricePerUnit: [0, [Validators.required, Validators.min(0)]],
+    IVA: [21, [Validators.required, Validators.min(0)]],
+    discount: [0, [Validators.min(0)]],
+  });
 
   editandoId = signal<number | null>(null);
-  lineaEnEdicion: WorkOrderLine | null = null;
 
   agregarLinea(): void {
-    if (!this.nuevaLinea.concept) return;
-
-    this.onAdd.emit(this.nuevaLinea);
-
-    this.nuevaLinea = { concept: '', quantity: 1, pricePerUnit: 0, IVA: 21, discount: 0 };
+    if (this.formNuevaLinea.invalid) return;
+    this.onAdd.emit(this.formNuevaLinea.getRawValue());
+    this.formNuevaLinea.reset();
   }
 
   eliminarLinea(id: number): void {
@@ -68,20 +75,31 @@ export class WorkOrderLinesComponent {
 
   iniciarEdicion(linea: WorkOrderLine) {
     this.editandoId.set(linea.id);
-    this.lineaEnEdicion = { ...linea };
+
+    this.formEdicion.patchValue({
+      concept: linea.concept,
+      quantity: linea.quantity,
+      pricePerUnit: linea.pricePerUnit,
+      IVA: linea.IVA,
+      discount: linea.discount,
+    });
   }
 
   cancelarEdicion() {
     this.editandoId.set(null);
-    this.lineaEnEdicion = null;
+    this.formEdicion.reset();
   }
 
   guardarEdicion() {
-    if (!this.lineaEnEdicion) return;
+    const idActual = this.editandoId();
+
+    if (!idActual || this.formEdicion.invalid) return;
+
     this.onUpdate.emit({
-      lineId: this.lineaEnEdicion.id,
-      data: this.lineaEnEdicion,
+      lineId: idActual,
+      data: this.formEdicion.getRawValue(),
     });
+
     this.cancelarEdicion();
   }
 }

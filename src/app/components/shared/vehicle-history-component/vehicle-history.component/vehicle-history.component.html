@@ -4,7 +4,7 @@
       <i class="bi bi-arrow-left me-2"></i>Volver
     </a>
     <h2 class="text-white m-0">
-      Historial del Vehículo <span class="text-primary">{{ matricula | uppercase }}</span>
+      Historial del Vehículo <span class="text-primary">{{ matricula() | uppercase }}</span>
     </h2>
   </div>
 
@@ -24,17 +24,17 @@
           </tr>
         </thead>
         <tbody>
-          @if (cargando) {
+          @if (cargando()) {
             <tr>
               <td colspan="4" class="text-center py-4 text-white-50">Cargando historial...</td>
             </tr>
           } @else {
-            @for (orden of historial; track orden.id) {
+            @for (orden of historial(); track orden.id) {
               <tr class="border-secondary">
                 <td>{{ orden.createdAt | date: 'dd/MM/yyyy' }}</td>
                 <td class="fw-bold">{{ orden.description }}</td>
                 <td>
-                  <span class="badge bg-secondary">{{ orden.mechanicName }}</span>
+                  <span class="badge bg-secondary">{{ orden.mechanicName || 'Sin asignar' }}</span>
                 </td>
                 <td class="text-end text-success fw-bold">
                   {{ orden.totalAmount | number: '1.2-2' }} €

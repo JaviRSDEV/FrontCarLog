@@ -73,10 +73,10 @@
           (change)="onFileSelected($event)"
         />
 
-        @if (imagenTemporal) {
-          <div class="mt-3 position-relative d-inline-block">
+        @if (imagenTemporal()) {
+          <div class="mt-3 position-relative d-inline-block animate-fade-in">
             <img
-              [src]="imagenTemporal"
+              [src]="imagenTemporal()"
               class="rounded shadow-sm border"
               style="width: 120px; height: 120px; object-fit: cover"
             />
@@ -103,7 +103,7 @@
         style="background-color: #00aeef"
         [disabled]="tallerForm.invalid"
       >
-        Crear taller
+        <i class="bi bi-check-circle me-2"></i>Crear taller
       </button>
     </form>
   </div>

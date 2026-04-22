@@ -1,17 +1,19 @@
-import { Injectable } from '@angular/core';
-import { Workorder } from '../../models/workorder';
-import { WorkOrderLine } from '../../models/workorderline';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+
 import { environment } from '../../../environments/environment.development';
+import { Workorder, CreateWorkOrderDto, UpdateWorkOrderDto } from '../../models/workorder';
+import { CreateWorkOrderLineDto } from '../../models/workorderline';
+import { WorkOrderLine } from '../../models/workorderline';
 
 @Injectable({
   providedIn: 'root',
 })
 export class WorkOrderService {
-  private apiUrl = `${environment.apiUrl}/workorders`;
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {}
+  private apiUrl = `${environment.apiUrl}/workorders`;
 
   getWorkOrdersByMechanic(dni: string): Observable<Workorder[]> {
     return this.http.get<Workorder[]>(`${this.apiUrl}/mechanic/${dni}`);
@@ -25,17 +27,11 @@ export class WorkOrderService {
     return this.http.get<Workorder>(`${this.apiUrl}/${id}`);
   }
 
-  createWorkOrder(workOrderData: {
-    description: string;
-    vehiclePlate: string;
-  }): Observable<Workorder> {
+  createWorkOrder(workOrderData: CreateWorkOrderDto): Observable<Workorder> {
     return this.http.post<Workorder>(this.apiUrl, workOrderData);
   }
 
-  updateWorkOrder(
-    id: number,
-    updateData: { mechanicNotes?: string; status?: string },
-  ): Observable<Workorder> {
+  updateWorkOrder(id: number, updateData: UpdateWorkOrderDto): Observable<Workorder> {
     return this.http.put<Workorder>(`${this.apiUrl}/${id}`, updateData);
   }
 
@@ -43,16 +39,7 @@ export class WorkOrderService {
     return this.http.delete<Workorder>(`${this.apiUrl}/${id}`);
   }
 
-  addWorkOrderLine(
-    orderId: number,
-    lineData: {
-      concept: string;
-      quantity: number;
-      pricePerUnit: number;
-      IVA: number;
-      discount: number;
-    },
-  ): Observable<Workorder> {
+  addWorkOrderLine(orderId: number, lineData: CreateWorkOrderLineDto): Observable<Workorder> {
     return this.http.post<Workorder>(`${this.apiUrl}/${orderId}/lines`, lineData);
   }
 
@@ -70,7 +57,6 @@ export class WorkOrderService {
 
   reassignWorkOrder(orderId: number, newMechanicId: string): Observable<Workorder> {
     const params = new HttpParams().set('newMechanicId', newMechanicId);
-
     return this.http.patch<Workorder>(`${this.apiUrl}/${orderId}/reassign`, {}, { params });
   }
 }

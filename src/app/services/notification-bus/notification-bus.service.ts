@@ -2,15 +2,17 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject, filter, map } from 'rxjs';
 
 export enum AppEventType {
-  RELOAD_VEHICLES,
-  RELOAD_EMPLOYEES,
-  NEW_INVITE,
+  RELOAD_VEHICLES = 'RELOAD_VEHICLES',
+  RELOAD_EMPLOYEES = 'RELOAD_EMPLOYEES',
+  NEW_INVITE = 'NEW_INVITE',
+  VEHICLE_REQUEST = 'VEHICLE_REQUEST',
 }
+
 @Injectable({
   providedIn: 'root',
 })
 export class NotificationBusService {
-  private eventSubject = new Subject<AppEventType>();
+  private readonly eventSubject = new Subject<AppEventType>();
 
   emit(event: AppEventType): void {
     this.eventSubject.next(event);

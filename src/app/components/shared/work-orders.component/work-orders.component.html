@@ -6,15 +6,15 @@
       <button class="btn btn-primary rounded-pill px-4 shadow-sm" (click)="toggleFormulario()">
         <i
           class="bi"
-          [class.bi-plus-lg]="!mostrarFormulario"
-          [class.bi-x-lg]="mostrarFormulario"
+          [class.bi-plus-lg]="!mostrarFormulario()"
+          [class.bi-x-lg]="mostrarFormulario()"
         ></i>
-        {{ mostrarFormulario ? ' Cancelar' : ' Nueva Orden' }}
+        {{ mostrarFormulario() ? ' Cancelar' : ' Nueva Orden' }}
       </button>
     }
   </div>
 
-  @if (mostrarFormulario) {
+  @if (mostrarFormulario()) {
     <app-work-order-form
       [userDni]="userDni"
       (guardado)="onOrdenGuardada()"
@@ -26,7 +26,7 @@
       <li class="nav-item">
         <button
           class="nav-link text-white"
-          [class.active]="activeTab === 'activas'"
+          [class.active]="activeTab() === 'activas'"
           (click)="cambiarPestana('activas')"
         >
           <i class="bi bi-tools me-1"></i>En curso
@@ -35,7 +35,7 @@
       <li class="nav-item">
         <button
           class="nav-link text-white"
-          [class.active]="activeTab === 'completadas'"
+          [class.active]="activeTab() === 'completadas'"
           (click)="cambiarPestana('completadas')"
         >
           <i class="bi bi-check2-circle me-1"></i>Completadas
@@ -44,8 +44,8 @@
     </ul>
 
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 fade-in">
-      @if (activeTab === 'activas') {
-        @for (orden of ordenesActivas; track orden.id) {
+      @if (activeTab() === 'activas') {
+        @for (orden of ordenesActivas(); track orden.id) {
           <div class="col">
             <div class="card bg-dark border-secondary text-white p-3 h-100 d-flex flex-column">
               <h5>{{ orden.vehicle.brand }} {{ orden.vehicle.model }}</h5>
@@ -82,9 +82,8 @@
             </p>
           </div>
         }
-
-      } @else if (activeTab === 'completadas') {
-        @for (orden of ordenesCompletadas; track orden.id) {
+      } @else if (activeTab() === 'completadas') {
+        @for (orden of ordenesCompletadas(); track orden.id) {
           <div class="col">
             <div
               class="card bg-dark border-secondary text-white p-3 h-100 d-flex flex-column opacity-75"

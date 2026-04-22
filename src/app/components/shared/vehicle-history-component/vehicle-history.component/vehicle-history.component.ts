@@ -1,9 +1,11 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe, DecimalPipe, UpperCasePipe } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
+
 import { VehicleService } from '../../../../services/vehicleService/vehicle.service';
 import { Workorder } from '../../../../models/workorder';
-import { HttpErrorResponse } from '@angular/common/http';
 import { Page } from '../../../../models/page.model';
 
 @Component({
@@ -14,39 +16,38 @@ import { Page } from '../../../../models/page.model';
   styleUrl: './vehicle-history.component.css',
 })
 export class VehicleHistoryComponent implements OnInit {
-  matricula: string = '';
-  historial: Workorder[] = [];
+  private route = inject(ActivatedRoute);
+  private vehicleService = inject(VehicleService);
+  private destroy$ = inject(DestroyRef);
 
-  cargando: boolean = true;
-
-  constructor(
-    private route: ActivatedRoute,
-    private vehicleService: VehicleService,
-    private cdr: ChangeDetectorRef,
-  ) {}
+  matricula = signal<string>('');
+  historial = signal<Workorder[]>([]);
+  cargando = signal<boolean>(true);
 
   ngOnInit(): void {
-    this.matricula = this.route.snapshot.paramMap.get('plate') || '';
+    const plate = this.route.snapshot.paramMap.get('plate') || '';
+    this.matricula.set(plate);
 
-    if (this.matricula) {
+    if (this.matricula()) {
       this.cargarHistorial();
     }
   }
 
   cargarHistorial() {
-    this.vehicleService.getHistoryByPlate(this.matricula).subscribe({
-      next: (data: Page<Workorder>) => {
-        this.historial = data.content;
-        this.cargando = false;
+    this.cargando.set(true);
 
-        this.cdr.detectChanges();
-      },
-      error: (err: HttpErrorResponse) => {
-        console.error('Error al cargar el historial:', err);
-        this.cargando = false;
-
-        this.cdr.detectChanges();
-      },
-    });
+    this.vehicleService
+      .getHistoryByPlate(this.matricula())
+      .pipe(takeUntilDestroyed(this.destroy$))
+      .subscribe({
+        next: (data: Page<Workorder>) => {
+          this.historial.set(data.content);
+          this.cargando.set(false);
+        },
+        error: (err: HttpErrorResponse) => {
+          console.error('Error al cargar el historial:', err);
+          this.cargando.set(false);
+        },
+      });
   }
 }

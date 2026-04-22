@@ -2,14 +2,14 @@
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="mb-0"><i class="bi bi-car-front-fill me-2 text-primary"></i>Gestión de vehículos</h2>
 
-    @if (activeTab === 'mis-vehiculos') {
+    @if (activeTab() === 'mis-vehiculos') {
       <button class="btn btn-primary rounded-pill px-4 shadow-sm" (click)="toggleFormulario()">
         <i
           class="bi"
-          [class.bi-plus-lg]="!mostrarFormulario"
-          [class.bi-x-lg]="mostrarFormulario"
+          [class.bi-plus-lg]="!mostrarFormulario()"
+          [class.bi-x-lg]="mostrarFormulario()"
         ></i>
-        {{ mostrarFormulario ? ' Cancelar' : ' Nuevo vehículo' }}
+        {{ mostrarFormulario() ? ' Cancelar' : ' Nuevo vehículo' }}
       </button>
     }
   </div>
@@ -18,7 +18,7 @@
     <li class="nav-item">
       <button
         class="nav-link text-white"
-        [class.active]="activeTab === 'mis-vehiculos'"
+        [class.active]="activeTab() === 'mis-vehiculos'"
         (click)="cambiarPestana('mis-vehiculos')"
       >
         <i class="bi bi-person-badge me-1"></i>Mis coches
@@ -28,7 +28,7 @@
       <li class="nav-item">
         <button
           class="nav-link text-white"
-          [class.active]="activeTab === 'asignados'"
+          [class.active]="activeTab() === 'asignados'"
           (click)="cambiarPestana('asignados')"
         >
           <i class="bi bi-wrench me-1"></i>Asignados a mí
@@ -39,7 +39,7 @@
       <li class="nav-item">
         <button
           class="nav-link text-white"
-          [class.active]="activeTab === 'flota'"
+          [class.active]="activeTab() === 'flota'"
           (click)="cambiarPestana('flota')"
         >
           <i class="bi bi-collection me-1"></i>Flota del taller
@@ -48,10 +48,10 @@
     }
   </ul>
 
-  @if (mostrarFormulario && activeTab === 'mis-vehiculos') {
+  @if (mostrarFormulario() && activeTab() === 'mis-vehiculos') {
     <app-vehicle-form
-      [vehiculoEdicion]="vehiculoParaEditar"
-      [isEditing]="isEditing"
+      [vehiculoEdicion]="vehiculoParaEditar()"
+      [isEditing]="isEditing()"
       [userDni]="userDni"
       [workshopId]="workshopId"
       (guardado)="onVehiculoGuardado()"
@@ -59,7 +59,7 @@
     </app-vehicle-form>
   }
 
-  @if (activeTab === 'flota') {
+  @if (activeTab() === 'flota') {
     <div class="card bg-dark bg-opacity-50 border-secondary mb-4 fade-in">
       <div class="card-body d-flex flex-column flex-md-row gap-3 align-items-center">
         <div class="text-white flex-grow-1">
@@ -73,13 +73,14 @@
             type="text"
             class="form-control text-uppercase"
             placeholder="Ej: 1234ABC"
-            [(ngModel)]="matriculaBuscada"
+            [ngModel]="matriculaBuscada()"
+            (ngModelChange)="matriculaBuscada.set($event)"
           />
           <button
             class="btn btn-primary fw-bold"
             type="button"
             (click)="solicitarIngreso()"
-            [disabled]="!matriculaBuscada"
+            [disabled]="!matriculaBuscada()"
           >
             Solicitar
           </button>
@@ -97,8 +98,8 @@
   </div>
 
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 fade-in">
-    @if (activeTab === 'mis-vehiculos') {
-      @for (v of misVehiculos; track v.plate) {
+    @if (activeTab() === 'mis-vehiculos') {
+      @for (v of misVehiculos(); track v.plate) {
         <div class="col">
           <app-vehicle-card
             [vehiculo]="v"
@@ -117,8 +118,8 @@
       }
     }
 
-    @if (activeTab === 'asignados') {
-      @for (v of vehiculosAsignados; track v.plate) {
+    @if (activeTab() === 'asignados') {
+      @for (v of vehiculosAsignados(); track v.plate) {
         <div class="col">
           <app-vehicle-card
             [vehiculo]="v"
@@ -136,8 +137,8 @@
       }
     }
 
-    @if (activeTab === 'flota') {
-      @for (v of flotaTaller; track v.plate) {
+    @if (activeTab() === 'flota') {
+      @for (v of flotaTaller(); track v.plate) {
         <div class="col">
           <app-vehicle-card
             [vehiculo]="v"
@@ -157,9 +158,9 @@
   </div>
 </div>
 
-@if (vehiculoSeleccionado) {
+@if (vehiculoSeleccionado()) {
   <app-vehicle-detail-modal
-    [vehiculo]="vehiculoSeleccionado"
+    [vehiculo]="vehiculoSeleccionado()!"
     (cerrarModal)="cerrarDetalles()"
     (editar)="editarVehiculo($event)"
     (eliminar)="eliminarVehiculo($event)"

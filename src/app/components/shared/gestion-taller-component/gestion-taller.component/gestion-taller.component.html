@@ -3,12 +3,12 @@
     <i class="bi bi-gear-wide-connected me-2"></i>Gestión de Usuario
   </h2>
 
-  @if (isManager) {
+  @if (isManager()) {
     <ul class="nav nav-tabs border-secondary mb-4">
       <li class="nav-item">
         <button
           class="nav-link text-white border-0"
-          [class.active-tab]="tabActiva === 'perfil'"
+          [class.active-tab]="tabActiva() === 'perfil'"
           (click)="cambiarTab('perfil')"
         >
           <i class="bi bi-person-fill me-2"></i>Mi Perfil
@@ -17,27 +17,27 @@
       <li class="nav-item">
         <button
           class="nav-link text-white border-0"
-          [class.active-tab]="tabActiva === 'plantilla'"
+          [class.active-tab]="tabActiva() === 'plantilla'"
           (click)="cambiarTab('plantilla')"
         >
-          <i class="bi bi-person-fill me-2"></i>Plantilla del Taller
+          <i class="bi bi-people-fill me-2"></i>Plantilla del Taller
         </button>
       </li>
     </ul>
   }
 
   <div class="tab-content">
-    @if (tabActiva === 'perfil') {
+    @if (tabActiva() === 'perfil') {
       <div class="row animate-fade-in">
         <div class="col-md-6 mx-auto">
-          @if (user) {
-            <app-mi-perfil-card [user]="user"></app-mi-perfil-card>
+          @if (user(); as userData) {
+            <app-mi-perfil-card [user]="userData"></app-mi-perfil-card>
           }
         </div>
       </div>
     }
 
-    @if (isManager && tabActiva === 'plantilla') {
+    @if (isManager() && tabActiva() === 'plantilla') {
       <div class="row animate-fade-in">
         <div class="col-12 mb-4">
           <app-hire-worker></app-hire-worker>

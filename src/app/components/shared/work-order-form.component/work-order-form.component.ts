@@ -1,10 +1,12 @@
-import { WorkOrderService } from './../../../services/workOrderService/work-order.service';
-import { Component, OnInit, EventEmitter, Input, Output, ChangeDetectorRef } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, OnInit, inject, input, output, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
+
+import { WorkOrderService } from '../../../services/workOrderService/work-order.service';
 import { VehicleService } from '../../../services/vehicleService/vehicle.service';
 import { Vehicle } from '../../../models/vehicle';
 import { Page } from '../../../models/page.model';
-import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-work-order-form',
@@ -14,66 +16,67 @@ import { HttpErrorResponse } from '@angular/common/http';
   styleUrl: './work-order-form.component.css',
 })
 export class WorkOrderFormComponent implements OnInit {
-  @Input() userDni: string = '';
-  @Output() guardado = new EventEmitter<void>();
-  @Output() cancelado = new EventEmitter<void>();
+  userDni = input<string>('');
+  guardado = output<void>();
+  cancelado = output<void>();
 
-  workOrderForm!: FormGroup;
-  mensajeError: string = '';
+  private fb = inject(FormBuilder);
+  private workOrderService = inject(WorkOrderService);
+  private vehicleService = inject(VehicleService);
+  private destroy$ = inject(DestroyRef);
 
-  vehiculosFlota: Vehicle[] = [];
-
-  constructor(
-    private fb: FormBuilder,
-    private workOrderService: WorkOrderService,
-    private vehicleService: VehicleService,
-    private cdr: ChangeDetectorRef,
-  ) {}
+  mensajeError = signal<string>('');
+  vehiculosFlota = signal<Vehicle[]>([]);
+  workOrderForm = this.fb.nonNullable.group({
+    vehiclePlate: ['', [Validators.required, Validators.pattern(/^[0-9]{4}[A-Z]{3}$/i)]],
+    description: ['', [Validators.required, Validators.minLength(10)]],
+  });
 
   ngOnInit(): void {
-    this.workOrderForm = this.fb.group({
-      vehiclePlate: ['', [Validators.required, Validators.pattern(/^[0-9]{4}[A-Z]{3}$/i)]],
-      description: ['', [Validators.required, Validators.minLength(10)]],
-    });
-
     this.cargarVehiculos();
   }
 
   cargarVehiculos(): void {
-    this.vehicleService.getAllVehicles().subscribe({
-      next: (data: Page<Vehicle>) => {
-        this.vehiculosFlota = data.content;
-        this.cdr.detectChanges();
-      },
-      error: (err: HttpErrorResponse) => {
-        console.error(err);
-        this.mensajeError = 'No se pudieron cargar los vehículos del taller';
-      },
-    });
-  }
-
-  onSubmit(): void {
-    this.mensajeError = '';
-
-    if (this.workOrderForm.valid) {
-      const formValue = this.workOrderForm.value;
-
-      const nuevaOrden = {
-        vehiclePlate: (formValue.vehiclePlate as string).toUpperCase(),
-        description: formValue.description as string,
-      };
-
-      this.workOrderService.createWorkOrder(nuevaOrden).subscribe({
-        next: () => {
-          this.guardado.emit();
+    this.vehicleService
+      .getAllVehicles()
+      .pipe(takeUntilDestroyed(this.destroy$))
+      .subscribe({
+        next: (data: Page<Vehicle>) => {
+          this.vehiculosFlota.set(data.content);
         },
         error: (err: HttpErrorResponse) => {
           console.error(err);
-          this.mensajeError =
-            err.error?.message ||
-            'Error al crear la orden de trabajo. Comprueba los datos introducidos';
+          this.mensajeError.set('No se pudieron cargar los vehículos del taller');
         },
       });
+  }
+
+  onSubmit(): void {
+    this.mensajeError.set('');
+
+    if (this.workOrderForm.valid) {
+      const formValue = this.workOrderForm.getRawValue();
+
+      const nuevaOrden = {
+        vehiclePlate: formValue.vehiclePlate.toUpperCase(),
+        description: formValue.description,
+      };
+
+      this.workOrderService
+        .createWorkOrder(nuevaOrden)
+        .pipe(takeUntilDestroyed(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.guardado.emit();
+          },
+          error: (err: HttpErrorResponse) => {
+            console.error(err);
+            this.mensajeError.set(
+              err.error?.message ||
+                'Error al crear la orden de trabajo. Comprueba los datos introducidos',
+            );
+          },
+        });
     } else {
       this.workOrderForm.markAllAsTouched();
     }

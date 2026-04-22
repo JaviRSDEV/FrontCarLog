@@ -1,10 +1,13 @@
-import { UserService } from './../../services/userService/user.service';
-import { Component } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Auth } from '../../services/authService/auth.service';
+import { Component, inject, signal, DestroyRef } from '@angular/core';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { User } from '../../models/user';
 import { HttpErrorResponse } from '@angular/common/http';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { switchMap, catchError, of } from 'rxjs';
+
+import { UserService } from '../../services/userService/user.service';
+import { Auth } from '../../services/authService/auth.service';
+import { User } from '../../models/user';
 
 @Component({
   selector: 'app-login',
@@ -14,114 +17,143 @@ import { HttpErrorResponse } from '@angular/common/http';
   styleUrls: ['./login.css'],
 })
 export class Login {
-  showLogin = false;
-  showRegister = false;
+  private fb = inject(FormBuilder);
+  private authService = inject(Auth);
+  private router = inject(Router);
+  private userService = inject(UserService);
+  private destroy$ = inject(DestroyRef);
 
-  loginForm: FormGroup;
-  registerForm: FormGroup;
+  showLogin = signal(false);
+  showRegister = signal(false);
 
-  loginError: string = '';
-  registerError: string = '';
+  loginError = signal('');
+  registerError = signal('');
 
-  constructor(
-    private fb: FormBuilder,
-    private authService: Auth,
-    private router: Router,
-    private userService: UserService,
-  ) {
-    this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      rememberMe: [false],
-    });
+  isLoggingIn = signal(false);
+  isRegistering = signal(false);
 
-    this.registerForm = this.fb.group({
-      dni: ['', [Validators.required, Validators.pattern(/^\d{8}[a-zA-Z]$/)]],
-      name: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      phone: ['', Validators.required],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      role: ['', Validators.required],
-    });
-  }
+  loginForm = this.fb.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]],
+    rememberMe: [false],
+  });
+
+  registerForm = this.fb.group({
+    dni: ['', [Validators.required, Validators.pattern(/^\d{8}[a-zA-Z]$/)]],
+    name: ['', Validators.required],
+    email: ['', [Validators.required, Validators.email]],
+    phone: ['', Validators.required],
+    password: ['', [Validators.required, Validators.minLength(6)]],
+    role: ['', Validators.required],
+  });
 
   openLogin(): void {
-    this.showLogin = true;
+    this.showLogin.set(true);
   }
+
   closeLogin(): void {
-    this.showLogin = false;
+    this.showLogin.set(false);
     this.loginForm.reset();
-    this.loginError = '';
+    this.loginError.set('');
+    this.isLoggingIn.set(false);
   }
+
   openRegister(): void {
-    this.showRegister = true;
+    this.showRegister.set(true);
   }
+
   closeRegister(): void {
-    this.showRegister = false;
+    this.showRegister.set(false);
     this.registerForm.reset();
-    this.registerError = '';
+    this.registerError.set('');
+    this.isRegistering.set(false);
   }
 
   onLoginSubmit(): void {
-    if (this.loginForm.valid) {
-      this.authService.login(this.loginForm.value).subscribe({
-        next: (basicUser: User) => {
-          this.userService.getUserByDni().subscribe({
-            next: (fullUser: User) => {
-              const rememberMe = this.loginForm.value.rememberMe;
-              const storage = rememberMe ? localStorage : sessionStorage;
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
+    }
 
-              localStorage.removeItem('user');
-              sessionStorage.removeItem('user');
-              storage.setItem('user', JSON.stringify(fullUser));
+    this.isLoggingIn.set(true);
+    this.loginError.set('');
 
-              this.closeLogin();
-              this.router.navigate(['/dashboard']);
-            },
-            error: (err: HttpErrorResponse) => {
+    const rawValues = this.loginForm.getRawValue();
+    const loginData: any = {
+      email: rawValues.email!,
+      password: rawValues.password!,
+      rememberMe: rawValues.rememberMe ?? false,
+    };
+
+    this.authService
+      .login(loginData)
+      .pipe(
+        switchMap((basicUser: User) => {
+          return this.userService.getUserByDni().pipe(
+            catchError((err: HttpErrorResponse) => {
               console.error('Error al obtener datos completos', err);
+              return of(basicUser);
+            }),
+          );
+        }),
+        takeUntilDestroyed(this.destroy$),
+      )
+      .subscribe({
+        next: (finalUser: User) => {
+          const rememberMe = loginData.rememberMe;
+          const storage = rememberMe ? localStorage : sessionStorage;
 
-              const rememberMe = this.loginForm.value.rememberMe;
-              const storage = rememberMe ? localStorage : sessionStorage;
+          localStorage.removeItem('user');
+          sessionStorage.removeItem('user');
+          storage.setItem('user', JSON.stringify(finalUser));
 
-              localStorage.removeItem('user');
-              sessionStorage.removeItem('user');
-              storage.setItem('user', JSON.stringify(basicUser));
-
-              this.closeLogin();
-              this.router.navigate(['/dashboard']);
-            },
-          });
+          this.closeLogin();
+          this.router.navigate(['/dashboard']);
         },
         error: (backendError: HttpErrorResponse) => {
           console.error('Error al iniciar sesión:', backendError);
+          this.isLoggingIn.set(false);
 
           if (backendError.status === 429) {
-            this.loginError =
-              backendError.error?.message || 'Demasiados intentos. Por favor, espera 1 minuto.';
+            this.loginError.set(
+              backendError.error?.message || 'Demasiados intentos. Espera 1 minuto.',
+            );
           } else if (
-            backendError.error?.message === 'Bad credentials' ||
+            backendError.status === 401 ||
             backendError.status === 403 ||
-            backendError.status === 401
+            backendError.error?.message === 'Bad credentials'
           ) {
-            this.loginError = 'Correo o contraseña incorrectos. Inténtalo de nuevo.';
+            this.loginError.set('Correo o contraseña incorrectos. Inténtalo de nuevo.');
           } else {
-            this.loginError = 'Ha ocurrido un error al conectar con el servidor.';
+            this.loginError.set('Ha ocurrido un error al conectar con el servidor.');
           }
-
-          // 💡 IMPORTANTE: Si estás usando una librería como SweetAlert o Toastr para mostrar el aviso,
-          // lanza el Toast justo aquí usando la variable this.loginError.
-          // Ejemplo: this.toastr.error(this.loginError);
         },
       });
-    } else {
-      this.loginForm.markAllAsTouched();
-    }
   }
 
   onRegisterSubmit(): void {
-    if (this.registerForm.valid) {
-      this.authService.register(this.registerForm.value).subscribe({
+    if (this.registerForm.invalid) {
+      this.registerForm.markAllAsTouched();
+      return;
+    }
+
+    this.isRegistering.set(true);
+    this.registerError.set('');
+
+    const rawValues = this.registerForm.getRawValue();
+    const registerData: any = {
+      dni: rawValues.dni!,
+      name: rawValues.name!,
+      email: rawValues.email!,
+      phone: rawValues.phone!,
+      password: rawValues.password!,
+      role: rawValues.role!,
+    };
+
+    this.authService
+      .register(registerData)
+      .pipe(takeUntilDestroyed(this.destroy$))
+      .subscribe({
         next: (user: User) => {
           localStorage.removeItem('user');
           sessionStorage.setItem('user', JSON.stringify(user));
@@ -137,18 +169,19 @@ export class Login {
         },
         error: (errorBackend: HttpErrorResponse) => {
           console.error('Error al registrar usuario', errorBackend);
+          this.isRegistering.set(false);
+
           if (errorBackend.status === 429) {
-            this.registerError =
-              errorBackend.error?.message || 'Demasiados intentos. Por favor, espera 1 minuto.';
+            this.registerError.set(
+              errorBackend.error?.message || 'Demasiados intentos. Por favor, espera 1 minuto.',
+            );
           } else {
-            this.registerError =
+            this.registerError.set(
               errorBackend.error?.message ||
-              'Error al registrarse. Comprueba los datos o si el correo ya existe';
+                'Error al registrarse. Comprueba los datos o si el correo ya existe.',
+            );
           }
         },
       });
-    } else {
-      this.registerForm.markAllAsTouched();
-    }
   }
 }

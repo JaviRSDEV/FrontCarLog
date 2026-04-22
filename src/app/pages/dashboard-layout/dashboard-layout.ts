@@ -1,10 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterOutlet } from '@angular/router';
 import { Navbar } from '../../components/shared/navbar/navbar.component';
 import { Header } from '../../components/shared/header/header.component';
 import { Footer } from '../../components/shared/footer/footer.component';
 
-import { Subscription } from 'rxjs';
 import { RxStomp } from '@stomp/rx-stomp';
 import { IMessage } from '@stomp/stompjs';
 import { myRxStompConfig } from '../../config/rx-stomp-config';
@@ -29,24 +29,27 @@ interface AppNotification {
   templateUrl: './dashboard-layout.html',
   styleUrl: './dashboard-layout.css',
 })
-export class DashboardLayout implements OnInit, OnDestroy {
-  private rxStomp: RxStomp;
-  private notificacionSubscription?: Subscription;
+export class DashboardLayout implements OnInit {
+  private authService = inject(Auth);
+  private notificationBus = inject(NotificationBusService);
+  private destroy$ = inject(DestroyRef);
 
-  constructor(
-    private authService: Auth,
-    private notificationBus: NotificationBusService,
-  ) {
-    this.rxStomp = new RxStomp();
+  private rxStomp = new RxStomp();
+
+  constructor() {
     this.rxStomp.configure(myRxStompConfig);
     this.rxStomp.activate();
+
+    this.destroy$.onDestroy(() => {
+      this.rxStomp.deactivate();
+    });
   }
 
   ngOnInit() {
     this.escucharNotificaciones();
   }
 
-  escucharNotificaciones() {
+  private escucharNotificaciones() {
     const userJson = localStorage.getItem('user') || sessionStorage.getItem('user');
 
     if (!userJson) return;
@@ -57,52 +60,56 @@ export class DashboardLayout implements OnInit, OnDestroy {
 
       if (!miDni) return;
 
-      this.notificacionSubscription = this.rxStomp
+      this.rxStomp
         .watch(`/topic/notificaciones/${miDni}`)
+        .pipe(takeUntilDestroyed(this.destroy$))
         .subscribe((message: IMessage) => {
           const notification: AppNotification = JSON.parse(message.body);
-
-          switch (notification.type) {
-            case 'FIRE':
-              console.warn(notification.title);
-              Swal.fire({
-                title: notification.title || '¡Atención!',
-                text: 'Has sido dado de baja del taller. Vuelve a iniciar sesión.',
-                icon: 'error',
-                background: '#212529',
-                color: '#fff',
-                confirmButtonColor: '#dc3545',
-                confirmButtonText: 'Cerrar sesión',
-                allowOutsideClick: false,
-              }).then(() => {
-                this.authService.logout();
-              });
-              break;
-
-            case 'INVITE':
-              this.mostrarToast(notification);
-              this.notificationBus.emit(AppEventType.NEW_INVITE);
-              break;
-
-            case 'VEHICLE_REQUEST':
-              this.mostrarToast(notification, "Ve a 'Mis Vehículos' para autorizar el ingreso.");
-              this.notificationBus.emit(AppEventType.RELOAD_VEHICLES);
-              break;
-
-            case 'NEW_EMPLOYEE':
-              this.notificationBus.emit(AppEventType.RELOAD_EMPLOYEES);
-              break;
-
-            case 'NEW_FLEET_VEHICLE':
-              this.notificationBus.emit(AppEventType.RELOAD_VEHICLES);
-              break;
-
-            default:
-              console.log('Notificación recibida: ', notification);
-          }
+          this.procesarNotificacion(notification);
         });
     } catch (e) {
       console.error('Error al iniciar suscripción de notificaciones:', e);
+    }
+  }
+
+  private procesarNotificacion(notification: AppNotification) {
+    switch (notification.type) {
+      case 'FIRE':
+        console.warn(notification.title);
+        Swal.fire({
+          title: notification.title || '¡Atención!',
+          text: 'Has sido dado de baja del taller. Vuelve a iniciar sesión.',
+          icon: 'error',
+          background: '#212529',
+          color: '#fff',
+          confirmButtonColor: '#dc3545',
+          confirmButtonText: 'Cerrar sesión',
+          allowOutsideClick: false,
+        }).then(() => {
+          this.authService.logout();
+        });
+        break;
+
+      case 'INVITE':
+        this.mostrarToast(notification);
+        this.notificationBus.emit(AppEventType.NEW_INVITE);
+        break;
+
+      case 'VEHICLE_REQUEST':
+        this.mostrarToast(notification, "Ve a 'Mis Vehículos' para autorizar el ingreso.");
+        this.notificationBus.emit(AppEventType.RELOAD_VEHICLES);
+        break;
+
+      case 'NEW_EMPLOYEE':
+        this.notificationBus.emit(AppEventType.RELOAD_EMPLOYEES);
+        break;
+
+      case 'NEW_FLEET_VEHICLE':
+        this.notificationBus.emit(AppEventType.RELOAD_VEHICLES);
+        break;
+
+      default:
+        console.log('Notificación recibida: ', notification);
     }
   }
 
@@ -119,12 +126,5 @@ export class DashboardLayout implements OnInit, OnDestroy {
       timer: 5000,
       timerProgressBar: true,
     });
-  }
-
-  ngOnDestroy(): void {
-    if (this.notificacionSubscription) {
-      this.notificacionSubscription.unsubscribe();
-    }
-    this.rxStomp.deactivate();
   }
 }

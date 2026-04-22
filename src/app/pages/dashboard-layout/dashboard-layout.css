@@ -22,3 +22,35 @@
   filter: blur(10px);
   z-index: -1;
 }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background-color: #000;
+}
+
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+app-footer {
+  flex-shrink: 0;
+}
+
+#pie_pagina {
+  background-color: #0a0a0a !important;
+  border-top: 1px solid #222 !important;
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+#pie_pagina:hover {
+  opacity: 1;
+}

@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
+
 import { User } from '../../models/user';
 import { environment } from '../../../environments/environment.development';
 
@@ -8,33 +9,27 @@ import { environment } from '../../../environments/environment.development';
   providedIn: 'root',
 })
 export class UserService {
-  private apiUrl = `${environment.apiUrl}/users`;
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {}
+  private apiUrl = `${environment.apiUrl}/users`;
 
   getUserByDni(): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/me`);
   }
 
   edit(userData: User, dni: string): Observable<User> {
-    const url = `${this.apiUrl}/${dni}`;
-    return this.http.put<User>(url, userData);
+    return this.http.put<User>(`${this.apiUrl}/${dni}`, userData);
   }
 
   contratarEmpleados(managerDni: string, employeeDni: string, newRole: string): Observable<User> {
-    const params = new HttpParams()
-      .set('managerDni', managerDni)
-      .set('employeeDni', employeeDni)
-      .set('newRole', newRole);
-
-    return this.http.patch<User>(`${this.apiUrl}/promote`, null, { params });
+    return this.http.patch<User>(`${this.apiUrl}/promote`, null, {
+      params: { managerDni, employeeDni, newRole },
+    });
   }
 
   invite(dni: string, managerDni: string, newRole: string): Observable<User> {
-    const params = new HttpParams().set('managerDni', managerDni).set('newRole', newRole);
-
     return this.http.patch<User>(`${this.apiUrl}/${dni}/invite`, null, {
-      params,
+      params: { managerDni, newRole },
       withCredentials: true,
     });
   }
@@ -48,6 +43,12 @@ export class UserService {
   }
 
   fireEmployee(dni: string): Observable<void> {
-    return this.http.patch<void>(`${this.apiUrl}/${dni}/fire`, {}, { withCredentials: true });
+    return this.http.patch<void>(
+      `${this.apiUrl}/${dni}/fire`,
+      {},
+      {
+        withCredentials: true,
+      },
+    );
   }
 }

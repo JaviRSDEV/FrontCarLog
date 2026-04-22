@@ -7,3 +7,11 @@ export interface WorkOrderLine {
   discount: number;
   subTotal?: number;
 }
+
+export interface CreateWorkOrderLineDto {
+  concept: string;
+  quantity: number;
+  pricePerUnit: number;
+  IVA: number;
+  discount: number;
+}

@@ -9,70 +9,80 @@ export const ErrorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      let mensajeParaMostrar = 'Ha ocurrido un error inesperado';
+      const mensajeParaMostrar =
+        error.error?.message ||
+        (error.status === 500
+          ? 'Error interno del servidor (500)'
+          : error.status === 0
+            ? 'No hay conexión con el servidor o la petición fue cancelada'
+            : 'Ha ocurrido un error inesperado');
 
-      if (error.error && error.error.message) {
-        mensajeParaMostrar = error.error.message;
-      } else if (error.status === 500) {
-        mensajeParaMostrar = 'Error interno del servidor (500)';
-      } else if (error.status === 0) {
-        mensajeParaMostrar = 'No hay conexión con el servidor o la petición fue cancelada';
+      if (req.url.includes('/authenticate') || req.url.includes('/register')) {
+        return throwError(() => error);
       }
 
-      if (error.status === 401 || error.error?.message === 'Bad credentials') {
-        console.warn('401/Login fallido detectado: Limpiando rastro de usuario...');
+      const swalBaseConfig = {
+        background: '#212529',
+        color: '#fff',
+        confirmButtonColor: '#0d6efd',
+      };
 
-        localStorage.removeItem('user');
-        sessionStorage.removeItem('user');
-        router.navigate(['/login']);
+      switch (error.status) {
+        case 401:
+          console.warn('401 detectado: Limpiando rastro de usuario...');
+          limpiarSesionLocal(router);
 
-        Swal.fire({
-          icon: 'error',
-          title: 'Acceso denegado',
-          text: 'Correo o contraseña incorrectos, o sesión caducada.',
-          background: '#212529',
-          color: '#fff',
-          confirmButtonColor: '#dc3545',
-        });
-      } else if (error.status === 429) {
-        Swal.fire({
-          icon: 'warning',
-          title: '¡Demasiados intentos!',
-          text: error.error?.message || 'Por favor, espera 1 minuto antes de volver a intentarlo.',
-          background: '#212529',
-          color: '#fff',
-          confirmButtonColor: '#0d6efd',
-        });
-      } else if (error.status === 403) {
-        Swal.fire({
-          title: 'Acceso Denegado',
-          text: mensajeParaMostrar,
-          icon: 'warning',
-          background: '#212529',
-          color: '#fff',
-          confirmButtonColor: '#0d6efd',
-          confirmButtonText: 'Entendido',
-        }).then(() => {
-          const msgLower = mensajeParaMostrar.toLowerCase();
-          if (msgLower.includes('taller') || msgLower.includes('sesión')) {
-            localStorage.removeItem('user');
-            sessionStorage.removeItem('user');
-            router.navigate(['/login']);
-          }
-        });
-      } else {
-        Swal.fire({
-          title: 'Atención',
-          text: mensajeParaMostrar,
-          icon: 'error',
-          background: '#212529',
-          color: '#fff',
-          confirmButtonColor: '#0d6efd',
-          confirmButtonText: 'Aceptar',
-        });
+          Swal.fire({
+            ...swalBaseConfig,
+            icon: 'error',
+            title: 'Acceso denegado',
+            text: 'Sesión caducada o credenciales incorrectas.',
+            confirmButtonColor: '#dc3545',
+          });
+          break;
+
+        case 403:
+          Swal.fire({
+            ...swalBaseConfig,
+            title: 'Acceso Denegado',
+            text: mensajeParaMostrar,
+            icon: 'warning',
+            confirmButtonText: 'Entendido',
+          }).then(() => {
+            const msgLower = mensajeParaMostrar.toLowerCase();
+            if (msgLower.includes('taller') || msgLower.includes('sesión')) {
+              limpiarSesionLocal(router);
+            }
+          });
+          break;
+
+        case 429:
+          Swal.fire({
+            ...swalBaseConfig,
+            icon: 'warning',
+            title: '¡Demasiados intentos!',
+            text: mensajeParaMostrar,
+          });
+          break;
+
+        default:
+          Swal.fire({
+            ...swalBaseConfig,
+            title: 'Atención',
+            text: mensajeParaMostrar,
+            icon: 'error',
+            confirmButtonText: 'Aceptar',
+          });
+          break;
       }
 
       return throwError(() => error);
     }),
   );
 };
+
+function limpiarSesionLocal(router: Router) {
+  localStorage.removeItem('user');
+  sessionStorage.removeItem('user');
+  router.navigate(['/login']);
+}

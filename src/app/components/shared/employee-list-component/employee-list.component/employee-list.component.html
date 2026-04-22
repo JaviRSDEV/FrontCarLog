@@ -14,17 +14,18 @@
         </tr>
       </thead>
       <tbody>
-        @for (emp of empleados; track emp.dni) {
+        @for (emp of empleados(); track emp.dni) {
           <tr class="border-secondary">
             <td class="fw-bold">{{ emp.name | uppercase }}</td>
             <td>{{ emp.dni }}</td>
             <td>{{ emp.email }}</td>
 
             <td>
-              @if (editingRoleDni === emp.dni) {
+              @if (editingRoleDni() === emp.dni) {
                 <select
                   class="form-select form-select-sm bg-dark text-white border-secondary"
-                  [(ngModel)]="selectedRole"
+                  [ngModel]="selectedRole()"
+                  (ngModelChange)="selectedRole.set($event)"
                   style="width: auto; min-width: 140px"
                 >
                   <option value="MECHANIC">Mecánico</option>
@@ -51,8 +52,8 @@
             </td>
 
             <td class="text-end">
-              @if (emp.dni !== managerDni) {
-                @if (editingRoleDni === emp.dni) {
+              @if (emp.dni !== managerDni()) {
+                @if (editingRoleDni() === emp.dni) {
                   <button class="btn btn-success btn-sm fw-bold me-2" (click)="guardarRol(emp)">
                     <i class="bi bi-check-lg"></i> Guardar
                   </button>
