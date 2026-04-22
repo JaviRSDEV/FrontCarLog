@@ -3,7 +3,6 @@ import { Vehicle } from './vehicle';
 import { User } from './user';
 import { WorkOrderLine } from './workorderline';
 
-// Definimos los estados posibles para tener autocompletado total
 export type WorkOrderStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
 
 export interface Workorder {

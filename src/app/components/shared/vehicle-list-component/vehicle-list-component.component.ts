@@ -1,10 +1,9 @@
-import { Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { Component, OnInit, inject, signal, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
-import { signal } from '@angular/core';
 import Swal from 'sweetalert2';
 
 import { Page } from './../../../models/page.model';
@@ -23,6 +22,7 @@ import { VehicleFormComponent } from '../vehicle-form.component/vehicle-form.com
 import { VehicleCardComponent } from '../vehicle-card.component/vehicle-card.component';
 import { VehicleDetailModalComponent } from '../vehicle-detail-modal.component/vehicle-detail-modal.component';
 import { SearchComponent } from '../search-component/search.component/search.component';
+import { Workshop } from '../../../models/workshop';
 
 type TabType = 'mis-vehiculos' | 'asignados' | 'flota';
 
@@ -49,9 +49,9 @@ export class VehicleListComponent implements OnInit {
   private notificationBus = inject(NotificationBusService);
   private destroy$ = inject(DestroyRef);
 
-  role: string = '';
-  userDni: string = '';
-  workshopId: number = 0;
+  role = signal<string>('');
+  userDni = signal<string>('');
+  workshopId = signal<number>(0);
   activeTab = signal<TabType>('mis-vehiculos');
 
   misVehiculos = signal<Vehicle[]>([]);
@@ -63,6 +63,7 @@ export class VehicleListComponent implements OnInit {
   vehiculoParaEditar = signal<Vehicle | null>(null);
   vehiculoSeleccionado = signal<Vehicle | null>(null);
   matriculaBuscada = signal<string>('');
+
   currentPage = signal<number>(0);
   pageSize = signal<number>(10);
   totalElements = signal<number>(0);
@@ -73,22 +74,30 @@ export class VehicleListComponent implements OnInit {
     if (userJson) {
       try {
         const user: User = JSON.parse(userJson);
-        this.role = (user.role || '').toString().replace(/"/g, '').toUpperCase();
-        this.userDni = user.dni ? String(user.dni) : '';
-        this.workshopId =
-          user.workShopId || (user.workshop as any)?.workshopId || (user.workshop as any)?.id || 0;
+        this.role.set((user.role || '').toString().replace(/"/g, '').toUpperCase());
+        this.userDni.set(user.dni ? String(user.dni) : '');
+
+        const ws = user.workshop;
+        let wsId = 0;
+
+        if (user.workShopId) {
+          wsId = user.workShopId;
+        } else if (user.workshop && typeof user.workshop !== 'string') {
+          const ws = user.workshop as Workshop;
+          wsId = ws.workshopId;
+        }
+        this.workshopId.set(wsId);
       } catch (e) {
-        console.error('Error al leer sesión en VehicleListComponent:', e);
+        console.error('Error al procesar sesión:', e);
       }
     }
 
     this.cargarDatos(this.activeTab());
+
     this.notificationBus
       .on(AppEventType.RELOAD_VEHICLES)
       .pipe(takeUntilDestroyed(this.destroy$))
-      .subscribe(() => {
-        this.cargarDatos(this.activeTab());
-      });
+      .subscribe(() => this.cargarDatos(this.activeTab(), this.currentPage()));
   }
 
   buscarVehiculos(texto: string, page: number = 0): void {
@@ -102,77 +111,77 @@ export class VehicleListComponent implements OnInit {
     else if (this.activeTab() === 'asignados') searchType = 'ASSIGNED';
 
     this.vehicleService
-      .searchVehicles(texto, this.workshopId, searchType, page, this.pageSize())
+      .searchVehicles(texto, this.workshopId(), searchType, page, this.pageSize())
       .pipe(takeUntilDestroyed(this.destroy$))
       .subscribe({
         next: (data: Page<Vehicle>) => {
-          if (this.activeTab() === 'flota') {
-            this.flotaTaller.set(data.content);
-          } else if (this.activeTab() === 'asignados') {
-            this.vehiculosAsignados.set(data.content);
-          } else {
-            this.misVehiculos.set(data.content);
-          }
-
           this.totalElements.set(data.totalElements);
           this.currentPage.set(data.number);
+
+          if (this.activeTab() === 'flota') this.flotaTaller.set(data.content);
+          else if (this.activeTab() === 'asignados') this.vehiculosAsignados.set(data.content);
+          else this.misVehiculos.set(data.content);
         },
-        error: (err: HttpErrorResponse) => console.error('Error en la búsqueda', err),
+        error: (err: HttpErrorResponse) => console.error('Error en búsqueda:', err),
       });
   }
 
   cargarDatos(tab: TabType, page: number = 0): void {
     this.currentPage.set(page);
 
-    if (tab === 'mis-vehiculos') {
-      if (!this.userDni) return;
-      this.vehicleService
-        .getVehiclesByOwner(this.userDni, page, this.pageSize())
-        .pipe(takeUntilDestroyed(this.destroy$))
-        .subscribe({
-          next: (data: Page<Vehicle>) => {
-            this.misVehiculos.set(data.content);
-            this.totalElements.set(data.totalElements);
-          },
-          error: (err: HttpErrorResponse) => console.error(err),
-        });
-    } else if (tab === 'asignados') {
-      if (!this.userDni) return;
+    switch (tab) {
+      case 'mis-vehiculos':
+        if (!this.userDni()) return;
+        this.vehicleService
+          .getVehiclesByOwner(this.userDni(), page, this.pageSize())
+          .pipe(takeUntilDestroyed(this.destroy$))
+          .subscribe({
+            next: (data: Page<Vehicle>) => {
+              this.misVehiculos.set(data.content);
+              this.totalElements.set(data.totalElements);
+            },
+            error: (err: HttpErrorResponse) => console.error(err),
+          });
+        break;
 
-      this.workOrderService
-        .getWorkOrdersByMechanic(this.userDni)
-        .pipe(takeUntilDestroyed(this.destroy$))
-        .subscribe({
-          next: (data: Workorder[] | any) => {
-            const arrayDatos = data.content ? data.content : data;
-            const cochesUnicos = new Map<string, Vehicle>();
+      case 'asignados':
+        if (!this.userDni()) return;
+        this.workOrderService
+          .getWorkOrdersByMechanic(this.userDni())
+          .pipe(takeUntilDestroyed(this.destroy$))
+          .subscribe({
+            next: (data: Page<Workorder> | Workorder[]) => {
+              const arrayDatos = Array.isArray(data) ? data : data.content;
+              const cochesUnicos = new Map<string, Vehicle>();
 
-            arrayDatos.forEach((orden: any) => {
-              if (
-                orden.vehicle &&
-                orden.status !== 'COMPLETED' &&
-                !cochesUnicos.has(orden.vehicle.plate)
-              ) {
-                cochesUnicos.set(orden.vehicle.plate, orden.vehicle);
-              }
-            });
+              arrayDatos.forEach((orden: Workorder) => {
+                if (
+                  orden.vehicle &&
+                  orden.status !== 'COMPLETED' &&
+                  !cochesUnicos.has(orden.vehicle.plate)
+                ) {
+                  cochesUnicos.set(orden.vehicle.plate, orden.vehicle);
+                }
+              });
+              this.vehiculosAsignados.set(Array.from(cochesUnicos.values()));
+            },
+            error: (err: HttpErrorResponse) => console.error(err),
+          });
+        break;
 
-            this.vehiculosAsignados.set(Array.from(cochesUnicos.values()));
-          },
-          error: (err: HttpErrorResponse) => console.error(err),
-        });
-    } else if (tab === 'flota') {
-      if (!this.workshopId) return;
-      this.vehicleService
-        .getVehiclesByWorkshop(this.workshopId, page, this.pageSize())
-        .pipe(takeUntilDestroyed(this.destroy$))
-        .subscribe({
-          next: (data: Page<Vehicle>) => {
-            this.flotaTaller.set(data.content);
-            this.totalElements.set(data.totalElements);
-          },
-          error: (err: HttpErrorResponse) => console.error(err),
-        });
+      case 'flota':
+        if (!this.workshopId()) return;
+        this.vehicleService
+          .getVehiclesByWorkshop(this.workshopId(), page, this.pageSize())
+          .pipe(takeUntilDestroyed(this.destroy$))
+          .subscribe({
+            next: (data: Page<Vehicle>) => {
+              this.flotaTaller.set(data.content);
+              this.totalElements.set(data.totalElements);
+            },
+            error: (err: HttpErrorResponse) => console.error(err),
+          });
+        break;
     }
   }
 
@@ -216,11 +225,9 @@ export class VehicleListComponent implements OnInit {
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#dc3545',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: '<i class="bi bi-trash"></i>Sí, eliminar',
-      cancelButtonText: 'Cancelar',
       background: '#212529',
       color: '#fff',
+      confirmButtonText: '<i class="bi bi-trash"></i> Sí, eliminar',
     }).then((result) => {
       if (result.isConfirmed) {
         this.vehicleService.deleteVehicle(plate).subscribe({
@@ -228,15 +235,7 @@ export class VehicleListComponent implements OnInit {
             this.cargarDatos(this.activeTab(), this.currentPage());
             this.vehiculoSeleccionado.set(null);
           },
-          error: (err: HttpErrorResponse) => {
-            Swal.fire({
-              title: 'Error',
-              text: 'Error al eliminar el vehículo',
-              icon: 'error',
-              background: '#212529',
-              color: '#fff',
-            });
-          },
+          error: () => this.mostrarError('No se pudo eliminar el vehículo'),
         });
       }
     });
@@ -254,37 +253,17 @@ export class VehicleListComponent implements OnInit {
       icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#198754',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: '<i class="bi bi-box-arrow-right"></i> Confirmar Salida',
-      cancelButtonText: 'Cancelar',
       background: '#212529',
       color: '#fff',
+      confirmButtonText: '<i class="bi bi-box-arrow-right"></i> Confirmar Salida',
     }).then((result) => {
       if (result.isConfirmed) {
-        this.vehicleService.registerExit(plate.toUpperCase(), this.workshopId).subscribe({
+        this.vehicleService.registerExit(plate.toUpperCase(), this.workshopId()).subscribe({
           next: () => {
             this.cargarDatos(this.activeTab(), this.currentPage());
-            Swal.fire({
-              title: 'Salida Registrada',
-              text: 'El vehículo ya no está en el taller.',
-              icon: 'success',
-              background: '#212529',
-              color: '#fff',
-              timer: 2000,
-              showConfirmButton: false,
-            });
+            this.notificarExito('Salida Registrada');
           },
-          error: (err: HttpErrorResponse) => {
-            console.error(err);
-            Swal.fire({
-              title: 'Error',
-              text: 'No se pudo registrar la salida.',
-              icon: 'error',
-              background: '#212529',
-              color: '#fff',
-              confirmButtonColor: '#0d6efd',
-            });
-          },
+          error: () => this.mostrarError('No se pudo registrar la salida'),
         });
       }
     });
@@ -294,28 +273,13 @@ export class VehicleListComponent implements OnInit {
     const matricula = this.matriculaBuscada().trim();
     if (!matricula) return;
 
-    this.vehicleService.requestEntry(matricula.toUpperCase(), this.workshopId).subscribe({
+    this.vehicleService.requestEntry(matricula.toUpperCase(), this.workshopId()).subscribe({
       next: () => {
-        Swal.fire({
-          title: '¡Solicitud Enviada!',
-          text: `Se ha notificado al propietario del vehículo ${matricula.toUpperCase()}.`,
-          icon: 'success',
-          background: '#212529',
-          color: '#fff',
-          confirmButtonColor: '#0d6efd',
-        });
+        this.notificarExito(`Solicitud enviada para ${matricula.toUpperCase()}`);
         this.matriculaBuscada.set('');
       },
       error: (err: HttpErrorResponse) => {
-        const msg = err.error?.message || 'Error al solicitar el ingreso.';
-        Swal.fire({
-          title: 'Atención',
-          text: msg,
-          icon: 'warning',
-          background: '#212529',
-          color: '#fff',
-          confirmButtonColor: '#0d6efd',
-        });
+        this.mostrarError(err.error?.message || 'Error al solicitar ingreso');
       },
     });
   }
@@ -324,27 +288,9 @@ export class VehicleListComponent implements OnInit {
     this.vehicleService.approveEntry(plate).subscribe({
       next: () => {
         this.cargarDatos('mis-vehiculos', this.currentPage());
-        Swal.fire({
-          title: 'Ingreso Aprobado',
-          text: 'El taller ya tiene acceso a tu vehículo.',
-          icon: 'success',
-          background: '#212529',
-          color: '#fff',
-          timer: 2000,
-          showConfirmButton: false,
-          position: 'top-end',
-          toast: true,
-        });
+        this.notificarToast('Ingreso Aprobado');
       },
-      error: () => {
-        Swal.fire({
-          title: 'Error',
-          text: 'No se pudo aprobar la solicitud.',
-          icon: 'error',
-          background: '#212529',
-          color: '#fff',
-        });
-      },
+      error: () => this.mostrarError('No se pudo aprobar la solicitud'),
     });
   }
 
@@ -352,27 +298,37 @@ export class VehicleListComponent implements OnInit {
     this.vehicleService.rejectEntry(plate).subscribe({
       next: () => {
         this.cargarDatos('mis-vehiculos', this.currentPage());
-        Swal.fire({
-          title: 'Ingreso Rechazado',
-          text: 'Has denegado el acceso al taller.',
-          icon: 'info',
-          background: '#212529',
-          color: '#fff',
-          timer: 2000,
-          showConfirmButton: false,
-          position: 'top-end',
-          toast: true,
-        });
+        this.notificarToast('Ingreso Rechazado');
       },
-      error: () => {
-        Swal.fire({
-          title: 'Error',
-          text: 'No se pudo rechazar la solicitud.',
-          icon: 'error',
-          background: '#212529',
-          color: '#fff',
-        });
-      },
+      error: () => this.mostrarError('No se pudo rechazar la solicitud'),
     });
+  }
+
+  private notificarExito(title: string) {
+    Swal.fire({
+      title,
+      icon: 'success',
+      background: '#212529',
+      color: '#fff',
+      timer: 2000,
+      showConfirmButton: false,
+    });
+  }
+
+  private notificarToast(title: string) {
+    Swal.fire({
+      title,
+      icon: 'success',
+      background: '#212529',
+      color: '#fff',
+      timer: 2000,
+      showConfirmButton: false,
+      position: 'top-end',
+      toast: true,
+    });
+  }
+
+  private mostrarError(text: string) {
+    Swal.fire({ title: 'Error', text, icon: 'error', background: '#212529', color: '#fff' });
   }
 }
