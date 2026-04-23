@@ -17,11 +17,11 @@ import { User } from '../../models/user';
   styleUrls: ['./login.css'],
 })
 export class Login {
-  private fb = inject(FormBuilder);
-  private authService = inject(Auth);
-  private router = inject(Router);
-  private userService = inject(UserService);
-  private destroy$ = inject(DestroyRef);
+  private readonly fb = inject(FormBuilder);
+  private readonly authService = inject(Auth);
+  private readonly router = inject(Router);
+  private readonly userService = inject(UserService);
+  private readonly destroy$ = inject(DestroyRef);
 
   showLogin = signal(false);
   showRegister = signal(false);

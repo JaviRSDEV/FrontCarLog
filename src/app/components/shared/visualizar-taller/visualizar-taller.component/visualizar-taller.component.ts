@@ -16,10 +16,10 @@ import { Workshop } from '../../../../models/workshop';
   styleUrl: './visualizar-taller.component.css',
 })
 export class VisualizarTallerComponent implements OnInit {
-  private tallerService = inject(TallerService);
-  private authService = inject(Auth);
-  private fb = inject(FormBuilder);
-  private destroy$ = inject(DestroyRef);
+  private readonly tallerService = inject(TallerService);
+  private readonly authService = inject(Auth);
+  private readonly fb = inject(FormBuilder);
+  private readonly destroy$ = inject(DestroyRef);
 
   workshopData = signal<any>(null);
   cargando = signal<boolean>(true);
@@ -73,6 +73,7 @@ export class VisualizarTallerComponent implements OnInit {
     } catch (error) {
       this.mensajeError.set('Error al leer la sesión.');
       this.cargando.set(false);
+      console.error('error: ', error);
     }
   }
 
@@ -122,7 +123,7 @@ export class VisualizarTallerComponent implements OnInit {
       reader.readAsDataURL(file);
       reader.onload = (e) => {
         const result = e.target?.result;
-        if (typeof result !== 'string') return reject('Error al leer archivo');
+        if (typeof result !== 'string') return reject(new Error('Error al leer archivo'));
         const img = new Image();
         img.src = result;
         img.onload = () => {
@@ -134,16 +135,15 @@ export class VisualizarTallerComponent implements OnInit {
               height *= maxWidth / width;
               width = maxWidth;
             }
-          } else {
-            if (height > maxHeight) {
-              width *= maxHeight / height;
-              height = maxHeight;
-            }
+          } else if (height > maxHeight) {
+            width *= maxHeight / height;
+            height = maxHeight;
           }
+
           canvas.width = width;
           canvas.height = height;
           const ctx = canvas.getContext('2d');
-          if (!ctx) return reject('No ctx');
+          if (!ctx) return reject(new Error('No ctx'));
           ctx.drawImage(img, 0, 0, width, height);
           resolve(canvas.toDataURL('image/webp', quality));
         };
@@ -184,9 +184,9 @@ export class VisualizarTallerComponent implements OnInit {
     formData.append('workshopData', jsonBlob);
 
     const imgTemp = this.imagenTemporal();
-    if (imgTemp && imgTemp.startsWith('data:image')) {
+    if (imgTemp?.startsWith('data:image')) {
       const blob = await (await fetch(imgTemp)).blob();
-      const fileName = `${payload.workshopName.replace(/\s+/g, '_')}_icon.webp`;
+      const fileName = `${payload.workshopName.replaceAlll(/\s+/g, '_')}_icon.webp`;
       formData.append('file', blob, fileName);
     } else if (imgTemp === null) {
       formData.append('deleteIcon', 'true');

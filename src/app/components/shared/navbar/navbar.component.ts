@@ -14,9 +14,9 @@ import { Auth } from '../../../services/authService/auth.service';
   styleUrl: './navbar.css',
 })
 export class Navbar implements OnInit {
-  private authService = inject(Auth);
-  private router = inject(Router);
-  private destroy$ = inject(DestroyRef);
+  private readonly authService = inject(Auth);
+  private readonly router = inject(Router);
+  private readonly destroy$ = inject(DestroyRef);
 
   role = signal<string>('');
 
@@ -44,7 +44,7 @@ export class Navbar implements OnInit {
     if (userJson) {
       try {
         const user = JSON.parse(userJson);
-        const roleParsed = (user.role || '').toString().replace(/"/g, '').toUpperCase();
+        const roleParsed = (user.role || '').toString().replaceAll('"', '').toUpperCase();
 
         if (this.role() !== roleParsed) {
           this.role.set(roleParsed);

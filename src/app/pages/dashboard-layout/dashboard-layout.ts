@@ -30,11 +30,11 @@ interface AppNotification {
   styleUrl: './dashboard-layout.css',
 })
 export class DashboardLayout implements OnInit {
-  private authService = inject(Auth);
-  private notificationBus = inject(NotificationBusService);
-  private destroy$ = inject(DestroyRef);
+  private readonly authService = inject(Auth);
+  private readonly notificationBus = inject(NotificationBusService);
+  private readonly destroy$ = inject(DestroyRef);
 
-  private rxStomp = new RxStomp();
+  private readonly rxStomp = new RxStomp();
 
   constructor() {
     this.rxStomp.configure(myRxStompConfig);

@@ -20,15 +20,15 @@ type TabType = 'perfil' | 'plantilla';
   styleUrl: './gestion-taller.component.css',
 })
 export class GestionTallerComponent implements OnInit {
-  private userService = inject(UserService);
-  private authService = inject(Auth);
-  private destroy$ = inject(DestroyRef);
+  private readonly userService = inject(UserService);
+  private readonly authService = inject(Auth);
+  private readonly destroy$ = inject(DestroyRef);
 
   user = signal<User | undefined>(undefined);
   tabActiva = signal<TabType>('perfil');
   role = computed(() => {
     const r = this.user()?.role || '';
-    return r.toString().replace(/"/g, '').toUpperCase();
+    return r.toString().replaceAll('"', '').toUpperCase();
   });
 
   isManager = computed(() => {

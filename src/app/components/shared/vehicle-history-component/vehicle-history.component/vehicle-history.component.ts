@@ -16,9 +16,9 @@ import { Page } from '../../../../models/page.model';
   styleUrl: './vehicle-history.component.css',
 })
 export class VehicleHistoryComponent implements OnInit {
-  private route = inject(ActivatedRoute);
-  private vehicleService = inject(VehicleService);
-  private destroy$ = inject(DestroyRef);
+  private readonly route = inject(ActivatedRoute);
+  private readonly vehicleService = inject(VehicleService);
+  private readonly destroy$ = inject(DestroyRef);
 
   matricula = signal<string>('');
   historial = signal<Workorder[]>([]);

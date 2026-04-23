@@ -124,9 +124,9 @@
           [lineas]="orden()!.lines || []"
           [isReadOnly]="orden()!.status === 'COMPLETED'"
           [totalAmount]="orden()!.totalAmount || 0"
-          (onAdd)="manejarNuevaLinea($event)"
-          (onDelete)="manejarBorradoLinea($event)"
-          (onUpdate)="manejarActualizacionLinea($event)"
+          (Add)="manejarNuevaLinea($event)"
+          (Delete)="manejarBorradoLinea($event)"
+          (Update)="manejarActualizacionLinea($event)"
         ></app-work-order-lines>
       </div>
     </div>

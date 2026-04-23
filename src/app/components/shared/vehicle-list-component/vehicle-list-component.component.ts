@@ -42,12 +42,12 @@ type TabType = 'mis-vehiculos' | 'asignados' | 'flota';
   styleUrl: './vehicle-list-component.css',
 })
 export class VehicleListComponent implements OnInit {
-  private vehicleService = inject(VehicleService);
-  private workOrderService = inject(WorkOrderService);
-  private authService = inject(Auth);
-  private router = inject(Router);
-  private notificationBus = inject(NotificationBusService);
-  private destroy$ = inject(DestroyRef);
+  private readonly vehicleService = inject(VehicleService);
+  private readonly workOrderService = inject(WorkOrderService);
+  private readonly authService = inject(Auth);
+  private readonly router = inject(Router);
+  private readonly notificationBus = inject(NotificationBusService);
+  private readonly destroy$ = inject(DestroyRef);
 
   role = signal<string>('');
   userDni = signal<string>('');
@@ -74,10 +74,9 @@ export class VehicleListComponent implements OnInit {
     if (userJson) {
       try {
         const user: User = JSON.parse(userJson);
-        this.role.set((user.role || '').toString().replace(/"/g, '').toUpperCase());
+        this.role.set((user.role || '').toString().replaceAll('"', '').toUpperCase());
         this.userDni.set(user.dni ? String(user.dni) : '');
 
-        const ws = user.workshop;
         let wsId = 0;
 
         if (user.workShopId) {

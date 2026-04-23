@@ -20,15 +20,15 @@ export class WorkOrderFormComponent implements OnInit {
   guardado = output<void>();
   cancelado = output<void>();
 
-  private fb = inject(FormBuilder);
-  private workOrderService = inject(WorkOrderService);
-  private vehicleService = inject(VehicleService);
-  private destroy$ = inject(DestroyRef);
+  private readonly fb = inject(FormBuilder);
+  private readonly workOrderService = inject(WorkOrderService);
+  private readonly vehicleService = inject(VehicleService);
+  private readonly destroy$ = inject(DestroyRef);
 
   mensajeError = signal<string>('');
   vehiculosFlota = signal<Vehicle[]>([]);
   workOrderForm = this.fb.nonNullable.group({
-    vehiclePlate: ['', [Validators.required, Validators.pattern(/^[0-9]{4}[A-Z]{3}$/i)]],
+    vehiclePlate: ['', [Validators.required, Validators.pattern(/^\d{4}[A-Z]{3}$/i)]],
     description: ['', [Validators.required, Validators.minLength(10)]],
   });
 

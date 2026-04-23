@@ -23,12 +23,12 @@ import { Workshop } from '../../../models/workshop';
   styleUrl: './work-order-detail.component.css',
 })
 export class WorkOrderDetailComponent implements OnInit {
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private workOrderService = inject(WorkOrderService);
-  private tallerService = inject(TallerService);
-  private authService = inject(Auth);
-  private destroy$ = inject(DestroyRef);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly workOrderService = inject(WorkOrderService);
+  private readonly tallerService = inject(TallerService);
+  private readonly authService = inject(Auth);
+  private readonly destroy$ = inject(DestroyRef);
 
   orden = signal<Workorder | undefined>(undefined);
   cargando = signal<boolean>(true);
@@ -43,7 +43,7 @@ export class WorkOrderDetailComponent implements OnInit {
     if (userStorage) {
       try {
         const userData: User = JSON.parse(userStorage);
-        const role = (userData.role || '').toString().replace(/"/g, '').toUpperCase();
+        const role = (userData.role || '').toString().replaceAll('"', '').toUpperCase();
 
         this.esManager.set(role === 'MANAGER' || role === 'CO_MANAGER');
 

@@ -23,10 +23,10 @@ type VistaType = 'todas' | 'asignadas' | '';
   styleUrl: './work-orders.component.css',
 })
 export class WorkOrdersComponent implements OnInit {
-  private workOrderService = inject(WorkOrderService);
-  private authService = inject(Auth);
-  private router = inject(Router);
-  private destroy$ = inject(DestroyRef);
+  private readonly workOrderService = inject(WorkOrderService);
+  private readonly authService = inject(Auth);
+  private readonly router = inject(Router);
+  private readonly destroy$ = inject(DestroyRef);
 
   role: string = '';
   userDni: string = '';
@@ -36,7 +36,7 @@ export class WorkOrdersComponent implements OnInit {
   modoVista = signal<VistaType>('');
   mostrarFormulario = signal(false);
 
-  private todasLasOrdenes = signal<Workorder[]>([]);
+  private readonly todasLasOrdenes = signal<Workorder[]>([]);
 
   ordenesActivas = computed(() => this.todasLasOrdenes().filter((o) => o.status !== 'COMPLETED'));
   ordenesCompletadas = computed(() =>
@@ -50,7 +50,7 @@ export class WorkOrdersComponent implements OnInit {
       try {
         const user: User = JSON.parse(userJson);
 
-        this.role = (user.role || '').toString().replace(/"/g, '').toUpperCase();
+        this.role = (user.role || '').toString().replaceAll('"', '').toUpperCase();
         this.userDni = user.dni;
         this.workshopId = user.workShopId || (user.workshop as Workshop)?.workshopId;
 

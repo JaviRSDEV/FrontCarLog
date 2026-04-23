@@ -13,8 +13,8 @@ export class SearchComponent implements OnInit {
   placeholder = input<string>('Buscar...');
   busquedaLista = output<string>();
 
-  private destroy$ = inject(DestroyRef);
-  private buscadorSubject = new Subject<string>();
+  private readonly destroy$ = inject(DestroyRef);
+  private readonly buscadorSubject = new Subject<string>();
 
   ngOnInit(): void {
     this.buscadorSubject

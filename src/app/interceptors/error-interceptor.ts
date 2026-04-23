@@ -9,13 +9,17 @@ export const ErrorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      const mensajeParaMostrar =
-        error.error?.message ||
-        (error.status === 500
-          ? 'Error interno del servidor (500)'
-          : error.status === 0
-            ? 'No hay conexión con el servidor o la petición fue cancelada'
-            : 'Ha ocurrido un error inesperado');
+      let mensajeParaMostrar = error.error?.message;
+
+      if (!mensajeParaMostrar) {
+        if (error.status === 500) {
+          mensajeParaMostrar = 'Error interno del servidor (500)';
+        } else if (error.status === 0) {
+          mensajeParaMostrar = 'No hay conexión con el servidor o la petición fue cancelada';
+        } else {
+          mensajeParaMostrar = 'Ha ocurrido un error inesperado';
+        }
+      }
 
       if (req.url.includes('/authenticate') || req.url.includes('/register')) {
         return throwError(() => error);

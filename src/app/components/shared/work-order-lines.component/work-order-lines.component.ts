@@ -24,11 +24,11 @@ export class WorkOrderLinesComponent {
   isReadOnly = input<boolean>(false);
   totalAmount = input<number>(0);
 
-  onAdd = output<NewWorkOrderLine>();
-  onDelete = output<number>();
-  onUpdate = output<{ lineId: number; data: Partial<WorkOrderLine> }>();
+  Add = output<NewWorkOrderLine>();
+  Delete = output<number>();
+  Update = output<{ lineId: number; data: Partial<WorkOrderLine> }>();
 
-  private fb = inject(FormBuilder);
+  private readonly fb = inject(FormBuilder);
 
   formNuevaLinea = this.fb.nonNullable.group({
     concept: ['', Validators.required],
@@ -50,7 +50,7 @@ export class WorkOrderLinesComponent {
 
   agregarLinea(): void {
     if (this.formNuevaLinea.invalid) return;
-    this.onAdd.emit(this.formNuevaLinea.getRawValue());
+    this.Add.emit(this.formNuevaLinea.getRawValue());
     this.formNuevaLinea.reset();
   }
 
@@ -68,7 +68,7 @@ export class WorkOrderLinesComponent {
       color: '#fff',
     }).then((result: SweetAlertResult) => {
       if (result.isConfirmed) {
-        this.onDelete.emit(id);
+        this.Delete.emit(id);
       }
     });
   }
@@ -95,7 +95,7 @@ export class WorkOrderLinesComponent {
 
     if (!idActual || this.formEdicion.invalid) return;
 
-    this.onUpdate.emit({
+    this.Update.emit({
       lineId: idActual,
       data: this.formEdicion.getRawValue(),
     });

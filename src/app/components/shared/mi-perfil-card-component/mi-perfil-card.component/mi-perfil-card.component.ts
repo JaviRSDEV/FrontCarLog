@@ -19,12 +19,12 @@ import { Auth } from '../../../../services/authService/auth.service';
   styleUrl: './mi-perfil-card.component.css',
 })
 export class MiPerfilCardComponent implements OnInit {
-  userInitial = input.required<User>({ alias: 'user' });
+  userInitial = input.required<User>();
 
-  private tallerService = inject(TallerService);
-  private userService = inject(UserService);
-  private authService = inject(Auth);
-  private destroy$ = inject(DestroyRef);
+  private readonly tallerService = inject(TallerService);
+  private readonly userService = inject(UserService);
+  private readonly authService = inject(Auth);
+  private readonly destroy$ = inject(DestroyRef);
 
   user = signal<User | null>(null);
   workShop = signal<Workshop | undefined>(undefined);

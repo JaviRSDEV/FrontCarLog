@@ -20,10 +20,10 @@ import { User } from '../../../models/user';
   styleUrl: './dashboard.component.css',
 })
 export class DashboardComponent implements OnInit {
-  private userService = inject(UserService);
-  private authService = inject(Auth);
-  private notificationBus = inject(NotificationBusService);
-  private destroy$ = inject(DestroyRef);
+  private readonly userService = inject(UserService);
+  private readonly authService = inject(Auth);
+  private readonly notificationBus = inject(NotificationBusService);
+  private readonly destroy$ = inject(DestroyRef);
 
   user = signal<User | undefined>(undefined);
   userName = computed(() => this.user()?.name || this.user()?.email.split('@')[0] || 'Usuario');

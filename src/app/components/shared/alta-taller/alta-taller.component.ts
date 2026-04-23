@@ -15,11 +15,11 @@ import { Auth } from '../../../services/authService/auth.service';
   styleUrl: './alta-taller.css',
 })
 export class AltaTaller {
-  private fb = inject(FormBuilder);
-  private router = inject(Router);
-  private tallerService = inject(TallerService);
-  private authService = inject(Auth);
-  private destroy$ = inject(DestroyRef);
+  private readonly fb = inject(FormBuilder);
+  private readonly router = inject(Router);
+  private readonly tallerService = inject(TallerService);
+  private readonly authService = inject(Auth);
+  private readonly destroy$ = inject(DestroyRef);
 
   imagenTemporal = signal<string | null>(null);
 
@@ -51,7 +51,7 @@ export class AltaTaller {
       reader.readAsDataURL(file);
       reader.onload = (e) => {
         const result = e.target?.result;
-        if (typeof result !== 'string') return reject('Error al leer archivo');
+        if (typeof result !== 'string') return reject(new Error('Error al leer archivo'));
         const img = new Image();
         img.src = result;
         img.onload = () => {
@@ -64,22 +64,20 @@ export class AltaTaller {
               height *= maxWidth / width;
               width = maxWidth;
             }
-          } else {
-            if (height > maxHeight) {
-              width *= maxHeight / height;
-              height = maxHeight;
-            }
+          } else if (height > maxHeight) {
+            width *= maxHeight / height;
+            height = maxHeight;
           }
 
           canvas.width = width;
           canvas.height = height;
           const ctx = canvas.getContext('2d');
-          if (!ctx) return reject('No se pudo obtener el contexto 2D');
+          if (!ctx) return reject(new Error('No se pudo obtener el contexto 2D'));
           ctx.drawImage(img, 0, 0, width, height);
           resolve(canvas.toDataURL('image/webp', quality));
         };
       };
-      reader.onerror = (err) => reject(err);
+      reader.onerror = (err) => reject(new Error('Error al lerr la imagen'));
     });
   }
 

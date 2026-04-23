@@ -16,7 +16,7 @@ export class VehicleDetailModalComponent implements OnInit {
   editar = output<Vehicle>();
   eliminar = output<string>();
 
-  private authService = inject(Auth);
+  private readonly authService = inject(Auth);
   currentUserDni = signal<string>('');
 
   ngOnInit(): void {

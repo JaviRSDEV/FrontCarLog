@@ -14,9 +14,9 @@ import { Auth } from '../../../../services/authService/auth.service';
   styleUrl: './hire-worker.component.css',
 })
 export class HireWorkerComponent {
-  private userService = inject(UserService);
-  private authService = inject(Auth);
-  private destroy$ = inject(DestroyRef);
+  private readonly userService = inject(UserService);
+  private readonly authService = inject(Auth);
+  private readonly destroy$ = inject(DestroyRef);
 
   dniBusqueda = signal<string>('');
   rolElegido = signal<string>('MECHANIC');

@@ -126,6 +126,7 @@
                   class="form-control form-control-lg rounded-4"
                   formControlName="email"
                 />
+
                 @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
                   @if (loginForm.get('email')?.hasError('required')) {
                     <small class="text-danger fw-semibold">El correo es obligatorio</small>
@@ -143,6 +144,7 @@
                   class="form-control form-control-lg rounded-4"
                   formControlName="password"
                 />
+
                 @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
                   @if (loginForm.get('password')?.hasError('required')) {
                     <small class="text-danger fw-semibold">La contraseña es obligatoria</small>

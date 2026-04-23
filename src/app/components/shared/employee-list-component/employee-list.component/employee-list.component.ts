@@ -2,6 +2,8 @@ import { Component, OnInit, inject, signal, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, UpperCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { from } from 'rxjs';
+import { filter, switchMap } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 import Swal from 'sweetalert2';
 
@@ -23,11 +25,11 @@ import { Workshop } from '../../../../models/workshop';
   styleUrl: './employee-list.component.css',
 })
 export class EmployeeListComponent implements OnInit {
-  private userService = inject(UserService);
-  private tallerService = inject(TallerService);
-  private authService = inject(Auth);
-  private notificationBus = inject(NotificationBusService);
-  private destroy$ = inject(DestroyRef);
+  private readonly userService = inject(UserService);
+  private readonly tallerService = inject(TallerService);
+  private readonly authService = inject(Auth);
+  private readonly notificationBus = inject(NotificationBusService);
+  private readonly destroy$ = inject(DestroyRef);
 
   empleados = signal<User[]>([]);
   managerDni = signal<string>('');
@@ -118,49 +120,52 @@ export class EmployeeListComponent implements OnInit {
   }
 
   despedir(dniEmpleado: string) {
-    Swal.fire({
-      title: '¿Estás seguro?',
-      text: `Vas a despedir al empleado con DNI ${dniEmpleado}. Esta acción no se puede deshacer.`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#dc3545',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: '<i class="bi bi-person-x-fill"></i> Sí, despedir',
-      cancelButtonText: 'Cancelar',
-      background: '#212529',
-      color: '#fff',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.userService
-          .fireEmployee(dniEmpleado)
-          .pipe(takeUntilDestroyed(this.destroy$))
-          .subscribe({
-            next: () => {
-              this.empleados.update((list) => list.filter((emp) => emp.dni !== dniEmpleado));
+    const confirmacion$ = from(
+      Swal.fire({
+        title: '¿Estás seguro?',
+        text: `Vas a despedir al empleado con DNI ${dniEmpleado}. Esta acción no se puede deshacer.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: '<i class="bi bi-person-x-fill"></i> Sí, despedir',
+        cancelButtonText: 'Cancelar',
+        background: '#212529',
+        color: '#fff',
+      }),
+    );
 
-              Swal.fire({
-                title: '¡Despedido!',
-                text: 'El empleado ha sido dado de baja del taller.',
-                icon: 'success',
-                background: '#212529',
-                color: '#fff',
-                timer: 2000,
-                showConfirmButton: false,
-              });
-            },
-            error: (err: HttpErrorResponse) => {
-              console.error('Error al despedir', err);
-              Swal.fire({
-                title: 'Error',
-                text: 'Hubo un problema al intentar despedir al empleado.',
-                icon: 'error',
-                background: '#212529',
-                color: '#fff',
-                confirmButtonColor: '#0d6efd',
-              });
-            },
+    confirmacion$
+      .pipe(
+        filter((result) => result.isConfirmed),
+        switchMap(() => this.userService.fireEmployee(dniEmpleado)),
+        takeUntilDestroyed(this.destroy$),
+      )
+      .subscribe({
+        next: () => {
+          this.empleados.update((list) => list.filter((emp) => emp.dni !== dniEmpleado));
+
+          Swal.fire({
+            title: '¡Despedido!',
+            text: 'El empleado ha sido dado de baja del taller.',
+            icon: 'success',
+            background: '#212529',
+            color: '#fff',
+            timer: 2000,
+            showConfirmButton: false,
           });
-      }
-    });
+        },
+        error: (err: HttpErrorResponse) => {
+          console.error('Error al despedir', err);
+          Swal.fire({
+            title: 'Error',
+            text: 'Hubo un problema al intentar despedir al empleado.',
+            icon: 'error',
+            background: '#212529',
+            color: '#fff',
+            confirmButtonColor: '#0d6efd',
+          });
+        },
+      });
   }
 }

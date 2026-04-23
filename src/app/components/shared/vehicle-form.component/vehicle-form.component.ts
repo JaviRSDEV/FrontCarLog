@@ -24,9 +24,9 @@ export class VehicleFormComponent implements OnInit {
   guardado = output<void>();
   cerrar = output<void>();
 
-  private fb = inject(FormBuilder);
-  private vehicleService = inject(VehicleService);
-  private destroy$ = inject(DestroyRef);
+  private readonly fb = inject(FormBuilder);
+  private readonly vehicleService = inject(VehicleService);
+  private readonly destroy$ = inject(DestroyRef);
 
   imagenesTemporales = signal<string[]>([]);
   vehiculoForm = this.fb.nonNullable.group({
@@ -84,7 +84,7 @@ export class VehicleFormComponent implements OnInit {
       reader.readAsDataURL(file);
       reader.onload = (e) => {
         const result = e.target?.result;
-        if (typeof result !== 'string') return reject('Error al leer archivo');
+        if (typeof result !== 'string') return reject(new Error('Error al leer archivo'));
 
         const img = new Image();
         img.src = result;
@@ -98,24 +98,22 @@ export class VehicleFormComponent implements OnInit {
               height *= maxWidth / width;
               width = maxWidth;
             }
-          } else {
-            if (height > maxHeight) {
-              width *= maxHeight / height;
-              height = maxHeight;
-            }
+          } else if (height > maxHeight) {
+            width *= maxHeight / height;
+            height = maxHeight;
           }
 
           canvas.width = width;
           canvas.height = height;
           const ctx = canvas.getContext('2d');
-          if (!ctx) return reject('No se pudo obtener el contexto 2D');
+          if (!ctx) return reject(new Error('No se pudo obtener el contexto 2D'));
 
           ctx.drawImage(img, 0, 0, width, height);
           resolve(canvas.toDataURL('image/webp', quality));
         };
-        img.onerror = (err) => reject(err);
+        img.onerror = (err) => reject(new Error('No se pudo procesar la imagen'));
       };
-      reader.onerror = (err) => reject(err);
+      reader.onerror = (err) => reject(new Error('No se pudo leer la imagen'));
     });
   }
 

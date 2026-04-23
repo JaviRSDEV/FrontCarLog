@@ -1,13 +1,14 @@
-import { Component, signal } from '@angular/core';
+(window as any).global = window;
+
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Login } from './pages/login/login'
 
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.css',
 })
 export class App {
-  title = 'frontend_carlog'
+  title = 'frontend_carlog';
 }
