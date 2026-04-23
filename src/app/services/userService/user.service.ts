@@ -9,9 +9,9 @@ import { environment } from '../../../environments/environment.development';
   providedIn: 'root',
 })
 export class UserService {
-  private http = inject(HttpClient);
+  private readonly http = inject(HttpClient);
 
-  private apiUrl = `${environment.apiUrl}/users`;
+  private readonly apiUrl = `${environment.apiUrl}/users`;
 
   getUserByDni(): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/me`);
@@ -35,11 +35,11 @@ export class UserService {
   }
 
   acceptInvitation(dni: string): Observable<User> {
-    return this.http.patch<User>(`${this.apiUrl}/${dni}/accept`, {});
+    return this.http.patch<User>(`${this.apiUrl}/accept`, {});
   }
 
   rejectInvitation(dni: string): Observable<User> {
-    return this.http.patch<User>(`${this.apiUrl}/${dni}/reject`, {});
+    return this.http.patch<User>(`${this.apiUrl}/reject`, {});
   }
 
   fireEmployee(dni: string): Observable<void> {
