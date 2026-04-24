@@ -22,9 +22,15 @@
     <form [formGroup]="workOrderForm" (ngSubmit)="onSubmit()">
       <div class="row g-3">
         <div class="col-md-4">
-          <label class="form-label fw-bold text-info"> Matrícula del Vehículo </label>
+          <label for="plateSelect" class="form-label fw-bold text-info">
+            Matrícula del Vehículo
+          </label>
 
-          <select class="form-select text-uppercase" formControlName="vehiclePlate">
+          <select
+            id="plateSelect"
+            class="form-select text-uppercase"
+            formControlName="vehiclePlate"
+          >
             <option value="" disabled selected>Selecciona un vehículo...</option>
             @for (vehiculo of vehiculosFlota(); track vehiculo.plate) {
               <option [value]="vehiculo.plate">
@@ -43,8 +49,9 @@
         </div>
 
         <div class="col-md-8">
-          <label class="form-label fw-bold text-info">Descripción</label>
+          <label for="descriptionInput" class="form-label fw-bold text-info">Descripción</label>
           <textarea
+            for="descriptionInput"
             class="form-control"
             formControlName="description"
             rows="3"

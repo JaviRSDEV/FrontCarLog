@@ -1,5 +1,16 @@
-<div class="modal-overlay" (click)="onCerrar()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
+<div
+  class="modal-overlay"
+  role="button"
+  aria-label="Cerrar modal"
+  tabindex="0"
+  (click)="onCerrar()"
+  (keydown.escape)="onCerrar()"
+>
+  <div
+    class="modal-content"
+    (click)="$event.stopPropagation()"
+    (keydown.enter)="$event.stopPropagation()"
+  >
     <button class="btn-close-modal" (click)="onCerrar()">
       <i class="bi bi-x-lg"></i>
     </button>

@@ -120,8 +120,11 @@
 
             <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
               <div class="text-start mb-3">
-                <label class="fw-bold mb-1" style="color: #0066ff">Correo electrónico</label>
+                <label for="emailInput" class="fw-bold mb-1" style="color: #0066ff"
+                  >Correo electrónico</label
+                >
                 <input
+                  id="emailInput"
                   type="email"
                   class="form-control form-control-lg rounded-4"
                   formControlName="email"
@@ -138,8 +141,11 @@
               </div>
 
               <div class="text-start mb-4">
-                <label class="fw-bold mb-1" style="color: #0066ff">Contraseña</label>
+                <label for="psswdInput" class="fw-bold mb-1" style="color: #0066ff"
+                  >Contraseña</label
+                >
                 <input
+                  id="psswdInput"
                   type="password"
                   class="form-control form-control-lg rounded-4"
                   formControlName="password"
@@ -355,6 +361,7 @@
     <div
       class="modal-backdrop fade show backdrop-animado"
       (click)="closeLogin(); closeRegister()"
+      (keydown.escape)="closeLogin(); closeRegister()"
     ></div>
   }
 </div>

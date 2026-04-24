@@ -15,7 +15,6 @@
 }
 
 #pie_pagina {
-  background-color: rgba(0, 174, 239, 0.85);
   backdrop-filter: blur(5px);
   padding-top: 1rem !important;
   padding-bottom: 1rem !important;

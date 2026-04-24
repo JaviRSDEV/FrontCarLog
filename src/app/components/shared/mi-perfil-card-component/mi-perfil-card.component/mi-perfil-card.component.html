@@ -33,8 +33,9 @@
       @if (editedUser(); as formUser) {
         <div class="text-start border-top border-secondary pt-3">
           <div class="mb-3">
-            <label class="form-label text-primary fw-bold mb-1">Nombre:</label>
+            <label for="nameInput" class="form-label text-primary fw-bold mb-1">Nombre:</label>
             <input
+              id="nameInput"
               type="text"
               class="form-control bg-dark text-white border-secondary"
               [(ngModel)]="formUser.name"
@@ -42,8 +43,9 @@
           </div>
 
           <div class="mb-3">
-            <label class="form-label text-primary fw-bold mb-1">Email:</label>
+            <label for="emailInput" class="form-label text-primary fw-bold mb-1">Email:</label>
             <input
+              id="emailInput"
               type="email"
               class="form-control bg-dark text-white border-secondary"
               [(ngModel)]="formUser.email"
@@ -51,8 +53,9 @@
           </div>
 
           <div class="mb-4">
-            <label class="form-label text-primary fw-bold mb-1">Teléfono:</label>
+            <label for="phoneInput" class="form-label text-primary fw-bold mb-1">Teléfono:</label>
             <input
+              id="phoneInput"
               type="text"
               class="form-control bg-dark text-white border-secondary"
               [(ngModel)]="formUser.phone"

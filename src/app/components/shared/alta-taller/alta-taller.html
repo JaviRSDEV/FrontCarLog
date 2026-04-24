@@ -9,8 +9,9 @@
 
     <form [formGroup]="tallerForm" (ngSubmit)="onSubmit()">
       <div class="mb-3 text-start">
-        <label class="fw-bold mb-1 text-secondary">Nombre del taller</label>
+        <label for="workshopNameInput" class="fw-bold mb-1 text-secondary">Nombre del taller</label>
         <input
+          id="workshopNameInput"
           type="text"
           class="form-control form-control-lg rounded-4"
           formControlName="workshopName"
@@ -22,8 +23,11 @@
       </div>
 
       <div class="mb-3 text-start">
-        <label class="fw-bold mb-1 text-secondary">Correo electrónico del taller</label>
+        <label for="workshopEmailInput" class="fw-bold mb-1 text-secondary"
+          >Correo electrónico del taller</label
+        >
         <input
+          id="workshopEmailInput"
           type="email"
           class="form-control form-control-lg rounded-4"
           formControlName="workshopEmail"
@@ -36,8 +40,9 @@
 
       <div class="row">
         <div class="col-md-6 mb-3 text-start">
-          <label class="fw-bold mb-1 text-secondary">Dirección</label>
+          <label for="workshopAddressInput" class="fw-bold mb-1 text-secondary">Dirección</label>
           <input
+            id="workshopAddressInput"
             type="text"
             class="form-control form-control-lg rounded-4"
             formControlName="address"
@@ -49,8 +54,9 @@
         </div>
 
         <div class="col-md-6 mb-3 text-start">
-          <label class="fw-bold mb-1 text-secondary">Teléfono</label>
+          <label for="workshopPhoneInput" class="fw-bold mb-1 text-secondary">Teléfono</label>
           <input
+            id="workshopPhoneInput"
             type="text"
             class="form-control form-control-lg rounded-4"
             formControlName="workshopPhone"
@@ -65,8 +71,11 @@
       </div>
 
       <div class="mb-4 text-start">
-        <label class="fw-bold mb-1 text-secondary">Logo o Imagen del taller</label>
+        <label for="workshopIconInput" class="fw-bold mb-1 text-secondary"
+          >Logo o Imagen del taller</label
+        >
         <input
+          id="workshopIconInput"
           type="file"
           class="form-control rounded-4"
           accept="image/*"
@@ -76,6 +85,7 @@
         @if (imagenTemporal()) {
           <div class="mt-3 position-relative d-inline-block animate-fade-in">
             <img
+              alt="previewImg"
               [src]="imagenTemporal()"
               class="rounded shadow-sm border"
               style="width: 120px; height: 120px; object-fit: cover"
