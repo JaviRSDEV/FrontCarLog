@@ -11,6 +11,15 @@ CarLog es una aplicación web que digitaliza el ciclo de vida completo del mante
 
 ---
 
+## Estado del proyecto
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=JaviRSDEV_FrontCarLog&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=JaviRSDEV_FrontCarLog)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=JaviRSDEV_FrontCarLog&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=JaviRSDEV_FrontCarLog)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=JaviRSDEV_FrontCarLog&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=JaviRSDEV_FrontCarLog)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=JaviRSDEV_FrontCarLog&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=JaviRSDEV_FrontCarLog)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=JaviRSDEV_FrontCarLog&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=JaviRSDEV_FrontCarLog)
+
+---
+
 ## Índice
 
 - [Tech Stack](#tech-stack)
