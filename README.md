@@ -41,7 +41,7 @@ CarLog es una aplicación web que digitaliza el ciclo de vida completo del mante
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Testing](#testing)
 - [Conexión con el Backend](#conexión-con-el-backend)
-- [Documentación técnica](#technical-documentation)
+- [Documentación técnica](#documentacion-tecnica)
 - [Licencia](#licencia)
 
 ---
