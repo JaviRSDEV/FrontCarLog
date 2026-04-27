@@ -186,7 +186,7 @@ export class VisualizarTallerComponent implements OnInit {
     const imgTemp = this.imagenTemporal();
     if (imgTemp?.startsWith('data:image')) {
       const blob = await (await fetch(imgTemp)).blob();
-      const fileName = `${payload.workshopName.replaceAlll(/\s+/g, '_')}_icon.webp`;
+      const fileName = `${payload.workshopName.replaceAll(/\s+/g, '_')}_icon.webp`;
       formData.append('file', blob, fileName);
     } else if (imgTemp === null) {
       formData.append('deleteIcon', 'true');
