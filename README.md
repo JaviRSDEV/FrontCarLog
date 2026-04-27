@@ -938,9 +938,3 @@ En desarrollo, `angular.json` reemplaza automáticamente `environment.ts` por `e
 ## Licencia
 
 Este proyecto es de uso académico/privado. Consulta con el autor para cualquier uso externo.
-
----
-
-> **Generado a partir del análisis completo del código fuente.**  
-> Stack: Angular 21 · TypeScript 5.9 · Bootstrap 5.3 · Tailwind CSS 4.1 · Vitest 4.0 · RxStomp 1.2 · SweetAlert2 11
-```
