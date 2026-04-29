@@ -271,4 +271,66 @@ export class WorkOrderDetailComponent implements OnInit {
       }
     });
   }
+
+  notificarRecogida() {
+    const currentOrder = this.orden();
+    if (!currentOrder) return;
+
+    Swal.fire({
+      title: '¿Notificar al cliente?',
+      text: 'Se enviará un correo avisando de que el vehículo está listo para recoger.',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#0d6efd',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: '<i class="bi bi-envelope-paper-fill"></i> Sí, enviar aviso',
+      cancelButtonText: 'Cancelar',
+      background: '#212529',
+      color: '#fff',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.workOrderService.notifyReadyForPickup(currentOrder.id).subscribe({
+          next: () => {
+            Swal.fire({
+              title: '¡Aviso Enviado!',
+              text: 'El cliente ha sido notificado correctamente.',
+              icon: 'success',
+              background: '#212529',
+              color: '#fff',
+              timer: 2000,
+              showConfirmButton: false,
+            });
+          },
+          error: (err: HttpErrorResponse) => {
+            console.error('Error al notificar:', err);
+            Swal.fire({
+              title: 'Error',
+              text: err.error?.message || 'No se pudo enviar el correo al cliente.',
+              icon: 'error',
+              background: '#212529',
+              color: '#fff',
+              confirmButtonColor: '#0d6efd',
+            });
+          },
+        });
+      }
+    });
+  }
+
+  onDownloadInvoice(orderId: number) {
+    this.workOrderService.downloadInvoice(orderId).subscribe({
+      next: (blob: Blob) => {
+        const url = globalThis.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `factura-carlog-${orderId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+
+        globalThis.URL.revokeObjectURL(url);
+        a.remove();
+      },
+      error: (err) => console.error(err),
+    });
+  }
 }

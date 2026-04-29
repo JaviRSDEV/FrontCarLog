@@ -59,4 +59,14 @@ export class WorkOrderService {
     const params = new HttpParams().set('newMechanicId', newMechanicId);
     return this.http.patch<Workorder>(`${this.apiUrl}/${orderId}/reassign`, {}, { params });
   }
+
+  notifyReadyForPickup(orderId: number): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/${orderId}/notify-pickup`, {});
+  }
+
+  downloadInvoice(id: number) {
+    return this.http.get(`${this.apiUrl}/${id}/invoice`, {
+      responseType: 'blob',
+    });
+  }
 }

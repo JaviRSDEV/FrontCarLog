@@ -43,7 +43,21 @@
               <i class="bi bi-unlock-fill me-1"></i> Reabrir Orden
             </button>
 
-            <span class="text-light fw-bold">
+            <button
+              class="btn btn-info btn-sm px-3 text-dark fw-bold"
+              (click)="notificarRecogida()"
+            >
+              <i class="bi bi-envelope-check-fill me-1"></i> Notificar Recogida
+            </button>
+
+            <button
+              class="btn btn-light btn-sm px-3 text-dark fw-bold"
+              (click)="onDownloadInvoice(orden()!.id)"
+            >
+              <i class="bi bi-file-earmark-pdf-fill me-1 text-danger"></i> Descargar Factura
+            </button>
+
+            <span class="text-light fw-bold ms-2">
               <i class="bi bi-lock-fill me-1 text-success"></i> Orden Finalizada
             </span>
           </div>
