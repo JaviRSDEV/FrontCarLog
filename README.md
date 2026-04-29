@@ -41,6 +41,7 @@ CarLog es una aplicación web que digitaliza el ciclo de vida completo del mante
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Testing](#testing)
 - [Conexión con el Backend](#conexión-con-el-backend)
+- [Documentación técnica](#documentación-técnica)
 - [Licencia](#licencia)
 
 ---
@@ -934,7 +935,12 @@ En desarrollo, `angular.json` reemplaza automáticamente `environment.ts` por `e
 ```
 
 ---
+## Documentación técnica
 
+* [Documentación técnica (Versión en español)](docs/CARLOG_DOCUMENTATION_ESP.pdf)
+* [Technical Documentation (English Version)](docs/CARLOG_DOCUMENTATION_ENG.pdf)
+
+---
 ## Licencia
 
 Este proyecto es de uso académico/privado. Consulta con el autor para cualquier uso externo.
